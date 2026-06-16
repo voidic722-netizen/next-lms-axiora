@@ -9,20 +9,24 @@ const api = axios.create({
   },
 })
 
-// ── Request interceptor ─────────────────────────────────────────────────────
-// Axios automatically reads the XSRF-TOKEN cookie and sends it as
-// X-XSRF-TOKEN on every mutating request — no manual handling needed.
 api.interceptors.request.use((config) => {
+  const { useAuthStore } = require('@/stores/auth-store')
+  const token = useAuthStore.getState().token
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`
+  }
   return config
 })
 
-// ── Response interceptor ────────────────────────────────────────────────────
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+      response.data = response.data.data
+    }
+    return response
+  },
   (error) => {
     if (error.response?.status === 401) {
-      // Clear the Zustand auth store and redirect to login.
-      // Dynamic import avoids a circular dependency (store → axios → store).
       import('@/stores/auth-store').then(({ useAuthStore }) => {
         useAuthStore.getState().clearUser()
       })

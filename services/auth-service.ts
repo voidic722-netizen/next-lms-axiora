@@ -1,27 +1,25 @@
 import api from '@/lib/axios'
 import type { User } from '@/types/user'
 
-// ── Internal backend response shapes ──────────────────────────────────────
 interface RawUser {
   id: number
   name: string
   email: string
-  role: string
+  role: number
   image: string | null
   position: string | null
   nidn: string | null
   nim: string | null
-  createdAt: string
-  updatedAt: string
-  deletedAt: string | null
-  fakultas_id: number | null
-  jurusan_id: number | null
-  kelas_id: number | null
-  mata_pelajaran_id: number | null
-  jurusan?: { id: number; name: string } | null
-  fakultas?: { id: number; name: string } | null
-  kelas?: { id: number; name: string } | null
-  mata_pelajaran?: { id: number; name: string } | null
+  created_at: string
+  updated_at: string
+  faculty_id: number | null
+  department_id: number | null
+  classroom_id: number | null
+  subject_id: number | null
+  faculty?: { id: number; name: string } | null
+  department?: { id: number; name: string } | null
+  classroom?: { id: number; name: string } | null
+  subject?: { id: number; name: string } | null
 }
 
 function mapUser(raw: RawUser): User {
@@ -29,34 +27,34 @@ function mapUser(raw: RawUser): User {
     id: raw.id,
     name: raw.name,
     email: raw.email,
-    role: raw.role as User['role'],
+    role: String(raw.role) as User['role'],
     image: raw.image,
     position: raw.position as User['position'],
     nidn: raw.nidn,
     nim: raw.nim,
-    createdAt: raw.createdAt,
-    updatedAt: raw.updatedAt,
-    deletedAt: raw.deletedAt,
-    facultyId: raw.fakultas_id,
-    departmentId: raw.jurusan_id,
-    classroomId: raw.kelas_id,
-    subjectId: raw.mata_pelajaran_id,
-    faculty: raw.fakultas ?? null,
-    department: raw.jurusan ?? null,
-    classroom: raw.kelas ?? null,
-    subject: raw.mata_pelajaran ?? null,
+    createdAt: raw.created_at,
+    updatedAt: raw.updated_at,
+    deletedAt: null,
+    facultyId: raw.faculty_id,
+    departmentId: raw.department_id,
+    classroomId: raw.classroom_id,
+    subjectId: raw.subject_id,
+    faculty: raw.faculty ?? null,
+    department: raw.department ?? null,
+    classroom: raw.classroom ?? null,
+    subject: raw.subject ?? null,
   }
 }
 
-export async function loginService(email: string, password: string): Promise<User> {
-  const { data } = await api.post<{ user: RawUser }>('/auth/login', { email, password })
-  return mapUser(data.user)
+export async function loginService(email: string, password: string): Promise<{ user: User; token: string }> {
+  const { data } = await api.post<{ user: RawUser; token: string }>('/auth/login', { email, password })
+  return { user: mapUser(data.user), token: data.token }
 }
 
 export async function getMeService(): Promise<User | null> {
   try {
-    const { data } = await api.get<{ user: RawUser }>('/auth/me')
-    return mapUser(data.user)
+    const { data } = await api.get<RawUser>('/auth/me')
+    return mapUser(data)
   } catch {
     return null
   }
@@ -66,9 +64,6 @@ export async function logoutService(): Promise<void> {
   await api.post('/auth/logout')
 }
 
-export async function updateProfileService(payload: {
-  name: string
-  email: string
-}): Promise<void> {
+export async function updateProfileService(payload: { name: string; email: string }): Promise<void> {
   await api.patch('/auth/profile', payload)
 }
