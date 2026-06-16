@@ -10,7 +10,7 @@ export default function NotFound() {
         Halaman yang Anda cari tidak tersedia atau telah dipindahkan.
       </p>
       <Button asChild>
-        <Link href="/">Kembali ke Beranda</Link>
+        <Link href="/dashboard">Kembali ke Beranda</Link>
       </Button>
     </div>
   )

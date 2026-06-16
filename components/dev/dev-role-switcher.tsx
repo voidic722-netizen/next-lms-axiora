@@ -25,11 +25,6 @@ const ROLE_ROUTES: Record<DevRole, string> = {
   student: '/',
 }
 
-/**
- * Widget floating untuk switch role saat development.
- * Hanya muncul jika NEXT_PUBLIC_MSW=true dan NODE_ENV=development.
- * Tidak pernah tampil di production.
- */
 export function DevRoleSwitcher() {
   const [open, setOpen] = useState(false)
   const router = useRouter()
@@ -49,7 +44,6 @@ export function DevRoleSwitcher() {
     const user = DEV_USERS[role]
     setLoading(false)
     setUser(user)
-    // Simpan ke cookie agar MSW /auth/me dan protected layout return user yang tepat
     document.cookie = `dev_role=${role}; path=/`
     router.push(ROLE_ROUTES[role])
     setOpen(false)
@@ -58,8 +52,8 @@ export function DevRoleSwitcher() {
   return (
     <div className="fixed bottom-20 right-4 z-[9999] md:bottom-4">
       {open && (
-        <div className="mb-2 bg-background border rounded-lg shadow-xl p-3 space-y-1.5 w-44">
-          <p className="text-xs font-semibold text-muted-foreground px-1 pb-1 border-b">
+        <div className="mb-2 bg-white border border-[#E2E8F0] rounded-lg shadow-xl p-3 space-y-1.5 w-44">
+          <p className="text-xs font-semibold text-[#64748B] px-1 pb-1 border-b border-[#E2E8F0]">
             🛠 Dev: Pilih Role
           </p>
           {(['admin', 'teacher', 'student'] as DevRole[]).map((role) => (
@@ -75,7 +69,7 @@ export function DevRoleSwitcher() {
               {currentRole === role ? '✓ ' : ''}{ROLE_LABELS[role]}
             </button>
           ))}
-          <p className="text-[10px] text-muted-foreground text-center pt-1">
+          <p className="text-[10px] text-[#64748B] text-center pt-1">
             Mock data aktif · MSW
           </p>
         </div>

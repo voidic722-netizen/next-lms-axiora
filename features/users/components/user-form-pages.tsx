@@ -14,7 +14,6 @@ import { createUserSchema, updateUserSchema } from '../schemas/user-schema'
 import type { CreateUserFormValues, UpdateUserFormValues } from '../schemas/user-schema'
 import type { CreateUserPayload, UpdateUserPayload } from '@/types/user'
 
-// ── Add User ─────────────────────────────────────────────────────────────────
 export function AddUserPage() {
   const router = useRouter()
   const mutation = useCreateUser()
@@ -49,7 +48,7 @@ export function AddUserPage() {
     router.push('/users')
   }
 
-  if (refData.isLoading) return <Skeleton className="h-[500px] max-w-2xl rounded-lg" />
+  if (refData.isLoading) return <Skeleton className="h-[500px] max-w-2xl rounded-lg bg-[#E2E8F0]" />
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -79,7 +78,6 @@ export function AddUserPage() {
   )
 }
 
-// ── Edit User ────────────────────────────────────────────────────────────────
 export function EditUserPage({ id }: { id: string }) {
   const router = useRouter()
   const numericId = parseInt(id, 10)
@@ -137,7 +135,7 @@ export function EditUserPage({ id }: { id: string }) {
     router.push('/users')
   }
 
-  if (usersLoading || refData.isLoading) return <Skeleton className="h-[500px] max-w-2xl rounded-lg" />
+  if (usersLoading || refData.isLoading) return <Skeleton className="h-[500px] max-w-2xl rounded-lg bg-[#E2E8F0]" />
 
   return (
     <div className="space-y-6 max-w-2xl">

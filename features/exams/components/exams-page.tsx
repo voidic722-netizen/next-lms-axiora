@@ -43,7 +43,7 @@ export function ExamsPage() {
     return user?.classroomId != null && e.classroomIds.map(Number).includes(user.classroomId)
   })
 
-  if (isLoading) return <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-lg" />)}</div>
+  if (isLoading) return <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-lg bg-[#E2E8F0]" />)}</div>
 
   return (
     <div className="space-y-6">
@@ -56,8 +56,8 @@ export function ExamsPage() {
       />
       {visible.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 gap-3">
-          <GraduationCap className="h-12 w-12 text-muted-foreground/40" />
-          <p className="text-muted-foreground">Belum ada ujian</p>
+          <GraduationCap className="h-12 w-12 text-[#64748B]/40" />
+          <p className="text-[#64748B]">Belum ada ujian</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -71,10 +71,10 @@ export function ExamsPage() {
 
       {/* Dialog konfirmasi mulai ujian */}
       {isStartDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-background rounded-lg p-6 max-w-sm w-full space-y-4 shadow-lg">
-            <h2 className="text-lg font-semibold">Mulai Ujian?</h2>
-            <p className="text-sm text-muted-foreground">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 max-w-sm w-full space-y-4 shadow-xl">
+            <h2 className="text-lg font-semibold text-[#0F172A]">Mulai Ujian?</h2>
+            <p className="text-sm text-[#64748B]">
               Pastikan koneksi internet stabil. Ujian akan dimulai dalam mode layar penuh.
               Berpindah tab dihitung sebagai pelanggaran.
             </p>
@@ -88,12 +88,12 @@ export function ExamsPage() {
 
       {/* Dialog ujian belum tersedia */}
       {isNotAvailableOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-background rounded-lg p-6 max-w-sm w-full space-y-4 shadow-lg">
-            <h2 className="text-lg font-semibold">Ujian Belum Dibuka</h2>
-            <p className="text-sm text-muted-foreground">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 max-w-sm w-full space-y-4 shadow-xl">
+            <h2 className="text-lg font-semibold text-[#0F172A]">Ujian Belum Dibuka</h2>
+            <p className="text-sm text-[#64748B]">
               Ujian ini baru bisa diakses mulai{' '}
-              <span className="font-medium text-foreground">{formatDate(notAvailableFrom ?? '')}</span>.
+              <span className="font-medium text-[#0F172A]">{formatDate(notAvailableFrom ?? '')}</span>.
             </p>
             <div className="flex justify-end">
               <Button onClick={() => setIsNotAvailableOpen(false)}>Mengerti</Button>
@@ -114,18 +114,21 @@ function ExamCard({ exam: e, isTeacherOrAdmin, onExamClick, onDelete }: {
   const notYet = isFuture(e.availableDate)
   const expired = !isFuture(e.deadlineDate)
   return (
-    <Card className="cursor-pointer hover:bg-muted/30 transition-colors" onClick={(ev) => onExamClick(ev, e.id, false, e.availableDate)}>
+    <Card
+      className="cursor-pointer border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200"
+      onClick={(ev) => onExamClick(ev, e.id, false, e.availableDate)}
+    >
       <CardContent className="pt-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold truncate">{e.title}</p>
+            <p className="font-semibold text-[#0F172A] truncate">{e.title}</p>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
-              {e.examTypes.map((t) => <Badge key={t} variant="outline" className="text-xs">{t}</Badge>)}
-              <Badge variant={expired ? 'destructive' : notYet ? 'secondary' : 'default'} className="text-xs">
+              {e.examTypes.map((t) => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>)}
+              <Badge className={`text-xs border-0 ${expired ? 'bg-[#EF4444] text-white' : notYet ? 'bg-[#EEF1FF] text-[#4B5CF0]' : 'bg-[#4B5CF0] text-white'}`}>
                 {expired ? 'Berakhir' : notYet ? 'Belum Dimulai' : 'Aktif'}
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground mt-1.5">
+            <p className="text-xs text-[#64748B] mt-1.5">
               {formatDate(e.availableDate)} — {formatDate(e.deadlineDate)} · {e.durationMinutes} menit · {e.questions.length} soal
             </p>
           </div>
@@ -133,7 +136,11 @@ function ExamCard({ exam: e, isTeacherOrAdmin, onExamClick, onDelete }: {
             <div className="flex gap-1 shrink-0" onClick={(ev) => ev.stopPropagation()}>
               <Button asChild variant="ghost" size="sm"><Link href={`/exams/${e.id}/edit`}>Edit</Link></Button>
               <ConfirmDialog
-                trigger={<Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">Hapus</Button>}
+                trigger={
+                  <Button variant="ghost" size="sm" className="text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200">
+                    Hapus
+                  </Button>
+                }
                 title="Hapus Ujian" description={`Yakin menghapus "${e.title}"?`}
                 confirmLabel="Hapus" onConfirm={onDelete}
               />
@@ -150,14 +157,14 @@ export function ExamSubmittedPage({ id }: { id: string }) {
   const { data: submission, isLoading } = useMyExamSubmission(id)
   const { data: exam } = useExamDetail(id)
 
-  if (isLoading) return <Skeleton className="h-64 rounded-lg max-w-md mx-auto" />
+  if (isLoading) return <Skeleton className="h-64 rounded-lg max-w-md mx-auto bg-[#E2E8F0]" />
 
   return (
     <div className="max-w-md mx-auto py-12 space-y-6 text-center">
-      <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto" />
+      <CheckCircle2 className="h-16 w-16 text-[#22C55E] mx-auto" />
       <div>
-        <h1 className="text-2xl font-bold">Ujian Selesai</h1>
-        <p className="text-muted-foreground mt-1">{exam?.title}</p>
+        <h1 className="text-2xl font-bold text-[#0F172A]">Ujian Selesai</h1>
+        <p className="text-[#64748B] mt-1">{exam?.title}</p>
       </div>
       {submission && (
         <div className="grid grid-cols-3 gap-4">
@@ -173,9 +180,9 @@ export function ExamSubmittedPage({ id }: { id: string }) {
 
 function ResultCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className="rounded-lg border bg-card p-3">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`text-xl font-bold mt-0.5 ${highlight ? 'text-primary' : ''}`}>{value}</p>
+    <div className="rounded-lg border border-[#E2E8F0] bg-white p-3 shadow-sm">
+      <p className="text-xs text-[#64748B]">{label}</p>
+      <p className={`text-xl font-bold mt-0.5 ${highlight ? 'text-[#4B5CF0]' : 'text-[#0F172A]'}`}>{value}</p>
     </div>
   )
 }
@@ -196,23 +203,23 @@ export function ExamSubmissionsPage({ id }: { id: string }) {
         columns={[
           { key: 'student', header: 'Mahasiswa', render: (row) => {
             const s = row as unknown as StudentExamSubmissionRecord
-            return <div><p className="font-medium text-sm">{s.studentName}</p><p className="text-xs text-muted-foreground">{s.classroomName}</p></div>
+            return <div><p className="font-medium text-sm text-[#0F172A]">{s.studentName}</p><p className="text-xs text-[#64748B]">{s.classroomName}</p></div>
           }},
           { key: 'status', header: 'Status', render: (row) => {
             const s = row as unknown as StudentExamSubmissionRecord
             return s.isSubmitted
-              ? <Badge>Selesai</Badge>
+              ? <Badge className="bg-[#22C55E] text-white border-0">Selesai</Badge>
               : <Badge variant="secondary">Belum</Badge>
           }},
           { key: 'score', header: 'Nilai', render: (row) => {
             const s = row as unknown as StudentExamSubmissionRecord
-            if (!s.submission) return <span className="text-muted-foreground text-sm">-</span>
-            return <span className="font-semibold">{s.submission.score}</span>
+            if (!s.submission) return <span className="text-[#64748B] text-sm">-</span>
+            return <span className="font-semibold text-[#0F172A]">{s.submission.score}</span>
           }},
           { key: 'correct', header: 'Benar', render: (row) => {
             const s = row as unknown as StudentExamSubmissionRecord
-            if (!s.submission) return <span className="text-muted-foreground text-sm">-</span>
-            return <span className="text-sm">{s.submission.correctCount}/{s.submission.totalQuestions}</span>
+            if (!s.submission) return <span className="text-[#64748B] text-sm">-</span>
+            return <span className="text-sm text-[#0F172A]">{s.submission.correctCount}/{s.submission.totalQuestions}</span>
           }},
         ]}
       />
@@ -258,34 +265,34 @@ function ExamForm({ defaultValues, onSubmit, isPending, submitLabel, onCancel }:
         <div className="space-y-1.5 sm:col-span-2">
           <Label>Judul Ujian</Label>
           <Input placeholder="UTS Semester 1" {...register('title')} />
-          {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
+          {errors.title && <p className="text-xs text-[#EF4444]">{errors.title.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Tanggal Mulai</Label>
           <Input type="datetime-local" {...register('availableDate')} />
-          {errors.availableDate && <p className="text-xs text-destructive">{errors.availableDate.message}</p>}
+          {errors.availableDate && <p className="text-xs text-[#EF4444]">{errors.availableDate.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Tenggat Waktu</Label>
           <Input type="datetime-local" {...register('deadlineDate')} />
-          {errors.deadlineDate && <p className="text-xs text-destructive">{errors.deadlineDate.message}</p>}
+          {errors.deadlineDate && <p className="text-xs text-[#EF4444]">{errors.deadlineDate.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Durasi (menit)</Label>
           <Input type="number" min={1} placeholder="90" {...register('durationMinutes', { valueAsNumber: true })} />
-          {errors.durationMinutes && <p className="text-xs text-destructive">{errors.durationMinutes.message}</p>}
+          {errors.durationMinutes && <p className="text-xs text-[#EF4444]">{errors.durationMinutes.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Kelas</Label>
-          <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto border rounded-md p-2">
+          <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto border border-[#E2E8F0] rounded-md p-2">
             {classrooms.map((c) => (
-              <label key={c.id} className="flex items-center gap-2 text-sm cursor-pointer">
+              <label key={c.id} className="flex items-center gap-2 text-sm text-[#0F172A] cursor-pointer">
                 <Checkbox checked={selectedClassrooms.includes(c.id)} onCheckedChange={() => toggleClassroom(c.id)} />
                 {c.name}
               </label>
             ))}
           </div>
-          {errors.classroomIds && <p className="text-xs text-destructive">{errors.classroomIds.message}</p>}
+          {errors.classroomIds && <p className="text-xs text-[#EF4444]">{errors.classroomIds.message}</p>}
         </div>
       </div>
 
@@ -297,18 +304,18 @@ function ExamForm({ defaultValues, onSubmit, isPending, submitLabel, onCancel }:
             <PlusCircle className="mr-2 h-4 w-4" />Tambah Soal
           </Button>
         </div>
-        {errors.questions && <p className="text-xs text-destructive">{errors.questions.message}</p>}
+        {errors.questions && <p className="text-xs text-[#EF4444]">{errors.questions.message}</p>}
         {fields.map((field, qi) => (
-          <Card key={field.id}>
+          <Card key={field.id} className="border border-[#E2E8F0] bg-white shadow-sm">
             <CardHeader className="pb-2 flex-row items-center justify-between">
-              <CardTitle className="text-sm font-medium">Soal {qi + 1}</CardTitle>
-              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => remove(qi)}>
+              <CardTitle className="text-sm font-medium text-[#0F172A]">Soal {qi + 1}</CardTitle>
+              <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200" onClick={() => remove(qi)}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </CardHeader>
             <CardContent className="space-y-3">
               <Input placeholder="Teks pertanyaan..." {...register(`questions.${qi}.text`)} />
-              {errors.questions?.[qi]?.text && <p className="text-xs text-destructive">{errors.questions[qi]?.text?.message}</p>}
+              {errors.questions?.[qi]?.text && <p className="text-xs text-[#EF4444]">{errors.questions[qi]?.text?.message}</p>}
               <div className="space-y-2">
                 {(field.options ?? []).map((_, oi) => (
                   <div key={oi} className="flex items-center gap-2">
@@ -352,7 +359,7 @@ export function EditExamPage({ id }: { id: string }) {
   const router = useRouter()
   const { data: exam, isLoading } = useExamDetail(id)
   const mutation = useUpdateExam(id)
-  if (isLoading) return <Skeleton className="h-[600px] max-w-3xl rounded-lg" />
+  if (isLoading) return <Skeleton className="h-[600px] max-w-3xl rounded-lg bg-[#E2E8F0]" />
   return (
     <div className="space-y-6 max-w-3xl">
       <PageHeader title="Edit Ujian" />

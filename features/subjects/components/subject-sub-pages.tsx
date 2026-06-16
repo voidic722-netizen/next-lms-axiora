@@ -13,7 +13,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { formatDate } from '@/lib/format-date'
 import { School, LayoutList, GraduationCap } from 'lucide-react'
 
-// ── Kelas ────────────────────────────────────────────────────────────────────
 export function SubjectClassesPage({ id }: { id: string }) {
   const { data: subject } = useSubjectDetail(id)
   const { data: classrooms = [], isLoading } = useClassrooms()
@@ -26,16 +25,17 @@ export function SubjectClassesPage({ id }: { id: string }) {
     <div className="space-y-6">
       <PageHeader title={`Kelas — ${subject?.name ?? '...'}`} description={`${filtered.length} kelas`} />
       {filtered.length === 0
-        ? <EmptyState icon={<School />} text="Belum ada kelas untuk mata pelajaran ini" />
+        ? <EmptyState icon={<School className="h-12 w-12" />} text="Belum ada kelas untuk mata pelajaran ini" />
         : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((c) => (
               <Link key={c.id} href={`/classrooms/${c.id}`}>
-                <Card className="hover:bg-muted/30 transition-colors h-full">
+                <Card className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200 h-full">
                   <CardContent className="pt-4 flex items-center gap-3">
-                    <School className="h-5 w-5 text-muted-foreground shrink-0" />
-                    <div><p className="font-semibold text-sm">{c.name}</p>
-                      <p className="text-xs text-muted-foreground">{c.semester?.name}</p>
+                    <School className="h-5 w-5 text-[#4B5CF0] shrink-0" />
+                    <div>
+                      <p className="font-semibold text-sm text-[#0F172A]">{c.name}</p>
+                      <p className="text-xs text-[#64748B]">{c.semester?.name}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -47,7 +47,6 @@ export function SubjectClassesPage({ id }: { id: string }) {
   )
 }
 
-// ── Ujian ────────────────────────────────────────────────────────────────────
 export function SubjectExamsPage({ id }: { id: string }) {
   const { data: subject } = useSubjectDetail(id)
   const { data: allClassrooms = [] } = useClassrooms()
@@ -66,16 +65,16 @@ export function SubjectExamsPage({ id }: { id: string }) {
     <div className="space-y-6">
       <PageHeader title={`Ujian — ${subject?.name ?? '...'}`} description={`${filtered.length} ujian`} />
       {filtered.length === 0
-        ? <EmptyState icon={<GraduationCap />} text="Belum ada ujian untuk mata pelajaran ini" />
+        ? <EmptyState icon={<GraduationCap className="h-12 w-12" />} text="Belum ada ujian untuk mata pelajaran ini" />
         : (
           <div className="space-y-3">
             {filtered.map((e) => (
               <Link key={e.id} href={`/exams/${e.id}`}>
-                <Card className="hover:bg-muted/30 transition-colors">
+                <Card className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
                   <CardContent className="py-3 px-4 flex items-center justify-between gap-3">
                     <div>
-                      <p className="font-medium text-sm">{e.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
+                      <p className="font-medium text-sm text-[#0F172A]">{e.title}</p>
+                      <p className="text-xs text-[#64748B] mt-0.5">
                         {e.durationMinutes} menit · {e.questions.length} soal
                       </p>
                     </div>
@@ -92,7 +91,6 @@ export function SubjectExamsPage({ id }: { id: string }) {
   )
 }
 
-// ── Tugas ─────────────────────────────────────────────────────────────────────
 export function SubjectAssignmentsPage({ id }: { id: string }) {
   const { data: subject } = useSubjectDetail(id)
   const { data: assignments = [], isLoading } = useAssignments()
@@ -105,16 +103,16 @@ export function SubjectAssignmentsPage({ id }: { id: string }) {
     <div className="space-y-6">
       <PageHeader title={`Tugas — ${subject?.name ?? '...'}`} description={`${filtered.length} tugas`} />
       {filtered.length === 0
-        ? <EmptyState icon={<LayoutList />} text="Belum ada tugas untuk mata pelajaran ini" />
+        ? <EmptyState icon={<LayoutList className="h-12 w-12" />} text="Belum ada tugas untuk mata pelajaran ini" />
         : (
           <div className="space-y-3">
             {filtered.map((a) => (
               <Link key={a.id} href={`/assignments/${a.id}`}>
-                <Card className="hover:bg-muted/30 transition-colors">
+                <Card className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
                   <CardContent className="py-3 px-4 flex items-center justify-between gap-3">
                     <div>
-                      <p className="font-medium text-sm">{a.title}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{a.description}</p>
+                      <p className="font-medium text-sm text-[#0F172A]">{a.title}</p>
+                      <p className="text-xs text-[#64748B] line-clamp-1 mt-0.5">{a.description}</p>
                     </div>
                     <Badge variant="secondary" className="text-xs shrink-0">
                       {formatDate(a.dueDate)}
@@ -131,8 +129,8 @@ export function SubjectAssignmentsPage({ id }: { id: string }) {
 
 function EmptyState({ icon, text }: { icon: React.ReactNode; text: string }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
-      <span className="h-12 w-12 opacity-40">{icon}</span>
+    <div className="flex flex-col items-center justify-center py-16 gap-3 text-[#64748B]">
+      <span className="opacity-40">{icon}</span>
       <p className="text-sm">{text}</p>
     </div>
   )
@@ -141,9 +139,9 @@ function EmptyState({ icon, text }: { icon: React.ReactNode; text: string }) {
 function PageSkeleton() {
   return (
     <div className="space-y-6">
-      <Skeleton className="h-8 w-64" />
+      <Skeleton className="h-8 w-64 bg-[#E2E8F0]" />
       <div className="space-y-3">
-        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
+        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg bg-[#E2E8F0]" />)}
       </div>
     </div>
   )

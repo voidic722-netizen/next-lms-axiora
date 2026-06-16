@@ -53,16 +53,16 @@ export function ProfilePage() {
               <AvatarFallback className="text-xl">{user.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-lg font-semibold">{user.name}</h2>
+              <h2 className="text-lg font-semibold text-[#0F172A]">{user.name}</h2>
               <Badge variant="secondary" className="mt-1">{USER_ROLE_LABEL[user.role]}</Badge>
             </div>
           </div>
 
-          <div className="space-y-3 border-t pt-4">
+          <div className="space-y-3 border-t border-[#E2E8F0] pt-4">
             {fields.map((f) => (
               <div key={f.label} className="grid grid-cols-5 gap-2 text-sm">
-                <span className="text-muted-foreground col-span-2">{f.label}</span>
-                <span className="font-medium col-span-3">{f.value}</span>
+                <span className="text-[#64748B] col-span-2">{f.label}</span>
+                <span className="font-medium text-[#0F172A] col-span-3">{f.value}</span>
               </div>
             ))}
           </div>
@@ -117,12 +117,12 @@ export function EditProfilePage() {
             <div className="space-y-1.5">
               <Label htmlFor="p-name">Nama</Label>
               <Input id="p-name" {...register('name')} />
-              {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+              {errors.name && <p className="text-xs text-[#EF4444]">{errors.name.message}</p>}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="p-email">Email</Label>
               <Input id="p-email" type="email" {...register('email')} />
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+              {errors.email && <p className="text-xs text-[#EF4444]">{errors.email.message}</p>}
             </div>
             <div className="flex gap-3 pt-2">
               <Button type="submit" disabled={mutation.isPending}>

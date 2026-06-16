@@ -3,12 +3,10 @@
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { School, Users, BookOpen, GraduationCap } from 'lucide-react'
+import { School, Users, BookOpen, GraduationCap, FolderOpen } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatDate, isPast } from '@/lib/format-date'
 import { sortByNearestDateAsc } from '@/utils/sort'
@@ -57,7 +55,6 @@ export function TeacherDashboard() {
     refetchOnWindowFocus: true,
   })
 
-  // Filter kelas berdasarkan mata pelajaran pengajar (subjectId)
   const myClassrooms = useMemo(() =>
     user?.subjectId
       ? classrooms.filter((c) => c.subjectId === user.subjectId)
@@ -70,13 +67,11 @@ export function TeacherDashboard() {
     [myClassrooms],
   )
 
-  // Mahasiswa yang berada di kelas pengajar
   const myStudents = useMemo(() =>
     allStudents.filter((s) => s.classroomId != null && myClassroomIds.has(s.classroomId)),
     [allStudents, myClassroomIds],
   )
 
-  // Tugas yang ditujukan ke kelas pengajar
   const myAssignments = useMemo(() =>
     sortByNearestDateAsc(
       allAssignments.filter((a) =>
@@ -87,7 +82,6 @@ export function TeacherDashboard() {
     [allAssignments, myClassroomIds],
   )
 
-  // Ujian yang ditujukan ke kelas pengajar
   const myExams = useMemo(() =>
     sortByNearestDateAsc(
       allExams.filter((e) =>
@@ -103,148 +97,110 @@ export function TeacherDashboard() {
   if (isLoading) return <DashboardSkeleton />
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8 bg-[#F8FAFC] min-h-screen">
       <div>
-        <h1 className="text-xl font-semibold">Selamat datang, {user?.name?.split(' ')[0]} 👋</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
+        <h1 className="text-2xl font-semibold text-[#0F172A]">
+          Selamat datang, {user?.name?.split(' ')[0]} 👋
+        </h1>
+        <p className="text-sm text-[#64748B] mt-1">
           {user?.subject?.name ?? 'Pengajar'} · {user?.position ?? ''}
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard icon={<School className="h-5 w-5 text-blue-500" />}
-          label="Kelas Saya" value={myClassrooms.length} />
-        <StatCard icon={<Users className="h-5 w-5 text-green-500" />}
-          label="Mahasiswa" value={myStudents.length} />
-        <StatCard icon={<BookOpen className="h-5 w-5 text-orange-500" />}
-          label="Tugas Aktif" value={myAssignments.filter((a) => !isPast(a.dueDate)).length} />
-        <StatCard icon={<GraduationCap className="h-5 w-5 text-purple-500" />}
-          label="Ujian Aktif" value={myExams.filter((e) => !isPast(e.deadlineDate)).length} />
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <StatCard
+          icon={<School className="h-5 w-5 text-[#4B5CF0]" />}
+          label="Kelas Saya"
+          value={myClassrooms.length}
+        />
+        <StatCard
+          icon={<Users className="h-5 w-5 text-[#22C55E]" />}
+          label="Mahasiswa"
+          value={myStudents.length}
+        />
+        <StatCard
+          icon={<BookOpen className="h-5 w-5 text-[#F59E0B]" />}
+          label="Tugas Aktif"
+          value={myAssignments.filter((a) => !isPast(a.dueDate)).length}
+        />
+        <StatCard
+          icon={<GraduationCap className="h-5 w-5 text-[#4B5CF0]" />}
+          label="Ujian Aktif"
+          value={myExams.filter((e) => !isPast(e.deadlineDate)).length}
+        />
       </div>
 
-      <Tabs defaultValue="classrooms">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="classrooms">Kelas ({myClassrooms.length})</TabsTrigger>
-          <TabsTrigger value="students">Mahasiswa ({myStudents.length})</TabsTrigger>
-          <TabsTrigger value="assignments">Tugas ({myAssignments.length})</TabsTrigger>
-          <TabsTrigger value="exams">Ujian ({myExams.length})</TabsTrigger>
-        </TabsList>
+      <div>
+        <div className="flex items-center gap-2 border-b border-[#E2E8F0] pb-2 mb-4">
+          <button className="text-sm font-medium text-[#4B5CF0] border-b-2 border-[#4B5CF0] pb-2">
+            Kelas ({myClassrooms.length})
+          </button>
+          <button className="text-sm font-medium text-[#64748B] pb-2">
+            Mahasiswa ({myStudents.length})
+          </button>
+          <button className="text-sm font-medium text-[#64748B] pb-2">
+            Tugas ({myAssignments.length})
+          </button>
+          <button className="text-sm font-medium text-[#64748B] pb-2">
+            Ujian ({myExams.length})
+          </button>
+        </div>
 
-        {/* Kelas */}
-        <TabsContent value="classrooms" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {myClassrooms.length === 0
-            ? <p className="col-span-full text-center text-sm text-muted-foreground py-8">Tidak ada kelas</p>
-            : myClassrooms.map((c) => (
-                <Link key={c.id} href={`/classrooms/${c.id}`}>
-                  <Card className="hover:bg-muted/30 transition-colors h-full">
-                    <CardContent className="pt-4">
-                      <p className="font-semibold">{c.name}</p>
-                      <p className="text-sm text-muted-foreground mt-0.5">{c.subject?.name}</p>
-                      <Badge variant="secondary" className="mt-2 text-xs">{c.semester?.name}</Badge>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-        </TabsContent>
-
-        {/* Mahasiswa */}
-        <TabsContent value="students" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {myStudents.length === 0
-            ? <p className="col-span-full text-center text-sm text-muted-foreground py-8">Tidak ada mahasiswa</p>
-            : myStudents.map((s) => (
-                <Card key={s.id}>
-                  <CardContent className="pt-4 flex items-center gap-3">
-                    <Avatar className="h-9 w-9">
-                      <AvatarFallback className="text-sm">{s.name.charAt(0).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="font-medium text-sm truncate">{s.name}</p>
-                      <p className="text-xs text-muted-foreground">{s.nim ?? s.email}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-        </TabsContent>
-
-        {/* Tugas */}
-        <TabsContent value="assignments" className="mt-4 space-y-3">
-          {myAssignments.length === 0
-            ? <p className="text-center text-sm text-muted-foreground py-8">Tidak ada tugas</p>
-            : myAssignments.map((a) => (
-                <Link key={a.id} href={`/assignments/${a.id}`}>
-                  <Card className="hover:bg-muted/30 transition-colors">
-                    <CardContent className="py-3 px-4 flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-medium text-sm truncate">{a.title}</p>
-                        <div className="flex gap-1.5 mt-1 flex-wrap">
-                          {a.types.map((t) => (
-                            <Badge key={t} variant="outline" className="text-xs">
-                              {ASSIGNMENT_TYPE_LABELS[t] ?? t}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <Badge variant={isPast(a.dueDate) ? 'destructive' : 'secondary'} className="shrink-0 text-xs">
-                        {formatDate(a.dueDate)}
-                      </Badge>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-        </TabsContent>
-
-        {/* Ujian */}
-        <TabsContent value="exams" className="mt-4 space-y-3">
-          {myExams.length === 0
-            ? <p className="text-center text-sm text-muted-foreground py-8">Tidak ada ujian</p>
-            : myExams.map((e) => (
-                <Link key={e.id} href={`/exams/${e.id}/submissions`}>
-                  <Card className="hover:bg-muted/30 transition-colors">
-                    <CardContent className="py-3 px-4 flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-medium text-sm truncate">{e.title}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {e.durationMinutes} menit · {e.questions.length} soal
-                        </p>
-                      </div>
-                      <Badge variant={isPast(e.deadlineDate) ? 'destructive' : 'default'} className="shrink-0 text-xs">
-                        {formatDate(e.deadlineDate)}
-                      </Badge>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-        </TabsContent>
-      </Tabs>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {myClassrooms.length === 0 ? (
+            <EmptyState text="Tidak ada kelas" />
+          ) : (
+            myClassrooms.map((c) => (
+              <Link key={c.id} href={`/classrooms/${c.id}`}>
+                <div className="bg-white border border-[#E2E8F0] rounded-lg p-4 shadow-sm hover:border-[#4B5CF0] hover:shadow transition-all duration-200">
+                  <p className="font-semibold text-[#0F172A]">{c.name}</p>
+                  <p className="text-sm text-[#64748B] mt-0.5">{c.subject?.name}</p>
+                  <Badge className="mt-2 text-xs bg-[#EEF1FF] text-[#4B5CF0] border-0">
+                    {c.semester?.name}
+                  </Badge>
+                </div>
+              </Link>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   )
 }
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <Card>
-      <CardContent className="pt-4 pb-3 flex items-center gap-3">
+    <div className="bg-white border border-[#E2E8F0] rounded-lg p-4 shadow-sm flex items-center gap-4 hover:shadow transition-all duration-200">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF1FF]">
         {icon}
-        <div>
-          <p className="text-2xl font-bold leading-none">{value}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div>
+        <p className="text-2xl font-bold tabular-nums text-[#0F172A]">{value}</p>
+        <p className="text-xs text-[#64748B]">{label}</p>
+      </div>
+    </div>
+  )
+}
+
+function EmptyState({ text }: { text: string }) {
+  return (
+    <div className="col-span-full flex flex-col items-center justify-center py-12 text-[#64748B]">
+      <FolderOpen className="h-8 w-8 mb-2" strokeWidth={1.5} />
+      <p className="text-sm">{text}</p>
+    </div>
   )
 }
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className="h-12 w-64" />
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8 bg-[#F8FAFC] min-h-screen">
+      <Skeleton className="h-12 w-64 bg-[#E2E8F0]" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-lg bg-[#E2E8F0]" />)}
       </div>
-      <Skeleton className="h-10 w-72" />
+      <Skeleton className="h-10 w-72 bg-[#E2E8F0]" />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)}
+        {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-lg bg-[#E2E8F0]" />)}
       </div>
     </div>
   )

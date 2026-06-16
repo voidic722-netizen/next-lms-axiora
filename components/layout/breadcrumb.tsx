@@ -12,7 +12,6 @@ import { getDepartmentDetailService } from '@/services/department-service'
 import { getAssignmentByIdService } from '@/services/assignment-service'
 import { getExamByIdService } from '@/services/exam-service'
 
-// Moved outside component — constant reference, no re-creation on render
 const DETAIL_ROUTES = [
   'subjects',
   'classrooms',
@@ -117,7 +116,6 @@ export function Breadcrumb() {
     [pathname],
   )
 
-  // segments[0] = route (e.g. "subjects"), segments[1] = possibly an ID
   const rootRoute = segments[0]
   const maybeId = segments[1]
   const isNumericId = maybeId !== undefined && /^\d+$/.test(maybeId)
@@ -158,26 +156,26 @@ export function Breadcrumb() {
   if (crumbs.length === 0) return null
 
   return (
-    <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-10 border-b border-[#E2E8F0] bg-white/80 backdrop-blur">
       <div className="flex h-12 items-center gap-1 px-4 md:px-6 text-sm">
         <Link
           href="/"
-          className="text-muted-foreground hover:text-foreground transition-colors flex items-center"
+          className="text-[#64748B] hover:text-[#4B5CF0] transition-colors duration-200 flex items-center"
         >
           <Home className="h-3.5 w-3.5" />
         </Link>
 
         {crumbs.map((crumb, index) => (
           <span key={crumb.href} className="flex items-center gap-1">
-            <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            <ChevronRight className="h-3.5 w-3.5 text-[#64748B] shrink-0" />
             {index === crumbs.length - 1 ? (
-              <span className="font-medium text-foreground truncate max-w-[200px]">
+              <span className="font-medium text-[#0F172A] truncate max-w-[200px]">
                 {crumb.label}
               </span>
             ) : (
               <Link
                 href={crumb.href}
-                className="text-muted-foreground hover:text-foreground transition-colors truncate max-w-[200px]"
+                className="text-[#64748B] hover:text-[#0F172A] transition-colors duration-200 truncate max-w-[200px]"
               >
                 {crumb.label}
               </Link>

@@ -36,28 +36,28 @@ export function ExamCard({
   const expired = isPast(deadlineDate)
 
   const statusBadge = isSubmitted
-    ? { label: 'Selesai', variant: 'default' as const }
+    ? { label: 'Selesai', className: 'bg-[#22C55E] text-white border-0' }
     : expired
-      ? { label: 'Berakhir', variant: 'destructive' as const }
+      ? { label: 'Berakhir', className: 'bg-[#EF4444] text-white border-0' }
       : notYet
-        ? { label: 'Belum Mulai', variant: 'secondary' as const }
-        : { label: 'Aktif', variant: 'default' as const }
+        ? { label: 'Belum Mulai', className: 'bg-[#EEF1FF] text-[#4B5CF0] border-0' }
+        : { label: 'Aktif', className: 'bg-[#4B5CF0] text-white border-0' }
 
   const content = (
     <CardContent className="py-3 px-4">
       <div className="flex items-start gap-3">
-        <GraduationCap className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+        <GraduationCap className="h-4 w-4 text-[#4B5CF0] shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm truncate">{title}</p>
+          <p className="font-medium text-sm text-[#0F172A] truncate">{title}</p>
           <div className="flex flex-wrap gap-1.5 mt-1.5">
             {examTypes.map((t) => (
-              <Badge key={t} variant="outline" className="text-xs">{t}</Badge>
+              <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
             ))}
-            <Badge variant={statusBadge.variant} className="text-xs">
+            <Badge className={cn('text-xs', statusBadge.className)}>
               {statusBadge.label}
             </Badge>
           </div>
-          <p className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1">
+          <p className="text-xs text-[#64748B] mt-1.5 flex items-center gap-1">
             <Clock className="h-3 w-3" />
             {durationMinutes} menit · {questionCount} soal · {formatDate(deadlineDate)}
           </p>
@@ -69,7 +69,10 @@ export function ExamCard({
   if (onClick) {
     return (
       <Card
-        className={cn('cursor-pointer hover:bg-muted/30 transition-colors', className)}
+        className={cn(
+          'cursor-pointer border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200',
+          className
+        )}
         onClick={(e) => onClick(e)}
       >
         {content}
@@ -79,7 +82,12 @@ export function ExamCard({
 
   return (
     <Link href={href ?? `/exams/${id}`}>
-      <Card className={cn('hover:bg-muted/30 transition-colors', className)}>
+      <Card
+        className={cn(
+          'border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200',
+          className
+        )}
+      >
         {content}
       </Card>
     </Link>

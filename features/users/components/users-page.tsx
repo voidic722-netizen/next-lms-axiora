@@ -38,8 +38,8 @@ export function UsersPage() {
               <AvatarFallback className="text-xs">{u.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium leading-none">{u.name}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{u.email}</p>
+              <p className="font-medium leading-none text-[#0F172A]">{u.name}</p>
+              <p className="text-xs text-[#64748B] mt-0.5">{u.email}</p>
             </div>
           </div>
         )
@@ -51,7 +51,7 @@ export function UsersPage() {
       render: (row: Record<string, unknown>) => {
         const u = row as unknown as User
         return (
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-[#64748B]">
             {u.nidn ?? u.nim ?? '-'}
           </span>
         )
@@ -87,7 +87,7 @@ export function UsersPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        className="h-8 w-8 text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
@@ -145,11 +145,11 @@ export function UsersPage() {
 function UsersPageSkeleton() {
   return (
     <div className="space-y-6">
-      <Skeleton className="h-8 w-48" />
-      <Skeleton className="h-10 w-72" />
+      <Skeleton className="h-8 w-48 bg-[#E2E8F0]" />
+      <Skeleton className="h-10 w-72 bg-[#E2E8F0]" />
       <div className="space-y-2">
         {Array.from({ length: 8 }).map((_, i) => (
-          <Skeleton key={i} className="h-14 rounded" />
+          <Skeleton key={i} className="h-14 rounded bg-[#E2E8F0]" />
         ))}
       </div>
     </div>

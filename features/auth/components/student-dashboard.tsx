@@ -3,12 +3,10 @@
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { BookOpen, GraduationCap, CalendarDays, CheckCircle2, Clock } from 'lucide-react'
+import { BookOpen, GraduationCap, CalendarDays, CheckCircle2, Clock, FolderOpen } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatDate, formatDay, isPast, isFuture } from '@/lib/format-date'
 import { sortByNearestDateAsc } from '@/utils/sort'
 import { ASSIGNMENT_TYPE_LABELS } from '@/features/assignments/constants/assignment-type-labels'
@@ -17,12 +15,8 @@ import { getExamsService } from '@/services/exam-service'
 import { getSchedulesService } from '@/services/schedule-service'
 import { getMyAssignmentSubmissionService } from '@/services/assignment-submission-service'
 import { getMyExamSubmissionService } from '@/services/exam-submission-service'
-import type { Assignment } from '@/types/assignment'
-import type { Exam } from '@/types/exam'
-import type { Schedule } from '@/types/schedule'
 
 export function StudentDashboard() {
-  // FIX: user sekarang ada di queryKey, bukan dalam stale closure
   const { user } = useAuth()
   const classroomId = user?.classroomId
 
@@ -53,7 +47,6 @@ export function StudentDashboard() {
     refetchOnWindowFocus: true,
   })
 
-  // Filter berdasarkan kelas mahasiswa
   const assignments = useMemo(() =>
     classroomId
       ? allAssignments.filter((a) => a.classroomIds.map(Number).includes(classroomId))
@@ -75,9 +68,6 @@ export function StudentDashboard() {
     [allSchedules, classroomId],
   )
 
-  // FIX N+1: submission status diambil dalam satu query gabungan
-  // Dependency-nya adalah ID list — jika list berubah, query diulang.
-  // TanStack Query men-cache hasilnya sehingga tidak refetch jika ID sama.
   const assignmentIds = useMemo(() => assignments.map((a) => a.id), [assignments])
   const examIds = useMemo(() => exams.map((e) => e.id), [exams])
 
@@ -129,153 +119,137 @@ export function StudentDashboard() {
   if (isLoading) return <DashboardSkeleton />
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8 bg-[#F8FAFC] min-h-screen">
       <div>
-        <h1 className="text-xl font-semibold">Selamat datang, {user?.name?.split(' ')[0]} 👋</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
+        <h1 className="text-2xl font-semibold text-[#0F172A]">
+          Selamat datang, {user?.name?.split(' ')[0]} 👋
+        </h1>
+        <p className="text-sm text-[#64748B] mt-1">
           {user?.classroom?.name ?? 'Belum terdaftar di kelas'}
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard icon={<BookOpen className="h-5 w-5 text-blue-500" />}
-          label="Tugas" value={assignments.length} />
-        <StatCard icon={<GraduationCap className="h-5 w-5 text-purple-500" />}
-          label="Ujian" value={exams.length} />
-        <StatCard icon={<CheckCircle2 className="h-5 w-5 text-green-500" />}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <StatCard
+          icon={<BookOpen className="h-5 w-5 text-[#4B5CF0]" />}
+          label="Tugas"
+          value={assignments.length}
+        />
+        <StatCard
+          icon={<GraduationCap className="h-5 w-5 text-[#4B5CF0]" />}
+          label="Ujian"
+          value={exams.length}
+        />
+        <StatCard
+          icon={<CheckCircle2 className="h-5 w-5 text-[#22C55E]" />}
           label="Sudah Dikumpul"
-          value={assignmentIds.filter((id) => submissionMap?.assignments[id]).length} />
-        <StatCard icon={<CalendarDays className="h-5 w-5 text-orange-500" />}
-          label="Jadwal" value={schedules.length} />
+          value={assignmentIds.filter((id) => submissionMap?.assignments[id]).length}
+        />
+        <StatCard
+          icon={<CalendarDays className="h-5 w-5 text-[#F59E0B]" />}
+          label="Jadwal"
+          value={schedules.length}
+        />
       </div>
 
-      <Tabs defaultValue="assignments">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="assignments">Tugas ({assignments.length})</TabsTrigger>
-          <TabsTrigger value="exams">Ujian ({exams.length})</TabsTrigger>
-          <TabsTrigger value="schedules">Jadwal ({schedules.length})</TabsTrigger>
-        </TabsList>
+      <div>
+        <div className="flex items-center gap-2 border-b border-[#E2E8F0] pb-2 mb-4">
+          <button
+            onClick={() => {}}
+            className="text-sm font-medium text-[#4B5CF0] border-b-2 border-[#4B5CF0] pb-2"
+          >
+            Tugas ({assignments.length})
+          </button>
+          <button
+            onClick={() => {}}
+            className="text-sm font-medium text-[#64748B] pb-2"
+          >
+            Ujian ({exams.length})
+          </button>
+          <button
+            onClick={() => {}}
+            className="text-sm font-medium text-[#64748B] pb-2"
+          >
+            Jadwal ({schedules.length})
+          </button>
+        </div>
 
-        {/* Assignments */}
-        <TabsContent value="assignments" className="mt-4 space-y-3">
-          {sortedAssignments.length === 0
-            ? <EmptyState text="Tidak ada tugas" />
-            : sortedAssignments.map((a) => {
-                const submitted = !!submissionMap?.assignments[a.id]
-                const overdue = isPast(a.dueDate) && !submitted
-                return (
-                  <Link key={a.id} href={`/assignments/${a.id}`}>
-                    <Card className="hover:bg-muted/30 transition-colors">
-                      <CardContent className="py-3 px-4 flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="font-medium text-sm truncate">{a.title}</p>
-                          <div className="flex flex-wrap gap-1.5 mt-1">
-                            {a.types.map((t) => (
-                              <Badge key={t} variant="outline" className="text-xs">
-                                {ASSIGNMENT_TYPE_LABELS[t] ?? t}
-                              </Badge>
-                            ))}
-                            <span className={`text-xs ${overdue ? 'text-destructive font-medium' : 'text-muted-foreground'}`}>
-                              {formatDate(a.dueDate)}
-                            </span>
-                          </div>
+        <div className="space-y-3">
+          {sortedAssignments.length === 0 ? (
+            <EmptyState text="Tidak ada tugas" />
+          ) : (
+            sortedAssignments.map((a) => {
+              const submitted = !!submissionMap?.assignments[a.id]
+              const overdue = isPast(a.dueDate) && !submitted
+              return (
+                <Link key={a.id} href={`/assignments/${a.id}`}>
+                  <div className="bg-white border border-[#E2E8F0] rounded-lg p-4 shadow-sm hover:border-[#4B5CF0] hover:shadow transition-all duration-200">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm text-[#0F172A] truncate">{a.title}</p>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          {a.types.map((t) => (
+                            <Badge key={t} variant="outline" className="text-xs bg-[#EEF1FF] text-[#4B5CF0] border-[#EEF1FF]">
+                              {ASSIGNMENT_TYPE_LABELS[t] ?? t}
+                            </Badge>
+                          ))}
+                          <span className={`text-xs ${overdue ? 'text-[#EF4444] font-medium' : 'text-[#64748B]'}`}>
+                            {formatDate(a.dueDate)}
+                          </span>
                         </div>
-                        {submitted
-                          ? <Badge className="shrink-0">Dikumpulkan</Badge>
-                          : <Badge variant={overdue ? 'destructive' : 'secondary'} className="shrink-0">
-                              {overdue ? 'Terlambat' : 'Belum'}
-                            </Badge>}
-                      </CardContent>
-                    </Card>
-                  </Link>
-                )
-              })}
-        </TabsContent>
-
-        {/* Exams */}
-        <TabsContent value="exams" className="mt-4 space-y-3">
-          {sortedExams.length === 0
-            ? <EmptyState text="Tidak ada ujian" />
-            : sortedExams.map((e) => {
-                const submitted = !!submissionMap?.exams[e.id]
-                const notYet = isFuture(e.availableDate)
-                const expired = isPast(e.deadlineDate)
-                return (
-                  <Link key={e.id} href={submitted ? `/exams/${e.id}/submitted` : `/exams/${e.id}`}>
-                    <Card className="hover:bg-muted/30 transition-colors">
-                      <CardContent className="py-3 px-4 flex items-center justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="font-medium text-sm truncate">{e.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            <Clock className="inline h-3 w-3 mr-1" />
-                            {e.durationMinutes} menit · {e.questions.length} soal · {formatDate(e.deadlineDate)}
-                          </p>
-                        </div>
-                        {submitted
-                          ? <Badge className="shrink-0 bg-green-600">Selesai</Badge>
-                          : <Badge variant={expired ? 'destructive' : notYet ? 'secondary' : 'default'} className="shrink-0">
-                              {expired ? 'Berakhir' : notYet ? 'Belum Mulai' : 'Mulai'}
-                            </Badge>}
-                      </CardContent>
-                    </Card>
-                  </Link>
-                )
-              })}
-        </TabsContent>
-
-        {/* Schedules */}
-        <TabsContent value="schedules" className="mt-4 space-y-3">
-          {sortedSchedules.length === 0
-            ? <EmptyState text="Tidak ada jadwal" />
-            : sortedSchedules.map((s) => (
-                <Card key={s.id}>
-                  <CardContent className="py-3 px-4 flex items-center gap-4">
-                    <div className="w-12 text-center shrink-0">
-                      <p className="text-xs text-muted-foreground">{formatDay(s.date).split(',')[0]}</p>
-                      <p className="text-xl font-bold leading-tight">{new Date(s.date).getDate()}</p>
+                      </div>
+                      {submitted ? (
+                        <Badge className="shrink-0 bg-[#22C55E] text-white border-0">Dikumpulkan</Badge>
+                      ) : (
+                        <Badge className={`shrink-0 ${overdue ? 'bg-[#EF4444] text-white' : 'bg-[#F1F5F9] text-[#64748B]'} border-0`}>
+                          {overdue ? 'Terlambat' : 'Belum'}
+                        </Badge>
+                      )}
                     </div>
-                    <div>
-                      <p className="font-medium text-sm">{s.topic}</p>
-                      <p className="text-xs text-muted-foreground">{formatDate(s.date)}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-        </TabsContent>
-      </Tabs>
+                  </div>
+                </Link>
+              )
+            })
+          )}
+        </div>
+      </div>
     </div>
   )
 }
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <Card>
-      <CardContent className="pt-4 pb-3 flex items-center gap-3">
+    <div className="bg-white border border-[#E2E8F0] rounded-lg p-4 shadow-sm flex items-center gap-4 hover:shadow transition-all duration-200">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF1FF]">
         {icon}
-        <div>
-          <p className="text-2xl font-bold leading-none">{value}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div>
+        <p className="text-2xl font-bold tabular-nums text-[#0F172A]">{value}</p>
+        <p className="text-xs text-[#64748B]">{label}</p>
+      </div>
+    </div>
   )
 }
 
 function EmptyState({ text }: { text: string }) {
-  return <p className="text-center text-sm text-muted-foreground py-8">{text}</p>
+  return (
+    <div className="flex flex-col items-center justify-center py-12 text-[#64748B]">
+      <FolderOpen className="h-8 w-8 mb-2" strokeWidth={1.5} />
+      <p className="text-sm">{text}</p>
+    </div>
+  )
 }
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-6">
-      <Skeleton className="h-12 w-64" />
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-lg" />)}
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8 bg-[#F8FAFC] min-h-screen">
+      <Skeleton className="h-12 w-64 bg-[#E2E8F0]" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-20 rounded-lg bg-[#E2E8F0]" />)}
       </div>
-      <Skeleton className="h-10 w-72" />
+      <Skeleton className="h-10 w-72 bg-[#E2E8F0]" />
       <div className="space-y-3">
-        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
+        {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 rounded-lg bg-[#E2E8F0]" />)}
       </div>
     </div>
   )

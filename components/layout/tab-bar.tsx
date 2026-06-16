@@ -24,7 +24,6 @@ export function TabBar({ user }: TabBarProps) {
   const clearUser = useAuthStore((s) => s.clearUser)
   const [open, setOpen] = useState(false)
 
-  // Memoised — only recomputes when role changes
   const groups = useMemo(
     () => getSidebarMenusByRole(user.role),
     [user.role],
@@ -35,7 +34,6 @@ export function TabBar({ user }: TabBarProps) {
     [groups],
   )
 
-  // Show the first 4 most-used items in the fixed bar; rest go into the sheet
   const pinnedItems = allItems.slice(0, 4)
 
   async function handleLogout() {
@@ -50,7 +48,7 @@ export function TabBar({ user }: TabBarProps) {
   }
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t bg-background flex items-center">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-[#E2E8F0] bg-white flex items-center">
       {pinnedItems.map((item) => {
         const isActive =
           item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
@@ -61,10 +59,10 @@ export function TabBar({ user }: TabBarProps) {
             key={item.href}
             href={item.href}
             className={cn(
-              'flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium transition-colors',
+              'flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium transition-all duration-200',
               isActive
-                ? 'text-primary'
-                : 'text-muted-foreground hover:text-foreground',
+                ? 'text-[#4B5CF0]'
+                : 'text-[#64748B] hover:text-[#0F172A]',
             )}
           >
             <Icon className="h-5 w-5" />
@@ -75,20 +73,19 @@ export function TabBar({ user }: TabBarProps) {
         )
       })}
 
-      {/* Menu sheet for remaining items */}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <button className="flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <button className="flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium text-[#64748B] hover:text-[#0F172A] transition-all duration-200">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             <span>Menu</span>
           </button>
         </SheetTrigger>
 
-        <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-2xl">
-          <div className="py-2 space-y-4">
+        <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-2xl bg-white">
+          <div className="py-4 space-y-5">
             {groups.map((group) => (
               <div key={group.group}>
-                <p className="px-1 mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <p className="px-2 mb-2 text-xs font-semibold text-[#64748B] uppercase tracking-wider">
                   {group.group}
                 </p>
                 <div className="grid grid-cols-2 gap-1">
@@ -105,10 +102,10 @@ export function TabBar({ user }: TabBarProps) {
                         href={item.href}
                         onClick={() => setOpen(false)}
                         className={cn(
-                          'flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
+                          'flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                           isActive
-                            ? 'bg-accent text-accent-foreground'
-                            : 'hover:bg-accent hover:text-accent-foreground',
+                            ? 'bg-[#EEF1FF] text-[#4B5CF0]'
+                            : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]',
                         )}
                       >
                         <Icon className="h-4 w-4 shrink-0" />
@@ -120,13 +117,13 @@ export function TabBar({ user }: TabBarProps) {
               </div>
             ))}
 
-            <Separator />
+            <Separator className="bg-[#E2E8F0]" />
 
             <div className="space-y-1">
               <Link
                 href="/profile"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium hover:bg-accent transition-colors"
+                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-200"
               >
                 Profil Saya
               </Link>
@@ -135,7 +132,7 @@ export function TabBar({ user }: TabBarProps) {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="w-full justify-start gap-2 px-3 text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="w-full justify-start gap-2 px-3 text-[#EF4444] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all duration-200"
               >
                 <LogOut className="h-4 w-4" />
                 Keluar

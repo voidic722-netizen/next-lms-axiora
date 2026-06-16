@@ -50,29 +50,44 @@ export function ThumbnailUpload({
   return (
     <div className={cn('space-y-1.5', className)}>
       {preview ? (
-        <div className={cn('relative w-full overflow-hidden rounded-lg border bg-muted', aspectRatio === 'video' ? 'aspect-video' : 'aspect-square')}>
+        <div className={cn(
+          'relative w-full overflow-hidden rounded-lg border bg-[#F8FAFC]',
+          aspectRatio === 'video' ? 'aspect-video' : 'aspect-square'
+        )}>
           <img src={preview} alt={label} className="w-full h-full object-cover" />
-          <Button type="button" variant="destructive" size="icon" onClick={handleClear}
-            className="absolute top-2 right-2 h-7 w-7">
+          <Button
+            type="button"
+            variant="destructive"
+            size="icon"
+            onClick={handleClear}
+            className="absolute top-2 right-2 h-7 w-7 hover:bg-[#DC2626] transition-colors duration-200"
+          >
             <X className="h-3.5 w-3.5" />
           </Button>
         </div>
       ) : (
-        <button type="button" onClick={() => fileRef.current?.click()}
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
           className={cn(
-            'flex flex-col items-center justify-center w-full rounded-lg border-2 border-dashed border-border',
-            'hover:border-primary/50 hover:bg-muted/50 transition-colors',
+            'flex flex-col items-center justify-center w-full rounded-lg border-2 border-dashed border-[#E2E8F0] transition-all duration-200',
+            'hover:border-[#4B5CF0]/50 hover:bg-[#F8FAFC]',
             aspectRatio === 'video' ? 'aspect-video' : 'aspect-square',
           )}
         >
-          <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
-          <span className="text-sm text-muted-foreground">Klik untuk pilih gambar</span>
-          <span className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP · Maks {maxSizeMb} MB</span>
+          <ImageIcon className="h-8 w-8 text-[#64748B] mb-2" />
+          <span className="text-sm text-[#64748B]">Klik untuk pilih gambar</span>
+          <span className="text-xs text-[#64748B] mt-1">JPG, PNG, WebP · Maks {maxSizeMb} MB</span>
         </button>
       )}
-      <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp"
-        className="hidden" onChange={handleFile} />
-      {sizeError && <p className="text-xs text-destructive">{sizeError}</p>}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={handleFile}
+      />
+      {sizeError && <p className="text-xs text-[#EF4444]">{sizeError}</p>}
     </div>
   )
 }

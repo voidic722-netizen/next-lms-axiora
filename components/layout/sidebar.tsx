@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useMemo } from 'react'
 import { LogOut, User as UserIcon } from 'lucide-react'
+import Image from 'next/image'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -40,20 +41,21 @@ export function Sidebar({ user }: SidebarProps) {
   }
 
   return (
-    <aside className="hidden md:flex w-64 flex-col border-r bg-sidebar h-screen sticky top-0 shrink-0">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
-          LMS
-        </div>
-        <span className="font-semibold text-sidebar-foreground">Dashboard</span>
+    <aside className="hidden md:flex w-64 flex-col border-r border-[#E2E8F0] bg-white h-screen sticky top-0 shrink-0">
+      <div className="flex items-center px-5 py-4 border-b border-[#E2E8F0]">
+        <Image
+          src="/assets/img/lhitam.png"
+          alt="Axiora Logo"
+          width={100}
+          height={32}
+          className="h-8 w-auto"
+        />
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 space-y-6 px-3">
+      <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-6">
         {groups.map((group) => (
           <div key={group.group}>
-            <p className="px-2 mb-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <p className="px-2 mb-2 text-xs font-semibold text-[#64748B] uppercase tracking-wider">
               {group.group}
             </p>
             <ul className="space-y-0.5">
@@ -69,10 +71,10 @@ export function Sidebar({ user }: SidebarProps) {
                     <Link
                       href={item.href}
                       className={cn(
-                        'flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors',
+                        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                         isActive
-                          ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                          ? 'bg-[#EEF1FF] text-[#4B5CF0]'
+                          : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]',
                       )}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
@@ -86,29 +88,28 @@ export function Sidebar({ user }: SidebarProps) {
         ))}
       </nav>
 
-      <Separator />
+      <Separator className="bg-[#E2E8F0]" />
 
-      {/* User footer */}
       <div className="p-3 space-y-1">
         <Link
           href="/profile"
-          className="flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-200"
         >
-          <Avatar className="h-6 w-6">
+          <Avatar className="h-7 w-7">
             <AvatarImage src={user.image ?? undefined} />
-            <AvatarFallback className="text-xs">
+            <AvatarFallback className="text-xs bg-[#EEF1FF] text-[#4B5CF0] font-semibold">
               {user.name.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <span className="truncate">{user.name}</span>
-          <UserIcon className="h-3.5 w-3.5 ml-auto shrink-0 text-muted-foreground" />
+          <UserIcon className="h-3.5 w-3.5 ml-auto shrink-0 text-[#64748B]" />
         </Link>
 
         <Button
           variant="ghost"
           size="sm"
           onClick={handleLogout}
-          className="w-full justify-start gap-3 px-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+          className="w-full justify-start gap-3 px-3 text-[#EF4444] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all duration-200"
         >
           <LogOut className="h-4 w-4" />
           Keluar

@@ -5,8 +5,8 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: {
-    default: 'LMS',
-    template: '%s | LMS',
+    default: 'Axiora',
+    template: '%s | Axiora',
   },
   description: 'Learning Management System',
 }
@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body>
+      <body className="bg-[#F8FAFC] text-[#0F172A] antialiased">
         <QueryProvider>
           {children}
           <ToastProvider />

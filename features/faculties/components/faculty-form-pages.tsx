@@ -9,8 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FacultyFormFields } from './faculty-form-fields'
-import { useCreateFaculty, useUpdateFaculty, useFacultyDetail } from '@/hooks/use-faculties'
-import { facultySchema, type FacultyFormValues } from '@/schemas/faculty-schema'
+import { useCreateFaculty, useUpdateFaculty, useFacultyDetail } from '@/features/faculties/hooks/use-faculties'
+import { facultySchema, type FacultyFormValues } from '@/features/faculties/schemas/faculty-schema'
 
 export function AddFacultyPage() {
   const router = useRouter()

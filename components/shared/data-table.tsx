@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search, FolderOpen } from 'lucide-react'
 
 export interface DataTableColumn<T> {
   key: string
@@ -66,25 +66,31 @@ export function DataTable<T extends Record<string, unknown>>({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {searchable && (
         <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B] pointer-events-none" />
           <Input
             placeholder={searchPlaceholder}
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            className="pl-9"
+            className="pl-9 border-[#E2E8F0] bg-white focus:ring-2 focus:ring-[#4B5CF0]/20 focus:border-[#4B5CF0] transition-all duration-200 rounded-lg"
           />
         </div>
       )}
 
-      <div className="rounded-md border overflow-hidden">
+      <div className="rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden bg-white">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="border-b border-[#E2E8F0] bg-[#F8FAFC] hover:bg-[#F8FAFC]">
               {columns.map((col) => (
-                <TableHead key={col.key} className={col.className}>
+                <TableHead
+                  key={col.key}
+                  className={cn(
+                    'text-xs font-semibold text-[#64748B] uppercase tracking-wider py-3.5',
+                    col.className,
+                  )}
+                >
                   {col.header}
                 </TableHead>
               ))}
@@ -95,16 +101,28 @@ export function DataTable<T extends Record<string, unknown>>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center text-muted-foreground"
+                  className="h-32 text-center"
                 >
-                  {emptyMessage}
+                  <div className="flex flex-col items-center justify-center gap-2 text-[#64748B]">
+                    <FolderOpen className="h-8 w-8" strokeWidth={1.5} />
+                    <span className="text-sm">{emptyMessage}</span>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               pagedData.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
+                <TableRow
+                  key={rowIndex}
+                  className={cn(
+                    'border-b border-[#E2E8F0] transition-all duration-200 hover:bg-[#F8FAFC]',
+                    rowIndex % 2 === 1 ? 'bg-[#F8FAFC]/50' : 'bg-white',
+                  )}
+                >
                   {columns.map((col) => (
-                    <TableCell key={col.key} className={col.className}>
+                    <TableCell
+                      key={col.key}
+                      className={cn('py-3.5 text-[#0F172A]', col.className)}
+                    >
                       {col.render(row)}
                     </TableCell>
                   ))}
@@ -116,7 +134,7 @@ export function DataTable<T extends Record<string, unknown>>({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-sm text-[#64748B]">
           <span>
             {filtered.length} data · Halaman {safePage} dari {totalPages}
           </span>
@@ -124,7 +142,7 @@ export function DataTable<T extends Record<string, unknown>>({
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-200"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={safePage <= 1}
             >
@@ -133,7 +151,7 @@ export function DataTable<T extends Record<string, unknown>>({
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-200"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={safePage >= totalPages}
             >
@@ -144,4 +162,8 @@ export function DataTable<T extends Record<string, unknown>>({
       )}
     </div>
   )
+}
+
+function cn(...classes: (string | undefined | false)[]) {
+  return classes.filter(Boolean).join(' ')
 }

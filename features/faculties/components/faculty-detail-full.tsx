@@ -20,8 +20,8 @@ export function FacultyDetailPage({ id }: { id: string }) {
   const { data: faculty, isLoading } = useFacultyDetail(id)
   const deleteMutation = useDeleteFaculty()
 
-  if (isLoading) return <Skeleton className="h-96 rounded-lg" />
-  if (!faculty) return <p className="text-muted-foreground">Fakultas tidak ditemukan.</p>
+  if (isLoading) return <Skeleton className="h-96 rounded-lg bg-[#E2E8F0]" />
+  if (!faculty) return <p className="text-[#64748B]">Fakultas tidak ditemukan.</p>
   const thumb = withStorageUrl(faculty.thumbnail)
 
   return (
@@ -40,8 +40,8 @@ export function FacultyDetailPage({ id }: { id: string }) {
           </div>
         ) : undefined}
       />
-      {thumb && <img src={thumb} alt={faculty.name} className="w-full max-h-64 object-cover rounded-lg border" />}
-      {faculty.dean && <p className="text-sm"><span className="text-muted-foreground">Dekan: </span><span className="font-medium">{faculty.dean}</span></p>}
+      {thumb && <img src={thumb} alt={faculty.name} className="w-full max-h-64 object-cover rounded-lg border border-[#E2E8F0]" />}
+      {faculty.dean && <p className="text-sm"><span className="text-[#64748B]">Dekan: </span><span className="font-medium text-[#0F172A]">{faculty.dean}</span></p>}
       <Tabs defaultValue="departments">
         <TabsList>
           <TabsTrigger value="departments">Jurusan ({faculty.departments.length})</TabsTrigger>
@@ -51,27 +51,39 @@ export function FacultyDetailPage({ id }: { id: string }) {
         <TabsContent value="departments" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {faculty.departments.map((d) => (
             <Link key={d.id} href={`/departments/${d.id}`}>
-              <Card className="hover:bg-muted/30 transition-colors"><CardContent className="pt-4 flex items-center gap-3">
-                <Building2 className="h-5 w-5 text-muted-foreground shrink-0" />
-                <p className="font-medium text-sm">{d.name}</p>
-              </CardContent></Card>
+              <Card className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
+                <CardContent className="pt-4 flex items-center gap-3">
+                  <Building2 className="h-5 w-5 text-[#4B5CF0] shrink-0" />
+                  <p className="font-medium text-sm text-[#0F172A]">{d.name}</p>
+                </CardContent>
+              </Card>
             </Link>
           ))}
         </TabsContent>
         <TabsContent value="teachers" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {faculty.teachers.map((t) => (
-            <Card key={t.id}><CardContent className="pt-4 flex items-center gap-3">
-              <Avatar><AvatarFallback>{t.name.charAt(0)}</AvatarFallback></Avatar>
-              <div className="min-w-0"><p className="font-medium text-sm truncate">{t.name}</p><p className="text-xs text-muted-foreground">{t.nidn ?? t.email}</p></div>
-            </CardContent></Card>
+            <Card key={t.id} className="border border-[#E2E8F0] bg-white shadow-sm">
+              <CardContent className="pt-4 flex items-center gap-3">
+                <Avatar><AvatarFallback>{t.name.charAt(0)}</AvatarFallback></Avatar>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm truncate text-[#0F172A]">{t.name}</p>
+                  <p className="text-xs text-[#64748B]">{t.nidn ?? t.email}</p>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </TabsContent>
         <TabsContent value="students" className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {faculty.students.map((s) => (
-            <Card key={s.id}><CardContent className="pt-4 flex items-center gap-3">
-              <Avatar><AvatarFallback>{s.name.charAt(0)}</AvatarFallback></Avatar>
-              <div className="min-w-0"><p className="font-medium text-sm truncate">{s.name}</p><p className="text-xs text-muted-foreground">{s.nim ?? s.email}</p></div>
-            </CardContent></Card>
+            <Card key={s.id} className="border border-[#E2E8F0] bg-white shadow-sm">
+              <CardContent className="pt-4 flex items-center gap-3">
+                <Avatar><AvatarFallback>{s.name.charAt(0)}</AvatarFallback></Avatar>
+                <div className="min-w-0">
+                  <p className="font-medium text-sm truncate text-[#0F172A]">{s.name}</p>
+                  <p className="text-xs text-[#64748B]">{s.nim ?? s.email}</p>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </TabsContent>
       </Tabs>

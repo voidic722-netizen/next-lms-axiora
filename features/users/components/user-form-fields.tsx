@@ -16,7 +16,7 @@ import type { Faculty } from '@/types/faculty'
 import type { Department } from '@/types/department'
 import type { Classroom } from '@/types/classroom'
 import type { Subject } from '@/types/subject'
-import type { CreateUserFormValues, UpdateUserFormValues } from '@/schemas/user-schema'
+import type { CreateUserFormValues, UpdateUserFormValues } from '@/features/users/schemas/user-schema'
 
 type UserFormValues = CreateUserFormValues | UpdateUserFormValues
 
@@ -48,7 +48,6 @@ export function UserFormFields({
   const facultyId = useWatch({ control, name: 'facultyId' as keyof UserFormValues })
   const departmentId = useWatch({ control, name: 'departmentId' as keyof UserFormValues })
 
-  // Cascading resets — match original business logic
   useEffect(() => {
     setValue('departmentId' as keyof UserFormValues, undefined as never)
   }, [facultyId, setValue])
@@ -70,17 +69,16 @@ export function UserFormFields({
 
   return (
     <div className="space-y-4">
-      {/* Common fields */}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="u-name">Nama</Label>
           <Input id="u-name" placeholder="Nama lengkap" {...register('name')} />
-          {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+          {errors.name && <p className="text-xs text-[#EF4444]">{errors.name.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="u-email">Email</Label>
           <Input id="u-email" type="email" placeholder="email@domain.com" {...register('email')} />
-          {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+          {errors.email && <p className="text-xs text-[#EF4444]">{errors.email.message}</p>}
         </div>
       </div>
 
@@ -100,11 +98,11 @@ export function UserFormFields({
               <SelectItem value={USER_ROLE.Student}>Student</SelectItem>
             </SelectContent>
           </Select>
-          {errors.role && <p className="text-xs text-destructive">{errors.role.message}</p>}
+          {errors.role && <p className="text-xs text-[#EF4444]">{errors.role.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="u-pass">
-            Password{!isCreate && <span className="text-muted-foreground ml-1">(opsional)</span>}
+            Password{!isCreate && <span className="text-[#64748B] ml-1">(opsional)</span>}
           </Label>
           <Input
             id="u-pass"
@@ -113,12 +111,11 @@ export function UserFormFields({
             {...register('password')}
           />
           {errors.password && (
-            <p className="text-xs text-destructive">{errors.password.message}</p>
+            <p className="text-xs text-[#EF4444]">{errors.password.message}</p>
           )}
         </div>
       </div>
 
-      {/* Teacher fields */}
       {role === USER_ROLE.Teacher && (
         <TeacherFormSection
           form={form}
@@ -128,7 +125,6 @@ export function UserFormFields({
         />
       )}
 
-      {/* Student fields */}
       {role === USER_ROLE.Student && (
         <StudentFormSection
           form={form}
@@ -154,8 +150,8 @@ function TeacherFormSection({
 }) {
   const { register, setValue, formState: { errors } } = form
   return (
-    <div className="space-y-4 border-t pt-4">
-      <p className="text-sm font-medium text-muted-foreground">Data Pengajar</p>
+    <div className="space-y-4 border-t border-[#E2E8F0] pt-4">
+      <p className="text-sm font-medium text-[#64748B]">Data Pengajar</p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label>Posisi</Label>
@@ -207,8 +203,8 @@ function StudentFormSection({
 }) {
   const { register, setValue } = form
   return (
-    <div className="space-y-4 border-t pt-4">
-      <p className="text-sm font-medium text-muted-foreground">Data Mahasiswa</p>
+    <div className="space-y-4 border-t border-[#E2E8F0] pt-4">
+      <p className="text-sm font-medium text-[#64748B]">Data Mahasiswa</p>
       <div className="space-y-1.5">
         <Label htmlFor="u-nim">NIM</Label>
         <Input id="u-nim" placeholder="NIM" {...register('nim' as keyof UserFormValues)} />

@@ -35,7 +35,7 @@ export function AssignmentDetailPage({ id }: { id: string }) {
   const { data: assignment, isLoading } = useAssignmentDetail(id)
 
   if (isLoading) return <AssignmentDetailSkeleton />
-  if (!assignment) return <p className="text-muted-foreground">Tugas tidak ditemukan.</p>
+  if (!assignment) return <p className="text-[#64748B]">Tugas tidak ditemukan.</p>
 
   return (
     <div className="space-y-6">
@@ -50,7 +50,6 @@ export function AssignmentDetailPage({ id }: { id: string }) {
   )
 }
 
-// ── Header ──────────────────────────────────────────────────────────────────
 function AssignmentDetailHeader({
   id,
   assignment,
@@ -97,36 +96,38 @@ function AssignmentDetailHeader({
 
       <Card>
         <CardContent className="pt-4 space-y-3">
-          <p className="text-sm">{assignment.description}</p>
+          <p className="text-sm text-[#0F172A]">{assignment.description}</p>
           <div className="flex flex-wrap gap-2">
             {assignment.types.map((t) => (
-              <Badge key={t} variant="outline">{ASSIGNMENT_TYPE_LABELS[t] ?? t}</Badge>
+              <Badge key={t} variant="secondary">{ASSIGNMENT_TYPE_LABELS[t] ?? t}</Badge>
             ))}
           </div>
           <div className="grid gap-2 sm:grid-cols-2 text-sm">
             <div>
-              <span className="text-muted-foreground">Tenggat: </span>
-              <span className={overdue ? 'text-destructive font-medium' : ''}>
+              <span className="text-[#64748B]">Tenggat: </span>
+              <span className={overdue ? 'text-[#EF4444] font-medium' : 'text-[#0F172A]'}>
                 {formatDate(assignment.dueDate)}
               </span>
             </div>
             <div>
-              <span className="text-muted-foreground">Maks ukuran file: </span>
-              {formatMaxFileSize(assignment.maxFileSize)}
+              <span className="text-[#64748B]">Maks ukuran file: </span>
+              <span className="text-[#0F172A]">{formatMaxFileSize(assignment.maxFileSize)}</span>
             </div>
           </div>
           {assignment.modules.length > 0 && (
-            <div className="space-y-2 border-t pt-3">
-              <p className="text-sm font-medium">Modul</p>
+            <div className="space-y-2 border-t border-[#E2E8F0] pt-3">
+              <p className="text-sm font-medium text-[#0F172A]">Modul</p>
               {assignment.modules.map((m) => (
                 <div key={m.id} className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 text-sm">
-                    <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                    <span className="truncate">{m.name}</span>
-                    <span className="text-muted-foreground">({m.fileSize})</span>
+                    <FileText className="h-4 w-4 text-[#64748B] shrink-0" />
+                    <span className="truncate text-[#0F172A]">{m.name}</span>
+                    <span className="text-[#64748B]">({m.fileSize})</span>
                   </div>
                   <Button
-                    variant="ghost" size="icon" className="h-7 w-7 shrink-0"
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 shrink-0"
                     onClick={() => downloadFile(m.filePath, m.name).catch(() => toast.error('Gagal mengunduh'))}
                   >
                     <Download className="h-3.5 w-3.5" />
@@ -141,7 +142,6 @@ function AssignmentDetailHeader({
   )
 }
 
-// ── Student Panel ────────────────────────────────────────────────────────────
 function StudentSubmissionPanel({
   assignmentId,
   maxFileSizeRaw,
@@ -165,17 +165,17 @@ function StudentSubmissionPanel({
         <CardHeader><CardTitle className="text-base">Pengumpulan Saya</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center gap-2">
-            <Badge variant={submission.status === 'late' ? 'destructive' : 'default'}>
+            <Badge className={submission.status === 'late' ? 'bg-[#EF4444] text-white border-0' : 'bg-[#22C55E] text-white border-0'}>
               {submission.status === 'late' ? 'Terlambat' : 'Tepat Waktu'}
             </Badge>
             {submission.grade != null && (
-              <Badge variant="outline">Nilai: {submission.grade}</Badge>
+              <Badge variant="secondary">Nilai: {submission.grade}</Badge>
             )}
           </div>
           {submission.files.map((f, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
-              <FileText className="h-4 w-4 text-muted-foreground" />
-              <span className="truncate">{f.fileName}</span>
+              <FileText className="h-4 w-4 text-[#64748B]" />
+              <span className="truncate text-[#0F172A]">{f.fileName}</span>
               <Button
                 variant="ghost" size="icon" className="h-6 w-6 shrink-0 ml-auto"
                 onClick={() => downloadFile(f.filePath, f.fileName).catch(() => toast.error('Gagal mengunduh'))}
@@ -185,8 +185,8 @@ function StudentSubmissionPanel({
             </div>
           ))}
           {submission.feedback && (
-            <div className="border-t pt-3">
-              <p className="text-sm text-muted-foreground">Feedback: {submission.feedback}</p>
+            <div className="border-t border-[#E2E8F0] pt-3">
+              <p className="text-sm text-[#64748B]">Feedback: {submission.feedback}</p>
             </div>
           )}
         </CardContent>
@@ -204,23 +204,23 @@ function StudentSubmissionPanel({
           onDragLeave={handleDragLeave}
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-            dragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+            dragActive ? 'border-[#4B5CF0] bg-[#EEF1FF]' : 'border-[#E2E8F0] hover:border-[#4B5CF0]/50'
           }`}
         >
-          <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-          <p className="text-sm text-muted-foreground">
+          <Upload className="h-8 w-8 mx-auto text-[#64748B] mb-2" />
+          <p className="text-sm text-[#64748B]">
             Klik atau seret file ke sini · Maks {formatMaxFileSize(maxFileSizeRaw)}
           </p>
         </div>
         <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleInputChange} />
-        {sizeError && <p className="text-xs text-destructive">{sizeError}</p>}
+        {sizeError && <p className="text-xs text-[#EF4444]">{sizeError}</p>}
         {stagedFiles.length > 0 && (
           <div className="space-y-2">
             {stagedFiles.map((sf) => (
               <div key={sf.id} className="flex items-center gap-2 text-sm">
-                <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="truncate flex-1">{sf.file.name}</span>
-                <button onClick={() => removeFile(sf.id)} className="text-muted-foreground hover:text-destructive text-xs">Hapus</button>
+                <FileText className="h-4 w-4 text-[#64748B] shrink-0" />
+                <span className="truncate flex-1 text-[#0F172A]">{sf.file.name}</span>
+                <button onClick={() => removeFile(sf.id)} className="text-[#64748B] hover:text-[#EF4444] text-xs">Hapus</button>
               </div>
             ))}
           </div>
@@ -238,7 +238,6 @@ function StudentSubmissionPanel({
   )
 }
 
-// ── Teacher Panel ────────────────────────────────────────────────────────────
 function TeacherSubmissionsPanel({ assignmentId }: { assignmentId: string }) {
   const { data: submissions = [], isLoading } = useAssignmentSubmissions(assignmentId)
   const { data: classrooms = [] } = useClassrooms()
@@ -284,13 +283,13 @@ function TeacherSubmissionsPanel({ assignmentId }: { assignmentId: string }) {
         </Select>
       </div>
 
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-[#64748B]">
         {filtered.filter((s) => s.isSubmitted).length} / {filtered.length} sudah mengumpulkan
       </p>
 
       <div className="space-y-3">
         {isLoading
-          ? Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 rounded" />)
+          ? Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 rounded bg-[#E2E8F0]" />)
           : filtered.map((record) => (
               <SubmissionCard
                 key={record.studentId}
@@ -330,11 +329,13 @@ function SubmissionCard({
       <CardContent className="pt-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="font-medium">{record.studentName}</p>
-            <p className="text-xs text-muted-foreground">{record.classroomName}</p>
+            <p className="font-medium text-[#0F172A]">{record.studentName}</p>
+            <p className="text-xs text-[#64748B]">{record.classroomName}</p>
           </div>
           {record.isSubmitted ? (
-            <Badge>{record.submission?.status === 'late' ? 'Terlambat' : 'Tepat Waktu'}</Badge>
+            <Badge className={record.submission?.status === 'late' ? 'bg-[#EF4444] text-white border-0' : 'bg-[#22C55E] text-white border-0'}>
+              {record.submission?.status === 'late' ? 'Terlambat' : 'Tepat Waktu'}
+            </Badge>
           ) : (
             <Badge variant="secondary">Belum Kumpul</Badge>
           )}
@@ -343,8 +344,8 @@ function SubmissionCard({
           <div className="mt-3 space-y-2">
             {record.submission.files.map((f, i) => (
               <div key={i} className="flex items-center gap-2 text-sm">
-                <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="truncate flex-1">{f.fileName}</span>
+                <FileText className="h-4 w-4 text-[#64748B] shrink-0" />
+                <span className="truncate flex-1 text-[#0F172A]">{f.fileName}</span>
               </div>
             ))}
             <div className="flex items-center gap-2 mt-2">
@@ -355,13 +356,13 @@ function SubmissionCard({
                 placeholder="Nilai (0-100)"
                 value={grade}
                 onChange={(e) => onGradeChange(e.target.value)}
-                className="flex h-8 w-28 rounded-md border border-input bg-background px-3 text-sm"
+                className="flex h-8 w-28 rounded-md border border-[#E2E8F0] bg-white px-3 text-sm text-[#0F172A] placeholder:text-[#64748B] focus-visible:border-[#4B5CF0] focus-visible:ring-2 focus-visible:ring-[#4B5CF0]/20 outline-none transition-all duration-200"
               />
               <Button size="sm" onClick={onGradeSubmit} disabled={isSaving || !grade}>
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Simpan'}
               </Button>
               {record.submission.grade != null && (
-                <span className="text-sm text-muted-foreground">Nilai saat ini: {record.submission.grade}</span>
+                <span className="text-sm text-[#64748B]">Nilai saat ini: {record.submission.grade}</span>
               )}
             </div>
           </div>
@@ -374,9 +375,9 @@ function SubmissionCard({
 function AssignmentDetailSkeleton() {
   return (
     <div className="space-y-6">
-      <Skeleton className="h-8 w-64" />
-      <Skeleton className="h-40 rounded-lg" />
-      <Skeleton className="h-64 rounded-lg" />
+      <Skeleton className="h-8 w-64 bg-[#E2E8F0]" />
+      <Skeleton className="h-40 rounded-lg bg-[#E2E8F0]" />
+      <Skeleton className="h-64 rounded-lg bg-[#E2E8F0]" />
     </div>
   )
 }

@@ -37,7 +37,7 @@ export const SIDEBAR_NAVIGATION_GROUPS: SidebarMenuGroup[] = [
     items: [
       {
         label: 'Beranda',
-        href: '/',
+        href: '/dashboard',
         icon: Home,
         roles: [USER_ROLE.Student],
       },

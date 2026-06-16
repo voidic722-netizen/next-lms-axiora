@@ -12,20 +12,20 @@ interface AlertMessageProps {
 
 const variantConfig: Record<AlertVariant, { icon: React.ReactNode; classes: string }> = {
   info: {
-    icon: <Info className="h-4 w-4 text-blue-500 shrink-0" />,
-    classes: 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300',
+    icon: <Info className="h-4 w-4 text-[#4B5CF0] shrink-0" />,
+    classes: 'bg-[#EEF1FF] border-[#C7D0FF] text-[#4B5CF0]',
   },
   success: {
-    icon: <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />,
-    classes: 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300',
+    icon: <CheckCircle2 className="h-4 w-4 text-[#22C55E] shrink-0" />,
+    classes: 'bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]',
   },
   warning: {
-    icon: <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />,
-    classes: 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300',
+    icon: <AlertTriangle className="h-4 w-4 text-[#F59E0B] shrink-0" />,
+    classes: 'bg-[#FFFBEB] border-[#FDE68A] text-[#92400E]',
   },
   error: {
-    icon: <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />,
-    classes: 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300',
+    icon: <AlertCircle className="h-4 w-4 text-[#EF4444] shrink-0" />,
+    classes: 'bg-[#FEF2F2] border-[#FECACA] text-[#B91C1C]',
   },
 }
 

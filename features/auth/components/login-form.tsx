@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useState } from 'react'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,11 +29,15 @@ export function LoginForm() {
   return (
     <div className="w-full max-w-md px-4">
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-lg">
-          LMS
-        </div>
-        <h1 className="text-2xl font-bold tracking-tight">Selamat datang kembali</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <Image
+          src="/assets/img/lhitam.png"
+          alt="Axiora Logo"
+          width={140}
+          height={40}
+          className="mx-auto mb-4 h-10 w-auto"
+        />
+        <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">Selamat datang kembali</h1>
+        <p className="mt-1 text-sm text-[#64748B]">
           Masuk ke akun Anda untuk melanjutkan
         </p>
       </div>
@@ -43,7 +48,6 @@ export function LoginForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(login)} className="space-y-4" noValidate>
-            {/* Email */}
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -51,15 +55,14 @@ export function LoginForm() {
                 type="email"
                 autoComplete="email"
                 placeholder="nama@email.com"
-                className={cn(errors.email && 'border-destructive')}
+                className={cn(errors.email && 'border-[#EF4444]')}
                 {...register('email')}
               />
               {errors.email && (
-                <p className="text-xs text-destructive">{errors.email.message}</p>
+                <p className="text-xs text-[#EF4444]">{errors.email.message}</p>
               )}
             </div>
 
-            {/* Password */}
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -68,13 +71,13 @@ export function LoginForm() {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className={cn('pr-10', errors.password && 'border-destructive')}
+                  className={cn('pr-10', errors.password && 'border-[#EF4444]')}
                   {...register('password')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A] transition-colors duration-200"
                   tabIndex={-1}
                 >
                   {showPassword ? (
@@ -85,7 +88,7 @@ export function LoginForm() {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-xs text-destructive">{errors.password.message}</p>
+                <p className="text-xs text-[#EF4444]">{errors.password.message}</p>
               )}
             </div>
 

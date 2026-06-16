@@ -36,15 +36,16 @@ export function DatePicker({
           disabled={disabled}
           className={cn(
             'w-full justify-start text-left font-normal',
-            !value && 'text-muted-foreground',
+            'border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC] transition-all duration-200',
+            !value && 'text-[#64748B]',
             className,
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          <CalendarIcon className="mr-2 h-4 w-4 text-[#64748B]" />
           {value ? format(value, 'dd MMMM yyyy', { locale: idLocale }) : placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0 border border-[#E2E8F0] rounded-xl shadow-lg" align="start">
         <Calendar
           mode="single"
           selected={value}
@@ -83,9 +84,9 @@ export function DateTimePicker({
       disabled={disabled}
       placeholder={placeholder}
       className={cn(
-        'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm',
-        'ring-offset-background placeholder:text-muted-foreground',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'flex h-10 w-full rounded-md border border-[#E2E8F0] bg-white px-3 py-2 text-sm text-[#0F172A] transition-all duration-200 outline-none',
+        'placeholder:text-[#64748B]',
+        'focus-visible:border-[#4B5CF0] focus-visible:ring-2 focus-visible:ring-[#4B5CF0]/20',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}

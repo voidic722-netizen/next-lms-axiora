@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import type { FacultyFormValues } from '@/schemas/faculty-schema'
+import type { FacultyFormValues } from '@/features/faculties/schemas/faculty-schema'
 
 interface FacultyFormFieldsProps {
   form: UseFormReturn<FacultyFormValues>
@@ -37,7 +37,7 @@ export function FacultyFormFields({ form, existingThumbnail }: FacultyFormFields
       <div className="space-y-1.5">
         <Label htmlFor="faculty-name">Nama Fakultas</Label>
         <Input id="faculty-name" placeholder="Fakultas Teknik" {...register('name')} />
-        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+        {errors.name && <p className="text-xs text-[#EF4444]">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-1.5">
@@ -49,14 +49,14 @@ export function FacultyFormFields({ form, existingThumbnail }: FacultyFormFields
           {...register('description')}
         />
         {errors.description && (
-          <p className="text-xs text-destructive">{errors.description.message}</p>
+          <p className="text-xs text-[#EF4444]">{errors.description.message}</p>
         )}
       </div>
 
       <div className="space-y-1.5">
         <Label>Thumbnail</Label>
         {preview ? (
-          <div className="relative w-full aspect-video rounded-lg overflow-hidden border bg-muted">
+          <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-[#E2E8F0] bg-[#F8FAFC]">
             <img src={preview} alt="preview" className="w-full h-full object-cover" />
             <Button
               type="button"
@@ -72,11 +72,11 @@ export function FacultyFormFields({ form, existingThumbnail }: FacultyFormFields
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
-            className="flex flex-col items-center justify-center w-full aspect-video rounded-lg border-2 border-dashed border-border hover:border-primary/50 hover:bg-muted/50 transition-colors"
+            className="flex flex-col items-center justify-center w-full aspect-video rounded-lg border-2 border-dashed border-[#E2E8F0] hover:border-[#4B5CF0]/50 hover:bg-[#F8FAFC] transition-colors"
           >
-            <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
-            <span className="text-sm text-muted-foreground">Klik untuk pilih gambar</span>
-            <span className="text-xs text-muted-foreground mt-1">JPG, PNG, WebP · Maks 2 MB</span>
+            <ImageIcon className="h-8 w-8 text-[#64748B] mb-2" />
+            <span className="text-sm text-[#64748B]">Klik untuk pilih gambar</span>
+            <span className="text-xs text-[#64748B] mt-1">JPG, PNG, WebP · Maks 2 MB</span>
           </button>
         )}
         <input
@@ -87,7 +87,7 @@ export function FacultyFormFields({ form, existingThumbnail }: FacultyFormFields
           onChange={handleFile}
         />
         {errors.thumbnail && (
-          <p className="text-xs text-destructive">{errors.thumbnail.message}</p>
+          <p className="text-xs text-[#EF4444]">{errors.thumbnail.message}</p>
         )}
       </div>
     </div>

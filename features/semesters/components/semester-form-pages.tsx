@@ -10,8 +10,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { semesterSchema, type SemesterFormValues } from '@/schemas/semester-schema'
-import { useCreateSemester, useUpdateSemester, useSemesters } from '@/hooks/use-semesters'
+import { semesterSchema, type SemesterFormValues } from '@/features/semesters/schemas/semester-schema'
+import { useCreateSemester, useUpdateSemester, useSemesters } from '@/features/semesters/hooks/use-semesters'
 
 function SemesterForm({
   defaultValues,
@@ -40,13 +40,13 @@ function SemesterForm({
       <div className="space-y-1.5">
         <Label htmlFor="sem-name">Nama Semester</Label>
         <Input id="sem-name" placeholder="Semester Ganjil" {...register('name')} />
-        {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+        {errors.name && <p className="text-xs text-[#EF4444]">{errors.name.message}</p>}
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="sem-year">Tahun Akademik</Label>
         <Input id="sem-year" placeholder="2024/2025" {...register('academicYear')} />
         {errors.academicYear && (
-          <p className="text-xs text-destructive">{errors.academicYear.message}</p>
+          <p className="text-xs text-[#EF4444]">{errors.academicYear.message}</p>
         )}
       </div>
       <div className="flex gap-3 pt-2">
@@ -94,7 +94,7 @@ export function EditSemesterPage({ id }: { id: string }) {
 
   const semester = semesters.find((s) => s.id === numericId)
 
-  if (isLoading) return <Skeleton className="h-64 max-w-md rounded-lg" />
+  if (isLoading) return <Skeleton className="h-64 max-w-md rounded-lg bg-[#E2E8F0]" />
 
   return (
     <div className="space-y-6 max-w-md">

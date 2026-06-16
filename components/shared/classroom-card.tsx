@@ -25,21 +25,26 @@ export function ClassroomCard({
 }: ClassroomCardProps) {
   return (
     <Link href={`/classrooms/${id}`}>
-      <Card className={cn('hover:bg-muted/30 transition-colors h-full', className)}>
+      <Card
+        className={cn(
+          'border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200 h-full',
+          className
+        )}
+      >
         <CardContent className="pt-4">
           <div className="flex items-start gap-3">
-            <School className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
+            <School className="h-5 w-5 text-[#4B5CF0] shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold truncate">{name}</p>
+              <p className="font-semibold text-[#0F172A] truncate">{name}</p>
               {subjectName && (
-                <p className="text-sm text-muted-foreground truncate mt-0.5">{subjectName}</p>
+                <p className="text-sm text-[#64748B] truncate mt-0.5">{subjectName}</p>
               )}
               <div className="flex gap-2 mt-2 flex-wrap">
                 {semesterName && (
                   <Badge variant="secondary" className="text-xs">{semesterName}</Badge>
                 )}
                 {studentCount !== undefined && (
-                  <Badge variant="outline" className="text-xs">{studentCount} mahasiswa</Badge>
+                  <Badge variant="secondary" className="text-xs">{studentCount} mahasiswa</Badge>
                 )}
               </div>
             </div>
@@ -70,17 +75,24 @@ export function StudentCard({
   className,
 }: StudentCardProps) {
   return (
-    <Card className={cn(className)}>
+    <Card
+      className={cn(
+        'border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200',
+        className
+      )}
+    >
       <CardContent className="pt-4 flex items-center gap-3">
         <Avatar className="h-10 w-10 shrink-0">
           <AvatarImage src={image ?? undefined} />
-          <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
+          <AvatarFallback className="bg-[#EEF1FF] text-[#4B5CF0] font-semibold">
+            {name.charAt(0).toUpperCase()}
+          </AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="font-medium text-sm truncate">{name}</p>
-          <p className="text-xs text-muted-foreground truncate">{nim ?? email}</p>
+          <p className="font-medium text-sm text-[#0F172A] truncate">{name}</p>
+          <p className="text-xs text-[#64748B] truncate">{nim ?? email}</p>
           {classroomName && (
-            <p className="text-xs text-muted-foreground truncate">{classroomName}</p>
+            <p className="text-xs text-[#64748B] truncate">{classroomName}</p>
           )}
         </div>
       </CardContent>
@@ -110,20 +122,27 @@ export function TeacherCard({
   className,
 }: TeacherCardProps) {
   return (
-    <Card className={cn(className)}>
+    <Card
+      className={cn(
+        'border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200',
+        className
+      )}
+    >
       <CardContent className="pt-4 flex items-center gap-3">
         <Avatar className="h-10 w-10 shrink-0">
           <AvatarImage src={image ?? undefined} />
-          <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
+          <AvatarFallback className="bg-[#EEF1FF] text-[#4B5CF0] font-semibold">
+            {name.charAt(0).toUpperCase()}
+          </AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="font-medium text-sm truncate">{name}</p>
-          <p className="text-xs text-muted-foreground truncate">{nidn ?? email}</p>
+          <p className="font-medium text-sm text-[#0F172A] truncate">{name}</p>
+          <p className="text-xs text-[#64748B] truncate">{nidn ?? email}</p>
           {position && (
-            <Badge variant="outline" className="text-xs mt-1">{position}</Badge>
+            <Badge variant="secondary" className="text-xs mt-1">{position}</Badge>
           )}
           {departmentName && (
-            <p className="text-xs text-muted-foreground truncate">{departmentName}</p>
+            <p className="text-xs text-[#64748B] truncate">{departmentName}</p>
           )}
         </div>
       </CardContent>
