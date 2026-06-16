@@ -3,8 +3,10 @@ export interface AssignmentModule {
   assignmentId: number
   name: string
   filePath: string
+  cloudinaryPublicId: string | null
   format: string
   fileSize: string
+  updatedAt: string
 }
 
 export interface Assignment {
@@ -19,6 +21,7 @@ export interface Assignment {
   subject?: { id: number; name: string }
   modules: AssignmentModule[]
   createdAt: string
+  updatedAt: string
 }
 
 export interface CreateAssignmentPayload {

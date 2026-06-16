@@ -23,6 +23,7 @@ export interface Exam {
   durationMinutes: number
   questions: ExamQuestion[]
   createdAt: string
+  updatedAt: string
 }
 
 export interface ExamQuestion_CreateOrUpdate extends Omit<ExamQuestion, 'image'> {

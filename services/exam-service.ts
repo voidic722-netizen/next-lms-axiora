@@ -19,13 +19,14 @@ interface RawExam {
   id: number
   title: string
   description: string | null
-  kategori_ujian: string[]
-  kelas_ids: number[]
-  available_date: string
-  deadline_date: string
+  exam_categories: string[]
+  classroom_ids: number[]
+  available_at: string
+  deadline_at: string
   duration_minutes: number
   questions: RawQuestion[]
   created_at: string
+  updated_at: string
 }
 
 function mapQuestion(raw: RawQuestion): ExamQuestion {
@@ -47,13 +48,14 @@ function mapExam(raw: RawExam): Exam {
     id: raw.id,
     title: raw.title,
     description: raw.description,
-    examTypes: raw.kategori_ujian,
-    classroomIds: raw.kelas_ids,
-    availableDate: raw.available_date,
-    deadlineDate: raw.deadline_date,
+    examTypes: raw.exam_categories,
+    classroomIds: raw.classroom_ids,
+    availableDate: raw.available_at,
+    deadlineDate: raw.deadline_at,
     durationMinutes: raw.duration_minutes,
     questions: raw.questions.map(mapQuestion),
     createdAt: raw.created_at,
+    updatedAt: raw.updated_at,
   }
 }
 
@@ -61,10 +63,10 @@ function buildExamFormData(payload: CreateOrUpdateExamPayload): FormData {
   const form = new FormData()
   form.append('title', payload.title)
   if (payload.description) form.append('description', payload.description)
-  form.append('kategori_ujian', JSON.stringify(payload.examTypes))
-  form.append('kelas_ids', JSON.stringify(payload.classroomIds))
-  form.append('available_date', payload.availableDate)
-  form.append('deadline_date', payload.deadlineDate)
+  form.append('exam_categories', JSON.stringify(payload.examTypes))
+  form.append('classroom_ids', JSON.stringify(payload.classroomIds))
+  form.append('available_at', payload.availableDate)
+  form.append('deadline_at', payload.deadlineDate)
   form.append('duration_minutes', String(payload.durationMinutes))
 
   payload.questions.forEach((q, i) => {
@@ -89,32 +91,32 @@ function buildExamFormData(payload: CreateOrUpdateExamPayload): FormData {
 }
 
 export async function getExamsService(): Promise<Exam[]> {
-  const { data } = await api.get<{ ujian: RawExam[] }>('/ujian')
-  return data.ujian.map(mapExam)
+  const { data } = await api.get<RawExam[]>('/exams')
+  return data.map(mapExam)
 }
 
 export async function getExamByIdService(id: number | string): Promise<Exam> {
-  const { data } = await api.get<{ ujian: RawExam }>(`/ujian/${id}`)
-  return mapExam(data.ujian)
+  const { data } = await api.get<RawExam>(`/exams/${id}`)
+  return mapExam(data)
 }
 
 export async function createExamService(payload: CreateOrUpdateExamPayload): Promise<Exam> {
-  const { data } = await api.post<{ ujian: RawExam }>('/ujian', buildExamFormData(payload), {
+  const { data } = await api.post<RawExam>('/exams', buildExamFormData(payload), {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
-  return mapExam(data.ujian)
+  return mapExam(data)
 }
 
 export async function updateExamService(
   id: number | string,
   payload: CreateOrUpdateExamPayload,
 ): Promise<Exam> {
-  const { data } = await api.put<{ ujian: RawExam }>(`/ujian/${id}`, buildExamFormData(payload), {
+  const { data } = await api.put<RawExam>(`/exams/${id}`, buildExamFormData(payload), {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
-  return mapExam(data.ujian)
+  return mapExam(data)
 }
 
 export async function deleteExamService(id: number | string): Promise<void> {
-  await api.delete(`/ujian/${id}`)
+  await api.delete(`/exams/${id}`)
 }

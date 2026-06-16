@@ -20,8 +20,8 @@ interface RawStudentExamRecord {
   student_name: string
   student_nim: string | null
   student_email: string | null
-  kelas_id: number | null
-  kelas_name: string | null
+  classroom_id: number | null
+  classroom_name: string | null
   is_submitted: boolean
   submission: {
     id: number
@@ -47,25 +47,21 @@ function mapSubmission(raw: RawExamSubmission): ExamSubmission {
 export async function getMyExamSubmissionService(
   examId: number | string,
 ): Promise<ExamSubmission | null> {
-  const { data } = await api.get<{ submission: RawExamSubmission | null }>(
-    `/ujian/${examId}/my-submission`,
-  )
-  return data.submission ? mapSubmission(data.submission) : null
+  const { data } = await api.get<RawExamSubmission | null>(`/exams/${examId}/my-submission`)
+  return data ? mapSubmission(data) : null
 }
 
 export async function getExamSubmissionsService(
   examId: number | string,
 ): Promise<StudentExamSubmissionRecord[]> {
-  const { data } = await api.get<{ submissions: RawStudentExamRecord[] }>(
-    `/ujian/${examId}/submissions`,
-  )
-  return data.submissions.map((s) => ({
+  const { data } = await api.get<RawStudentExamRecord[]>(`/exams/${examId}/submissions`)
+  return data.map((s) => ({
     studentId: s.student_id,
     studentName: s.student_name,
     studentNim: s.student_nim,
     studentEmail: s.student_email,
-    classroomId: s.kelas_id,
-    classroomName: s.kelas_name,
+    classroomId: s.classroom_id,
+    classroomName: s.classroom_name,
     isSubmitted: s.is_submitted,
     submission: s.submission
       ? {
@@ -87,18 +83,13 @@ export async function submitExamService(
   options?: SubmitExamOptions,
 ): Promise<ExamSubmissionResult> {
   if (options?.keepalive) {
-    // Use sendBeacon / keepalive fetch for pagehide/beforeunload submissions
-    const body = JSON.stringify({
-      exam_id: examId,
-      answers: payload.answers,
-    })
+    const body = JSON.stringify({ answers: payload.answers })
     const sent = navigator.sendBeacon(
-      `${process.env.NEXT_PUBLIC_API_URL}/ujian/${examId}/submit`,
+      `${process.env.NEXT_PUBLIC_API_URL}/exams/${examId}/submit`,
       new Blob([body], { type: 'application/json' }),
     )
     if (!sent) {
-      // Fallback: keepalive fetch
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ujian/${examId}/submit`, {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/${examId}/submit`, {
         method: 'POST',
         credentials: 'include',
         keepalive: true,
@@ -109,11 +100,9 @@ export async function submitExamService(
     return { score: 0, correctCount: 0, totalQuestions: 0 }
   }
 
-  const { data } = await api.post<{
-    score: number
-    correct_count: number
-    total_questions: number
-  }>(`/ujian/${examId}/submit`, { answers: payload.answers })
+  const { data } = await api.post<RawExamSubmission>(`/exams/${examId}/submit`, {
+    answers: payload.answers,
+  })
 
   return {
     score: data.score,

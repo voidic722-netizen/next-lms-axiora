@@ -14,7 +14,7 @@ interface RawFile {
 
 interface RawSubmission {
   id: number
-  tugas_id: number
+  assignment_id: number
   user_id: number
   files: RawFile[]
   status: 'submitted' | 'late'
@@ -28,8 +28,8 @@ interface RawSubmission {
 interface RawStudentRecord {
   student_id: number
   student_name: string
-  kelas_id: number
-  kelas_name: string
+  classroom_id: number
+  classroom_name: string
   is_submitted: boolean
   submission: {
     id: number
@@ -53,7 +53,7 @@ function mapFile(raw: RawFile) {
 function mapSubmission(raw: RawSubmission): AssignmentSubmission {
   return {
     id: raw.id,
-    assignmentId: raw.tugas_id,
+    assignmentId: raw.assignment_id,
     userId: raw.user_id,
     files: raw.files.map(mapFile),
     status: raw.status,
@@ -68,19 +68,19 @@ function mapSubmission(raw: RawSubmission): AssignmentSubmission {
 export async function getMyAssignmentSubmissionService(
   assignmentId: number | string,
 ): Promise<AssignmentSubmission | null> {
-  const { data } = await api.get<{ submission: RawSubmission | null }>(`/tugas/${assignmentId}/my-submission`)
-  return data.submission ? mapSubmission(data.submission) : null
+  const { data } = await api.get<RawSubmission | null>(`/assignments/${assignmentId}/my-submission`)
+  return data ? mapSubmission(data) : null
 }
 
 export async function getAssignmentSubmissionsService(
   assignmentId: number | string,
 ): Promise<StudentSubmissionRecord[]> {
-  const { data } = await api.get<{ submissions: RawStudentRecord[] }>(`/tugas/${assignmentId}/submissions`)
-  return data.submissions.map((s) => ({
+  const { data } = await api.get<RawStudentRecord[]>(`/assignments/${assignmentId}/submissions`)
+  return data.map((s) => ({
     studentId: s.student_id,
     studentName: s.student_name,
-    classroomId: s.kelas_id,
-    classroomName: s.kelas_name,
+    classroomId: s.classroom_id,
+    classroomName: s.classroom_name,
     isSubmitted: s.is_submitted,
     submission: s.submission
       ? {
@@ -100,20 +100,20 @@ export async function submitAssignmentService(
   files: File[],
 ): Promise<AssignmentSubmission> {
   const form = new FormData()
-  files.forEach((file) => form.append('files', file))
-  const { data } = await api.post<{ submission: RawSubmission }>(`/tugas/${assignmentId}/submit`, form, {
+  files.forEach((file) => form.append('files[]', file))
+  const { data } = await api.post<RawSubmission>(`/assignments/${assignmentId}/submit`, form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
-  return mapSubmission(data.submission)
+  return mapSubmission(data)
 }
 
 export async function gradeSubmissionService(
   submissionId: number,
   payload: GradeSubmissionPayload,
 ): Promise<AssignmentSubmission> {
-  const { data } = await api.post<{ submission: RawSubmission }>(
-    `/tugas-pengumpulan/${submissionId}/grade`,
+  const { data } = await api.post<RawSubmission>(
+    `/assignment-submissions/${submissionId}/grade`,
     { grade: payload.grade, feedback: payload.feedback ?? '' },
   )
-  return mapSubmission(data.submission)
+  return mapSubmission(data)
 }
