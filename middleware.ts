@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 const AUTH_TOKEN_COOKIE = process.env.AUTH_TOKEN_COOKIE_NAME ?? 'auth_token'
 const IS_MSW_ACTIVE = process.env.NEXT_PUBLIC_MSW === 'true'
 
-const PUBLIC_PATHS = ['/login']
+const PUBLIC_PATHS = ['/login', '/']
 
 function isPublicPath(pathname: string): boolean {
   return PUBLIC_PATHS.some((p) => pathname.startsWith(p))
