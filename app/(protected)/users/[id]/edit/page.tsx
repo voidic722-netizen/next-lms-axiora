@@ -3,6 +3,7 @@ import { EditUserPage } from '@/features/users/components/edit-user-page'
 
 export const metadata: Metadata = { title: 'Edit User' }
 
-export default function Page({ params }: { params: { id: string } }) {
-  return <EditUserPage id={params.id} />
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  return <EditUserPage id={id} />
 }

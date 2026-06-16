@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { UserFormFields } from './user-form-fields'
-import { useCreateUser, useUpdateUser, useUsers, useUserReferenceData } from '../hooks/use-users'
+import { useCreateUser, useUpdateUser, useUsers, useUserReferenceData, useSingleUser } from '../hooks/use-users'
 import { createUserSchema, updateUserSchema } from '../schemas/user-schema'
 import type { CreateUserFormValues, UpdateUserFormValues } from '../schemas/user-schema'
 import type { CreateUserPayload, UpdateUserPayload } from '@/types/user'
@@ -53,7 +53,7 @@ export function AddUserPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <PageHeader title="Tambah User" />
-      <Card>
+      <Card >
         <CardContent className="pt-6">
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <UserFormFields
@@ -81,11 +81,9 @@ export function AddUserPage() {
 export function EditUserPage({ id }: { id: string }) {
   const router = useRouter()
   const numericId = parseInt(id, 10)
-  const { data: users = [], isLoading: usersLoading } = useUsers()
+  const { data: currentUser, isLoading: userLoading } = useSingleUser(numericId)
   const mutation = useUpdateUser(numericId)
   const refData = useUserReferenceData()
-
-  const currentUser = users.find((u) => u.id === numericId)
 
   const form = useForm<UpdateUserFormValues>({
     resolver: zodResolver(updateUserSchema) as never,
@@ -135,7 +133,7 @@ export function EditUserPage({ id }: { id: string }) {
     router.push('/users')
   }
 
-  if (usersLoading || refData.isLoading) return <Skeleton className="h-[500px] max-w-2xl rounded-lg bg-[#E2E8F0]" />
+  if (userLoading || refData.isLoading) return <Skeleton className="h-[500px] max-w-2xl rounded-lg bg-[#E2E8F0]" />
 
   return (
     <div className="space-y-6 max-w-2xl">

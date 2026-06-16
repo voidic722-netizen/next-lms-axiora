@@ -86,13 +86,12 @@ export async function createDepartmentService(payload: CreateDepartmentPayload):
 
 export async function updateDepartmentService(id: number, payload: UpdateDepartmentPayload): Promise<Department> {
   const form = new FormData()
+  form.append('_method', 'PUT')
   form.append('name', payload.name)
   form.append('description', payload.description)
   form.append('faculty_id', String(payload.facultyId))
   if (payload.thumbnail) form.append('thumbnail', payload.thumbnail)
-  const { data } = await api.put<RawDepartment>(`/departments/${id}`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawDepartment>(`/departments/${id}`, form)
   return mapDepartment(data)
 }
 

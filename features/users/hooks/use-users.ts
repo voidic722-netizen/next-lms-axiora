@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   getUsersService,
+  getSingleUserService,
   createUserService,
   updateUserService,
   deleteUserService,
@@ -15,6 +16,7 @@ import type { CreateUserPayload, UpdateUserPayload } from '@/types/user'
 export const USER_KEYS = {
   all: ['users'] as const,
   byRole: (role?: string) => ['users', role] as const,
+  single: (id: number) => ['users', id] as const,
 }
 
 export function useUsers(role?: string) {
@@ -22,6 +24,15 @@ export function useUsers(role?: string) {
     queryKey: USER_KEYS.byRole(role),
     queryFn: () => getUsersService(role),
     staleTime: 30_000,
+  })
+}
+
+export function useSingleUser(id: number) {
+  return useQuery({
+    queryKey: USER_KEYS.single(id),
+    queryFn: () => getSingleUserService(id),
+    staleTime: 30_000,
+    enabled: !isNaN(id),  // tambah ini
   })
 }
 

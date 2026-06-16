@@ -51,14 +51,13 @@ export async function createSubjectService(payload: CreateSubjectPayload): Promi
 
 export async function updateSubjectService(id: number, payload: UpdateSubjectPayload): Promise<Subject> {
   const form = new FormData()
+  form.append('_method', 'PUT')
   form.append('name', payload.name)
   form.append('type', payload.type)
   form.append('description', payload.description)
   if (payload.departmentId != null) form.append('department_id', String(payload.departmentId))
   if (payload.thumbnail) form.append('thumbnail', payload.thumbnail)
-  const { data } = await api.put<RawSubject>(`/subjects/${id}`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawSubject>(`/subjects/${id}`, form)
   return mapSubject(data)
 }
 

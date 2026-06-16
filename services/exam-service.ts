@@ -111,9 +111,9 @@ export async function updateExamService(
   id: number | string,
   payload: CreateOrUpdateExamPayload,
 ): Promise<Exam> {
-  const { data } = await api.put<RawExam>(`/exams/${id}`, buildExamFormData(payload), {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const form = buildExamFormData(payload)
+  form.append('_method', 'PUT')
+  const { data } = await api.post<RawExam>(`/exams/${id}`, form)
   return mapExam(data)
 }
 

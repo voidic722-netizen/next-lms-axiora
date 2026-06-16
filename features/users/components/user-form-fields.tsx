@@ -148,14 +148,19 @@ function TeacherFormSection({
   departments: Department[]
   subjects: Subject[]
 }) {
-  const { register, setValue } = form
+  const { register, setValue, getValues, watch } = form
+  const position = watch('position' as keyof UserFormValues)
+  const facultyId = watch('facultyId' as keyof UserFormValues)
+  const departmentId = watch('departmentId' as keyof UserFormValues)
+  const subjectId = watch('subjectId' as keyof UserFormValues)
+
   return (
     <div className="space-y-4 border-t border-[#E2E8F0] pt-4">
       <p className="text-sm font-medium text-[#64748B]">Data Pengajar</p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label>Posisi</Label>
-          <Select onValueChange={(v) => setValue('position' as keyof UserFormValues, v as never)}>
+          <Select value={position as string} onValueChange={(v) => setValue('position' as keyof UserFormValues, v as never)}>
             <SelectTrigger><SelectValue placeholder="Pilih posisi" /></SelectTrigger>
             <SelectContent>
               {POSITION_OPTIONS.map((o) => (

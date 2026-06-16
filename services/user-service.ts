@@ -22,6 +22,18 @@ interface RawUser {
   updated_at: string
 }
 
+const POSITION_FRONTEND_TO_BACKEND: Record<string, string> = {
+  dosen: 'lecturer',
+  kaprodi: 'department_head',
+  dekan: 'dean',
+}
+
+const POSITION_BACKEND_TO_FRONTEND: Record<string, string> = {
+  lecturer: 'dosen',
+  department_head: 'kaprodi',
+  dean: 'dekan',
+}
+
 function mapUser(raw: RawUser): User {
   return {
     id: raw.id,
@@ -29,7 +41,7 @@ function mapUser(raw: RawUser): User {
     email: raw.email,
     role: String(raw.role) as User['role'],
     image: raw.image,
-    position: raw.position as User['position'],
+    position: raw.position ? (POSITION_BACKEND_TO_FRONTEND[raw.position] as User['position']) : null,
     nidn: raw.nidn,
     nim: raw.nim,
     createdAt: raw.created_at,
@@ -51,13 +63,18 @@ export async function getUsersService(role?: string): Promise<User[]> {
   return data.map(mapUser)
 }
 
+export async function getSingleUserService(id: number): Promise<User> {
+  const { data } = await api.get<RawUser>(`/users/${id}`)
+  return mapUser(data)
+}
+
 export async function createUserService(payload: CreateUserPayload): Promise<User> {
   const body = {
     name: payload.name,
     email: payload.email,
     password: payload.password,
     role: payload.role,
-    position: payload.position,
+    position: payload.position ? POSITION_FRONTEND_TO_BACKEND[payload.position] : null,
     nidn: payload.nidn,
     nim: payload.nim,
     faculty_id: payload.facultyId,
@@ -75,11 +92,15 @@ export async function updateUserService(
   image?: File,
 ): Promise<User> {
   const form = new FormData()
+  form.append('_method', 'PUT')
   form.append('name', payload.name)
   form.append('email', payload.email)
   form.append('role', payload.role)
   if (payload.password) form.append('password', payload.password)
-  if (payload.position) form.append('position', payload.position)
+  if (payload.position) {
+  const mappedPosition = POSITION_FRONTEND_TO_BACKEND[payload.position]
+  if (mappedPosition) form.append('position', mappedPosition)
+}
   if (payload.nidn) form.append('nidn', payload.nidn)
   if (payload.nim) form.append('nim', payload.nim)
   if (payload.facultyId != null) form.append('faculty_id', String(payload.facultyId))
@@ -88,9 +109,7 @@ export async function updateUserService(
   if (payload.subjectId != null) form.append('subject_id', String(payload.subjectId))
   if (image) form.append('image', image)
 
-  const { data } = await api.put<RawUser>(`/users/${id}`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawUser>(`/users/${id}`, form)
   return mapUser(data)
 }
 

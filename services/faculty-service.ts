@@ -110,12 +110,11 @@ export async function createFacultyService(payload: CreateFacultyPayload): Promi
 
 export async function updateFacultyService(id: number, payload: UpdateFacultyPayload): Promise<Faculty> {
   const form = new FormData()
+  form.append('_method', 'PUT')
   form.append('name', payload.name)
   form.append('description', payload.description)
   if (payload.thumbnail) form.append('thumbnail', payload.thumbnail)
-  const { data } = await api.put<RawFaculty>(`/faculties/${id}`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawFaculty>(`/faculties/${id}`, form)
   return mapFaculty(data)
 }
 

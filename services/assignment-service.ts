@@ -84,9 +84,9 @@ export async function createAssignmentService(payload: CreateAssignmentPayload):
 }
 
 export async function updateAssignmentService(id: number | string, payload: UpdateAssignmentPayload): Promise<Assignment> {
-  const { data } = await api.put<RawAssignment>(`/assignments/${id}`, buildAssignmentFormData(payload), {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const form = buildAssignmentFormData(payload)
+  form.append('_method', 'PUT')
+  const { data } = await api.post<RawAssignment>(`/assignments/${id}`, form)
   return mapAssignment(data)
 }
 

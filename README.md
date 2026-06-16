@@ -28,6 +28,14 @@ A Learning Management System (LMS) frontend built with **Next.js 16**, **React 1
 - **User Management** – Admin panel for user administration
 - **MSW Mocking** – Development with mock data support
 
+## Demo Account
+
+Live demo is available at the hosted URL. Use the following credentials to log in:
+
+| Role  | Email                | Password    |
+|-------|----------------------|-------------|
+| Admin | admin@axiora.com     | password123 |
+
 ## Getting Started
 
 ### Prerequisites
