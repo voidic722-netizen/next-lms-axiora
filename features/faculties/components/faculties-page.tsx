@@ -90,9 +90,6 @@ function FacultyCard({
           <h3 className="font-semibold text-[#0F172A] truncate hover:underline">{faculty.name}</h3>
         </Link>
         <p className="text-sm text-[#64748B] line-clamp-2 mt-1">{faculty.description}</p>
-        {faculty.dean && (
-          <p className="text-xs text-[#64748B] mt-2">Dekan: {faculty.dean}</p>
-        )}
         {isAdmin && (
           <div className="flex gap-2 mt-3 pt-3 border-t border-[#E2E8F0]">
             <Button asChild variant="outline" size="sm" className="flex-1">

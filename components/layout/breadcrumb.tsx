@@ -20,7 +20,6 @@ const DETAIL_ROUTES = [
   'assignments',
   'exams',
 ] as const
-type DetailRoute = (typeof DETAIL_ROUTES)[number]
 
 const ROUTE_LABELS: Record<string, string> = {
   subjects: 'Mata Pelajaran',
@@ -40,7 +39,6 @@ const ROUTE_LABELS: Record<string, string> = {
   submitted: 'Hasil Ujian',
   submissions: 'Pengumpulan',
   classes: 'Kelas',
-  exams: 'Ujian',
 }
 
 function useEntityName(

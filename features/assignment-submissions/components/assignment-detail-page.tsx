@@ -16,7 +16,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { formatDate, isPast } from '@/lib/format-date'
-import { formatMaxFileSize, resolveMaxFileSizeBytes } from '@/utils/format'
+import { formatMaxFileSize } from '@/utils/format'
 import { downloadFile } from '@/lib/download-file'
 import { ASSIGNMENT_TYPE_LABELS } from '@/features/assignments/constants/assignment-type-labels'
 import { useAssignmentDetail, useDeleteAssignment } from '@/features/assignments/hooks/use-assignments'
@@ -31,7 +31,7 @@ import { useClassrooms } from '@/features/classrooms/hooks/use-classrooms'
 import type { StudentSubmissionRecord } from '@/types/assignment-submission'
 
 export function AssignmentDetailPage({ id }: { id: string }) {
-  const { user, isTeacherOrAdmin } = useAuth()
+  const { isTeacherOrAdmin } = useAuth()
   const { data: assignment, isLoading } = useAssignmentDetail(id)
 
   if (isLoading) return <AssignmentDetailSkeleton />

@@ -20,7 +20,6 @@ interface Message {
   isTyping?: boolean;
 }
 
-// Stop words yang diabaikan saat matching
 const STOP_WORDS = new Set([
   "apa", "itu", "yang", "di", "ke", "dari", "dan", "atau", "adalah",
   "ada", "tidak", "dengan", "untuk", "ini", "itu", "saya", "kamu",
@@ -28,10 +27,9 @@ const STOP_WORDS = new Set([
   "dimana", "apakah", "saja", "juga", "sudah", "belum", "akan",
   "tentang", "terkait", "seputar", "gimana", "dong", "yuk", "tolong",
   "mohon", "bisakah", "dapatkah", "jelaskan", "ceritakan", "beritahu",
-  "axiora", // jangan jadikan "axiora" sebagai sinyal kuat karena ada di hampir semua item
+  "axiora",
 ]);
 
-// Ekstrak kata bermakna dari query
 const extractTokens = (text: string): string[] => {
   return text
     .toLowerCase()
@@ -50,22 +48,18 @@ const findBestMatch = (query: string): KnowledgeItem | null => {
   for (const item of knowledgeBase as KnowledgeItem[]) {
     let score = 0;
 
-    // 1. Exact question match → tertinggi
     if (item.question.toLowerCase() === lowerQuery) {
       score += 200;
     }
 
-    // 2. Question mengandung query utuh
     if (item.question.toLowerCase().includes(lowerQuery)) {
       score += 50;
     }
 
-    // 3. Query mengandung question (user nanya dengan kata-kata mirip pertanyaan)
     if (lowerQuery.includes(item.question.toLowerCase())) {
       score += 40;
     }
 
-    // 4. Token matching pada question (lebih bermakna)
     const questionTokens = extractTokens(item.question);
     for (const token of queryTokens) {
       if (questionTokens.some((qt) => qt.includes(token) || token.includes(qt))) {
@@ -73,18 +67,15 @@ const findBestMatch = (query: string): KnowledgeItem | null => {
       }
     }
 
-    // 5. Token matching pada keywords (lebih rendah bobotnya)
     const itemKeywords = item.keywords.map((k) => k.toLowerCase());
     for (const token of queryTokens) {
       for (const kw of itemKeywords) {
-        // Hanya match kalau keyword cukup spesifik (> 4 karakter)
         if (kw.length > 4 && (kw.includes(token) || token.includes(kw))) {
           score += 8;
         }
       }
     }
 
-    // 6. Token matching pada answer (bobot rendah)
     const answerTokens = extractTokens(item.answer);
     for (const token of queryTokens) {
       if (answerTokens.some((at) => at.includes(token) || token.includes(at))) {
@@ -92,7 +83,6 @@ const findBestMatch = (query: string): KnowledgeItem | null => {
       }
     }
 
-    // Hanya anggap match kalau skor cukup bermakna
     if (score > highestScore && score >= 10) {
       highestScore = score;
       bestMatch = item;
@@ -102,18 +92,15 @@ const findBestMatch = (query: string): KnowledgeItem | null => {
   return bestMatch;
 };
 
-// Fungsi untuk mendapatkan suggested questions dinamis berdasarkan input
 const getDynamicSuggestions = (inputText: string, usedQuestions: string[]): string[] => {
   const kb = knowledgeBase as KnowledgeItem[];
   const inputTokens = extractTokens(inputText);
   
-  // Score setiap knowledge item berdasarkan input
   const scoredItems = kb.map(item => {
     let score = 0;
     const questionTokens = extractTokens(item.question);
     const itemKeywords = item.keywords.map(k => k.toLowerCase());
     
-    // Match tokens dengan question dan keywords
     for (const token of inputTokens) {
       if (questionTokens.some(qt => qt.includes(token) || token.includes(qt))) {
         score += 10;
@@ -126,7 +113,6 @@ const getDynamicSuggestions = (inputText: string, usedQuestions: string[]): stri
     return { item, score };
   });
   
-  // Filter, sortir, ambil top 4, dan buang yang sudah ditampilkan
   return scoredItems
     .filter(si => si.score > 0 || inputText.length === 0)
     .sort((a, b) => b.score - a.score)
@@ -143,12 +129,10 @@ export function Chatbot() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  // Dapatkan pertanyaan yang sudah pernah ditampilkan di pesan
   const usedQuestions = useMemo(() => {
     return messages.filter(m => m.sender === "user").map(m => m.text);
   }, [messages]);
   
-  // Dapatkan suggested questions dinamis
   const dynamicSuggestions = useMemo(() => {
     return getDynamicSuggestions(input, usedQuestions);
   }, [input, usedQuestions]);
@@ -172,7 +156,8 @@ export function Chatbot() {
   }, [isOpen, messages.length]);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    // FIX: Ubah tipe parameter menjadi Event agar kompatibel dengan touchstart
+    const handleClickOutside = (event: Event) => {
       if (
         isOpen &&
         chatContainerRef.current &&
@@ -231,7 +216,6 @@ export function Chatbot() {
 
   const chatUI = (
     <>
-      {/* Bubble button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Buka chat"
@@ -255,7 +239,6 @@ export function Chatbot() {
         )}
       </button>
 
-      {/* Chat box */}
       {isOpen && (
         <div
           ref={chatContainerRef}
@@ -268,7 +251,6 @@ export function Chatbot() {
             flexDirection: "column", overflow: "hidden",
           }}
         >
-          {/* Header */}
           <div style={{
             backgroundColor: "#7c3aed", color: "white",
             padding: "12px 16px", display: "flex",
@@ -292,7 +274,6 @@ export function Chatbot() {
             </button>
           </div>
 
-          {/* Messages */}
           <div style={{
             flex: 1, overflowY: "auto", padding: "16px",
             display: "flex", flexDirection: "column", gap: "10px",
@@ -341,7 +322,6 @@ export function Chatbot() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Suggested questions */}
           {dynamicSuggestions.length > 0 && (
             <div style={{ padding: "8px 12px", borderTop: "1px solid #e2e8f0", backgroundColor: "white", flexShrink: 0 }}>
               <p style={{ fontSize: "10px", fontWeight: 600, color: "#94a3b8", margin: "0 0 6px 0", textTransform: "uppercase", letterSpacing: "0.05em" }}>
@@ -363,7 +343,6 @@ export function Chatbot() {
             </div>
           )}
 
-          {/* Input */}
           <div style={{
             padding: "10px 12px", borderTop: "1px solid #e2e8f0",
             backgroundColor: "white", display: "flex", gap: "8px", flexShrink: 0,

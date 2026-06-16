@@ -41,7 +41,7 @@ export function FacultyDetailPage({ id }: { id: string }) {
         ) : undefined}
       />
       {thumb && <img src={thumb} alt={faculty.name} className="w-full max-h-64 object-cover rounded-lg border border-[#E2E8F0]" />}
-      {faculty.dean && <p className="text-sm"><span className="text-[#64748B]">Dekan: </span><span className="font-medium text-[#0F172A]">{faculty.dean}</span></p>}
+      {faculty.deanUser && <p className="text-sm"><span className="text-[#64748B]">Dekan: </span><span className="font-medium text-[#0F172A]">{faculty.deanUser.name}</span></p>}
       <Tabs defaultValue="departments">
         <TabsList>
           <TabsTrigger value="departments">Jurusan ({faculty.departments.length})</TabsTrigger>

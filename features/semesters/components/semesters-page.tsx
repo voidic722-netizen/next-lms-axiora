@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react'
+import { Pencil, Trash2, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { PageHeader } from '@/components/shared/page-header'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
@@ -21,7 +20,6 @@ import type { Semester } from '@/types/semester'
 
 export function SemestersPage() {
   const { isAdmin } = useAuth()
-  const router = useRouter()
   const { data: semesters = [], isLoading } = useSemesters()
   const createMutation = useCreateSemester()
   const deleteMutation = useDeleteSemester()
@@ -49,10 +47,10 @@ export function SemestersPage() {
 
   async function onSubmit(values: SemesterFormValues) {
     if (editing) {
-      await updateMutation.mutateAsync(values)
+      await updateMutation.mutateAsync(values as any)
       cancelEdit()
     } else {
-      await createMutation.mutateAsync(values)
+      await createMutation.mutateAsync(values as any)
       reset()
     }
   }

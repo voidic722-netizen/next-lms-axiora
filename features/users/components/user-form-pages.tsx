@@ -89,13 +89,13 @@ export function EditUserPage({ id }: { id: string }) {
 
   const form = useForm<UpdateUserFormValues>({
     resolver: zodResolver(updateUserSchema) as never,
-    values: currentUser
+    values: (currentUser
       ? {
           name: currentUser.name,
           email: currentUser.email,
-          role: currentUser.role,
+          role: currentUser.role as "1" | "2" | "3",
           ...(currentUser.role === '2' && {
-            position: currentUser.position ?? undefined,
+            position: (currentUser.position ?? undefined) as "dosen" | "kaprodi" | "dekan" | undefined,
             nidn: currentUser.nidn ?? undefined,
             facultyId: currentUser.facultyId ?? undefined,
             departmentId: currentUser.departmentId ?? undefined,
@@ -108,7 +108,7 @@ export function EditUserPage({ id }: { id: string }) {
             classroomId: currentUser.classroomId ?? undefined,
           }),
         }
-      : undefined,
+      : undefined) as any,
   })
 
   async function onSubmit(values: UpdateUserFormValues) {

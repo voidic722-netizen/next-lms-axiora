@@ -73,7 +73,7 @@ export function AddSemesterPage() {
         <CardContent className="pt-6">
           <SemesterForm
             onSubmit={async (v) => {
-              await mutation.mutateAsync(v)
+              await mutation.mutateAsync(v as any)
               router.push('/semesters')
             }}
             isPending={mutation.isPending}
@@ -108,7 +108,7 @@ export function EditSemesterPage({ id }: { id: string }) {
                 : undefined
             }
             onSubmit={async (v) => {
-              await mutation.mutateAsync(v)
+              await mutation.mutateAsync(v as any)
               router.push('/semesters')
             }}
             isPending={mutation.isPending}

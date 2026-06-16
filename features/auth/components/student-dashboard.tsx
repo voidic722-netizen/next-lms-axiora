@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { BookOpen, GraduationCap, CalendarDays, CheckCircle2, Clock, FolderOpen } from 'lucide-react'
+import { BookOpen, GraduationCap, CalendarDays, CheckCircle2, FolderOpen } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { formatDate, formatDay, isPast, isFuture } from '@/lib/format-date'
+import { formatDate, isPast, } from '@/lib/format-date'
 import { sortByNearestDateAsc } from '@/utils/sort'
 import { ASSIGNMENT_TYPE_LABELS } from '@/features/assignments/constants/assignment-type-labels'
 import { getAssignmentsService } from '@/services/assignment-service'
@@ -104,14 +104,6 @@ export function StudentDashboard() {
   const sortedAssignments = useMemo(
     () => sortByNearestDateAsc(assignments, (a) => a.dueDate),
     [assignments],
-  )
-  const sortedExams = useMemo(
-    () => sortByNearestDateAsc(exams, (e) => e.deadlineDate),
-    [exams],
-  )
-  const sortedSchedules = useMemo(
-    () => sortByNearestDateAsc(schedules, (s) => s.date),
-    [schedules],
   )
 
   const isLoading = aLoading || eLoading || sLoading

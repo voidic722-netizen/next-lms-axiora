@@ -148,7 +148,7 @@ function TeacherFormSection({
   departments: Department[]
   subjects: Subject[]
 }) {
-  const { register, setValue, formState: { errors } } = form
+  const { register, setValue } = form
   return (
     <div className="space-y-4 border-t border-[#E2E8F0] pt-4">
       <p className="text-sm font-medium text-[#64748B]">Data Pengajar</p>

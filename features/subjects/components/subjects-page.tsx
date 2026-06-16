@@ -105,8 +105,8 @@ function SubjectCard({
           <Link href={`/subjects/${s.id}`}>
             <h3 className="font-semibold text-[#0F172A] truncate hover:underline">{s.name}</h3>
           </Link>
-          <Badge variant={s.type === 'wajib' ? 'default' : 'secondary'} className="shrink-0">
-            {s.type}
+          <Badge variant={s.type === 'compulsory' ? 'default' : 'secondary'} className="shrink-0">
+            {s.type === 'compulsory' ? 'Wajib' : 'Umum'}
           </Badge>
         </div>
         <p className="text-sm text-[#64748B] line-clamp-2 mt-1">{s.description}</p>
@@ -153,7 +153,9 @@ export function SubjectDetailPage({ id }: { id: string }) {
             <img src={thumb} alt={subject.name} className="w-full max-h-64 object-cover rounded-lg" />
           )}
           <div className="flex items-center gap-2">
-            <Badge variant={subject.type === 'wajib' ? 'default' : 'secondary'}>{subject.type}</Badge>
+            <Badge variant={subject.type === 'compulsory' ? 'default' : 'secondary'}>
+              {subject.type === 'compulsory' ? 'Wajib' : 'Umum'}
+            </Badge>
           </div>
           <p className="text-sm text-[#0F172A]">{subject.description}</p>
         </CardContent>
@@ -275,7 +277,7 @@ export function AddSubjectPage() {
         <CardContent className="pt-6">
           <SubjectForm
             onSubmit={async (v) => {
-              await mutation.mutateAsync(v)
+              await mutation.mutateAsync(v as any)
               router.push('/subjects')
             }}
             isPending={mutation.isPending}
@@ -301,16 +303,16 @@ export function EditSubjectPage({ id }: { id: string }) {
           <SubjectForm
             defaultValues={
               subject
-                ? {
+                ? ({
                     name: subject.name,
                     type: subject.type,
                     description: subject.description,
                     departmentId: subject.departmentId ?? undefined,
-                  }
+                  } as any)
                 : undefined
             }
             onSubmit={async (v) => {
-              await mutation.mutateAsync(v)
+              await mutation.mutateAsync(v as any)
               router.push(`/subjects/${id}`)
             }}
             isPending={mutation.isPending}
