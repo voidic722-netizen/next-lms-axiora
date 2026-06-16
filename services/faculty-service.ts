@@ -11,31 +11,31 @@ interface RawFaculty {
   id: number
   name: string
   description: string
-  dean: string
   thumbnail: string | null
   created_at: string
+  updated_at: string
 }
 
 interface RawFacultyDetail extends RawFaculty {
-  dekan: { id: number; name: string; nidn: string | null } | null
-  jurusan: Array<{ id: number; name: string; description: string; thumbnail: string | null }>
-  pengajar: Array<{
+  dean: { id: number; name: string; nidn: string | null } | null
+  departments: Array<{ id: number; name: string; description: string; thumbnail: string | null }>
+  lecturers: Array<{
     id: number
     name: string
     email: string
     nidn: string | null
     position: string | null
     image: string | null
-    jurusan: { id: number; name: string } | null
+    department: { id: number; name: string } | null
   }>
-  siswa: Array<{
+  students: Array<{
     id: number
     name: string
     email: string
     nim: string | null
     image: string | null
-    jurusan: { id: number; name: string } | null
-    kelas: { id: number; name: string } | null
+    department: { id: number; name: string } | null
+    classroom: { id: number; name: string } | null
   }>
 }
 
@@ -44,57 +44,57 @@ function mapFaculty(raw: RawFaculty): Faculty {
     id: raw.id,
     name: raw.name,
     description: raw.description,
-    dean: raw.dean,
     thumbnail: withStorageUrl(raw.thumbnail),
     createdAt: raw.created_at,
+    updatedAt: raw.updated_at,
   }
 }
 
 function mapFacultyDetail(raw: RawFacultyDetail): FacultyDetail {
   return {
     ...mapFaculty(raw),
-    deanUser: raw.dekan ?? null,
-    departments: raw.jurusan.map((j) => ({
-      id: j.id,
-      name: j.name,
-      description: j.description,
-      thumbnail: withStorageUrl(j.thumbnail),
+    deanUser: raw.dean ?? null,
+    departments: raw.departments.map((d) => ({
+      id: d.id,
+      name: d.name,
+      description: d.description,
+      thumbnail: withStorageUrl(d.thumbnail),
     })),
-    teachers: raw.pengajar.map((p) => ({
+    teachers: raw.lecturers.map((p) => ({
       id: p.id,
       name: p.name,
       email: p.email,
       nidn: p.nidn,
       position: p.position,
       image: withStorageUrl(p.image),
-      department: p.jurusan,
+      department: p.department,
     })),
-    students: raw.siswa.map((s) => ({
+    students: raw.students.map((s) => ({
       id: s.id,
       name: s.name,
       email: s.email,
       nim: s.nim,
       image: withStorageUrl(s.image),
-      department: s.jurusan,
-      classroom: s.kelas,
+      department: s.department,
+      classroom: s.classroom,
     })),
   }
 }
 
 export async function getFacultiesService(): Promise<Faculty[]> {
-  const { data } = await api.get<{ fakultas: RawFaculty[] }>('/fakultas')
-  return data.fakultas.map(mapFaculty)
+  const { data } = await api.get<RawFaculty[]>('/faculties')
+  return data.map(mapFaculty)
 }
 
 export async function getFacultyDetailService(id: number): Promise<FacultyDetail> {
-  const { data } = await api.get<{ fakultas: RawFacultyDetail }>(`/fakultas/${id}`)
-  return mapFacultyDetail(data.fakultas)
+  const { data } = await api.get<RawFacultyDetail>(`/faculties/${id}`)
+  return mapFacultyDetail(data)
 }
 
 export async function getAvailableFacultiesForDeanService(excludeUserId?: number): Promise<Faculty[]> {
   const params = excludeUserId ? { exclude_user_id: excludeUserId } : {}
-  const { data } = await api.get<{ fakultas: RawFaculty[] }>('/fakultas/available-for-dekan', { params })
-  return data.fakultas.map(mapFaculty)
+  const { data } = await api.get<RawFaculty[]>('/faculties/available-for-dean', { params })
+  return data.map(mapFaculty)
 }
 
 export async function createFacultyService(payload: CreateFacultyPayload): Promise<Faculty> {
@@ -102,10 +102,10 @@ export async function createFacultyService(payload: CreateFacultyPayload): Promi
   form.append('name', payload.name)
   form.append('description', payload.description)
   if (payload.thumbnail) form.append('thumbnail', payload.thumbnail)
-  const { data } = await api.post<{ fakultas: RawFaculty }>('/fakultas', form, {
+  const { data } = await api.post<RawFaculty>('/faculties', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
-  return mapFaculty(data.fakultas)
+  return mapFaculty(data)
 }
 
 export async function updateFacultyService(id: number, payload: UpdateFacultyPayload): Promise<Faculty> {
@@ -113,12 +113,12 @@ export async function updateFacultyService(id: number, payload: UpdateFacultyPay
   form.append('name', payload.name)
   form.append('description', payload.description)
   if (payload.thumbnail) form.append('thumbnail', payload.thumbnail)
-  const { data } = await api.put<{ fakultas: RawFaculty }>(`/fakultas/${id}`, form, {
+  const { data } = await api.put<RawFaculty>(`/faculties/${id}`, form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
-  return mapFaculty(data.fakultas)
+  return mapFaculty(data)
 }
 
 export async function deleteFacultyService(id: number): Promise<void> {
-  await api.delete(`/fakultas/${id}`)
+  await api.delete(`/faculties/${id}`)
 }

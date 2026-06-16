@@ -5,6 +5,7 @@ export interface Department {
   facultyId: number
   thumbnail: string | null
   createdAt: string
+  updatedAt: string
 }
 
 export interface DepartmentTeacher {
@@ -30,7 +31,7 @@ export interface DepartmentSubject {
   name: string
   description: string
   thumbnail: string | null
-  type: 'umum' | 'wajib'
+  type: 'general' | 'compulsory'
   teacher: string | null
 }
 

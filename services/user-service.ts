@@ -5,22 +5,21 @@ interface RawUser {
   id: number
   name: string
   email: string
-  role: string
+  role: number
   image: string | null
   position: string | null
   nidn: string | null
   nim: string | null
-  createdAt: string
-  updatedAt: string
-  deletedAt: string | null
-  fakultas_id: number | null
-  jurusan_id: number | null
-  kelas_id: number | null
-  mata_pelajaran_id: number | null
-  jurusan?: { id: number; name: string } | null
-  fakultas?: { id: number; name: string } | null
-  kelas?: { id: number; name: string } | null
-  mata_pelajaran?: { id: number; name: string } | null
+  faculty_id: number | null
+  department_id: number | null
+  classroom_id: number | null
+  subject_id: number | null
+  faculty?: { id: number; name: string } | null
+  department?: { id: number; name: string } | null
+  classroom?: { id: number; name: string } | null
+  subject?: { id: number; name: string } | null
+  created_at: string
+  updated_at: string
 }
 
 function mapUser(raw: RawUser): User {
@@ -28,29 +27,28 @@ function mapUser(raw: RawUser): User {
     id: raw.id,
     name: raw.name,
     email: raw.email,
-    role: raw.role as User['role'],
+    role: String(raw.role) as User['role'],
     image: raw.image,
     position: raw.position as User['position'],
     nidn: raw.nidn,
     nim: raw.nim,
-    createdAt: raw.createdAt,
-    updatedAt: raw.updatedAt,
-    deletedAt: raw.deletedAt,
-    facultyId: raw.fakultas_id,
-    departmentId: raw.jurusan_id,
-    classroomId: raw.kelas_id,
-    subjectId: raw.mata_pelajaran_id,
-    faculty: raw.fakultas ?? null,
-    department: raw.jurusan ?? null,
-    classroom: raw.kelas ?? null,
-    subject: raw.mata_pelajaran ?? null,
+    createdAt: raw.created_at,
+    updatedAt: raw.updated_at,
+    facultyId: raw.faculty_id,
+    departmentId: raw.department_id,
+    classroomId: raw.classroom_id,
+    subjectId: raw.subject_id,
+    faculty: raw.faculty ?? null,
+    department: raw.department ?? null,
+    classroom: raw.classroom ?? null,
+    subject: raw.subject ?? null,
   }
 }
 
 export async function getUsersService(role?: string): Promise<User[]> {
   const params = role ? { role } : {}
-  const { data } = await api.get<{ users: RawUser[] }>('/users', { params })
-  return data.users.map(mapUser)
+  const { data } = await api.get<RawUser[]>('/users', { params })
+  return data.map(mapUser)
 }
 
 export async function createUserService(payload: CreateUserPayload): Promise<User> {
@@ -62,13 +60,13 @@ export async function createUserService(payload: CreateUserPayload): Promise<Use
     position: payload.position,
     nidn: payload.nidn,
     nim: payload.nim,
-    fakultas_id: payload.facultyId,
-    jurusan_id: payload.departmentId,
-    kelas_id: payload.classroomId,
-    mata_pelajaran_id: payload.subjectId,
+    faculty_id: payload.facultyId,
+    department_id: payload.departmentId,
+    classroom_id: payload.classroomId,
+    subject_id: payload.subjectId,
   }
-  const { data } = await api.post<{ user: RawUser }>('/users', body)
-  return mapUser(data.user)
+  const { data } = await api.post<RawUser>('/users', body)
+  return mapUser(data)
 }
 
 export async function updateUserService(
@@ -84,16 +82,16 @@ export async function updateUserService(
   if (payload.position) form.append('position', payload.position)
   if (payload.nidn) form.append('nidn', payload.nidn)
   if (payload.nim) form.append('nim', payload.nim)
-  if (payload.facultyId != null) form.append('fakultas_id', String(payload.facultyId))
-  if (payload.departmentId != null) form.append('jurusan_id', String(payload.departmentId))
-  if (payload.classroomId != null) form.append('kelas_id', String(payload.classroomId))
-  if (payload.subjectId != null) form.append('mata_pelajaran_id', String(payload.subjectId))
+  if (payload.facultyId != null) form.append('faculty_id', String(payload.facultyId))
+  if (payload.departmentId != null) form.append('department_id', String(payload.departmentId))
+  if (payload.classroomId != null) form.append('classroom_id', String(payload.classroomId))
+  if (payload.subjectId != null) form.append('subject_id', String(payload.subjectId))
   if (image) form.append('image', image)
 
-  const { data } = await api.put<{ user: RawUser }>(`/users/${id}`, form, {
+  const { data } = await api.put<RawUser>(`/users/${id}`, form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
-  return mapUser(data.user)
+  return mapUser(data)
 }
 
 export async function deleteUserService(id: number): Promise<void> {

@@ -1,6 +1,6 @@
 import type { UserRole } from './roles'
 
-export type TeacherPosition = 'dosen' | 'kaprodi' | 'dekan'
+export type TeacherPosition = 'lecturer' | 'department_head' | 'dean'
 
 export interface User {
   id: number
@@ -8,20 +8,16 @@ export interface User {
   email: string
   role: UserRole
   image: string | null
-  // Teacher-specific
   position: TeacherPosition | null
   nidn: string | null
   facultyId: number | null
   departmentId: number | null
   subjectId: number | null
-  // Student-specific
   nim: string | null
   classroomId: number | null
-  // Timestamps
   createdAt: string
   updatedAt: string
-  deletedAt: string | null
-  // Relations (optional — included when fetched with relations)
+  deletedAt?: string | null
   faculty?: { id: number; name: string } | null
   department?: { id: number; name: string } | null
   classroom?: { id: number; name: string } | null

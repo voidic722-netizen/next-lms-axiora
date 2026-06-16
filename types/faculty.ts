@@ -2,9 +2,9 @@ export interface Faculty {
   id: number
   name: string
   description: string
-  dean: string
   thumbnail: string | null
   createdAt: string
+  updatedAt: string
 }
 
 export interface FacultyDepartment {

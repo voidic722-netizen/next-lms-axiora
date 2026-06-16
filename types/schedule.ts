@@ -4,6 +4,7 @@ export interface Schedule {
   classroomId: number
   topic: string
   createdAt: string
+  updatedAt: string
   classroom?: {
     id: number
     name: string

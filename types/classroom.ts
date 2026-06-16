@@ -5,6 +5,7 @@ export interface Classroom {
   semesterId: number
   subjectId: number
   createdAt: string
+  updatedAt: string
   department?: {
     id: number
     name: string
@@ -42,7 +43,7 @@ export interface ClassroomAssignment {
   title: string
   description: string
   types: string[]
-  classroomIds: Array<number | string>
+  classroomIds: number[]
   dueDate: string
   maxFileSize: number
   subjectId: number
@@ -54,7 +55,7 @@ export interface ClassroomExam {
   title: string
   description?: string | null
   examTypes: string[]
-  classroomIds: Array<number | string>
+  classroomIds: number[]
   availableDate: string
   deadlineDate: string
   durationMinutes: number
