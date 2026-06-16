@@ -14,6 +14,12 @@ export const EXAM_KEYS = {
   detail: (id: number | string) => ['exams', Number(id)] as const,
 }
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
+}
+
 export function useExams() {
   return useQuery({
     queryKey: EXAM_KEYS.all,
@@ -41,7 +47,7 @@ export function useCreateExam() {
       qc.invalidateQueries({ queryKey: EXAM_KEYS.all })
       toast.success('Ujian berhasil ditambahkan')
     },
-    onError: () => toast.error('Gagal menambahkan ujian'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menambahkan ujian')),
   })
 }
 
@@ -54,7 +60,7 @@ export function useUpdateExam(id: number | string) {
       qc.invalidateQueries({ queryKey: EXAM_KEYS.detail(id) })
       toast.success('Ujian berhasil diperbarui')
     },
-    onError: () => toast.error('Gagal memperbarui ujian'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal memperbarui ujian')),
   })
 }
 
@@ -66,6 +72,6 @@ export function useDeleteExam() {
       qc.invalidateQueries({ queryKey: EXAM_KEYS.all })
       toast.success('Ujian berhasil dihapus')
     },
-    onError: () => toast.error('Gagal menghapus ujian'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menghapus ujian')),
   })
 }

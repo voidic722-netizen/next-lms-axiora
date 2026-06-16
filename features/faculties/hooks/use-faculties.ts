@@ -16,6 +16,12 @@ export const FACULTY_KEYS = {
   available: ['faculties', 'available-for-dean'] as const,
 }
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
+}
+
 export function useFaculties() {
   return useQuery({
     queryKey: FACULTY_KEYS.all,
@@ -49,7 +55,7 @@ export function useCreateFaculty() {
       qc.invalidateQueries({ queryKey: FACULTY_KEYS.all })
       toast.success('Fakultas berhasil ditambahkan')
     },
-    onError: () => toast.error('Gagal menambahkan fakultas'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menambahkan fakultas')),
   })
 }
 
@@ -62,7 +68,7 @@ export function useUpdateFaculty(id: number) {
       qc.invalidateQueries({ queryKey: FACULTY_KEYS.detail(id) })
       toast.success('Fakultas berhasil diperbarui')
     },
-    onError: () => toast.error('Gagal memperbarui fakultas'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal memperbarui fakultas')),
   })
 }
 
@@ -74,6 +80,6 @@ export function useDeleteFaculty() {
       qc.invalidateQueries({ queryKey: FACULTY_KEYS.all })
       toast.success('Fakultas berhasil dihapus')
     },
-    onError: () => toast.error('Gagal menghapus fakultas'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menghapus fakultas')),
   })
 }

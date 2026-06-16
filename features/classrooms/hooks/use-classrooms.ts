@@ -4,14 +4,18 @@ import {
   getClassroomsService,
   getClassroomByIdService,
   createClassroomService,
-  updateClassroomService,
-  deleteClassroomService,
 } from '@/services/classroom-service'
-import type { CreateClassroomPayload, UpdateClassroomPayload } from '@/types/classroom'
+import type { CreateClassroomPayload } from '@/types/classroom'
 
 export const CLASSROOM_KEYS = {
   all: ['classrooms'] as const,
   detail: (id: number | string) => ['classrooms', Number(id)] as const,
+}
+
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
 }
 
 export function useClassrooms() {
@@ -39,31 +43,6 @@ export function useCreateClassroom() {
       qc.invalidateQueries({ queryKey: CLASSROOM_KEYS.all })
       toast.success('Kelas berhasil ditambahkan')
     },
-    onError: () => toast.error('Gagal menambahkan kelas'),
-  })
-}
-
-export function useUpdateClassroom(id: number | string) {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (payload: UpdateClassroomPayload) => updateClassroomService(id, payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: CLASSROOM_KEYS.all })
-      qc.invalidateQueries({ queryKey: CLASSROOM_KEYS.detail(id) })
-      toast.success('Kelas berhasil diperbarui')
-    },
-    onError: () => toast.error('Gagal memperbarui kelas'),
-  })
-}
-
-export function useDeleteClassroom() {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: (id: number | string) => deleteClassroomService(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: CLASSROOM_KEYS.all })
-      toast.success('Kelas berhasil dihapus')
-    },
-    onError: () => toast.error('Gagal menghapus kelas'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menambahkan kelas')),
   })
 }

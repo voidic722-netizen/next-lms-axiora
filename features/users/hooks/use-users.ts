@@ -60,6 +60,12 @@ export function useUserReferenceData() {
   }
 }
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
+}
+
 export function useCreateUser() {
   const qc = useQueryClient()
   return useMutation({
@@ -68,7 +74,7 @@ export function useCreateUser() {
       qc.invalidateQueries({ queryKey: USER_KEYS.all })
       toast.success('User berhasil ditambahkan')
     },
-    onError: () => toast.error('Gagal menambahkan user'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menambahkan user')),
   })
 }
 
@@ -81,7 +87,7 @@ export function useUpdateUser(id: number) {
       qc.invalidateQueries({ queryKey: USER_KEYS.all })
       toast.success('User berhasil diperbarui')
     },
-    onError: () => toast.error('Gagal memperbarui user'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal memperbarui user')),
   })
 }
 
@@ -93,6 +99,6 @@ export function useDeleteUser() {
       qc.invalidateQueries({ queryKey: USER_KEYS.all })
       toast.success('User berhasil dihapus')
     },
-    onError: () => toast.error('Gagal menghapus user'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menghapus user')),
   })
 }

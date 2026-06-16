@@ -12,6 +12,12 @@ export const SEMESTER_KEYS = {
   all: ['semesters'] as const,
 }
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
+}
+
 export function useSemesters() {
   return useQuery({
     queryKey: SEMESTER_KEYS.all,
@@ -28,7 +34,7 @@ export function useCreateSemester() {
       qc.invalidateQueries({ queryKey: SEMESTER_KEYS.all })
       toast.success('Semester berhasil ditambahkan')
     },
-    onError: () => toast.error('Gagal menambahkan semester'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menambahkan semester')),
   })
 }
 
@@ -40,7 +46,7 @@ export function useUpdateSemester(id: number) {
       qc.invalidateQueries({ queryKey: SEMESTER_KEYS.all })
       toast.success('Semester berhasil diperbarui')
     },
-    onError: () => toast.error('Gagal memperbarui semester'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal memperbarui semester')),
   })
 }
 
@@ -52,6 +58,6 @@ export function useDeleteSemester() {
       qc.invalidateQueries({ queryKey: SEMESTER_KEYS.all })
       toast.success('Semester berhasil dihapus')
     },
-    onError: () => toast.error('Gagal menghapus semester'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menghapus semester')),
   })
 }

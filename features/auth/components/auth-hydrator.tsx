@@ -9,24 +9,21 @@ interface AuthHydratorProps {
   children: React.ReactNode
 }
 
-/**
- * Thin client wrapper that hydrates the Zustand auth store with the user
- * object fetched server-side in the protected layout.
- * Renders children immediately — no loading flash.
- */
 export function AuthHydrator({ user, children }: AuthHydratorProps) {
   const setUser = useAuthStore((s) => s.setUser)
+  const setToken = useAuthStore((s) => s.setToken)
   const setLoading = useAuthStore((s) => s.setLoading)
   const hydrated = useRef(false)
 
-  // Synchronously hydrate on the first render to avoid flicker
   if (!hydrated.current) {
+    const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]+)/)
+    const token = match ? match[1] : null
     setUser(user)
+    if (token) setToken(token)
     setLoading(false)
     hydrated.current = true
   }
 
-  // Keep in sync if user prop changes (e.g. after profile edit)
   useEffect(() => {
     setUser(user)
   }, [user, setUser])

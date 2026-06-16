@@ -14,6 +14,12 @@ export const DEPARTMENT_KEYS = {
   detail: (id: number | string) => ['departments', Number(id)] as const,
 }
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
+}
+
 export function useDepartments() {
   return useQuery({
     queryKey: DEPARTMENT_KEYS.all,
@@ -39,7 +45,7 @@ export function useCreateDepartment() {
       qc.invalidateQueries({ queryKey: DEPARTMENT_KEYS.all })
       toast.success('Jurusan berhasil ditambahkan')
     },
-    onError: () => toast.error('Gagal menambahkan jurusan'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menambahkan jurusan')),
   })
 }
 
@@ -52,7 +58,7 @@ export function useUpdateDepartment(id: number) {
       qc.invalidateQueries({ queryKey: DEPARTMENT_KEYS.detail(id) })
       toast.success('Jurusan berhasil diperbarui')
     },
-    onError: () => toast.error('Gagal memperbarui jurusan'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal memperbarui jurusan')),
   })
 }
 
@@ -64,6 +70,6 @@ export function useDeleteDepartment() {
       qc.invalidateQueries({ queryKey: DEPARTMENT_KEYS.all })
       toast.success('Jurusan berhasil dihapus')
     },
-    onError: () => toast.error('Gagal menghapus jurusan'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menghapus jurusan')),
   })
 }

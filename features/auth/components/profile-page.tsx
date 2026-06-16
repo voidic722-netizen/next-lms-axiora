@@ -20,7 +20,6 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { USER_ROLE_LABEL } from '@/types/roles'
 
-// ── Profile Page ─────────────────────────────────────────────────────────────
 export function ProfilePage() {
   const { user } = useAuth()
   if (!user) return null
@@ -73,7 +72,6 @@ export function ProfilePage() {
   )
 }
 
-// ── Edit Profile Schema ───────────────────────────────────────────────────────
 const profileSchema = z.object({
   name: z.string().min(1, 'Nama wajib diisi'),
   email: z.string().min(1, 'Email wajib diisi').email('Format email tidak valid'),
@@ -81,7 +79,6 @@ const profileSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>
 
-// ── Edit Profile Page ────────────────────────────────────────────────────────
 export function EditProfilePage() {
   const router = useRouter()
   const { user } = useAuth()
@@ -92,14 +89,18 @@ export function EditProfilePage() {
     mutationFn: (values: ProfileFormValues) => updateProfileService(values),
     onSuccess: (_, values) => {
       if (user) {
-        // Update Zustand store secara optimistis
         setUser({ ...user, name: values.name, email: values.email })
       }
       qc.invalidateQueries({ queryKey: ['auth', 'me'] })
       toast.success('Profil berhasil diperbarui')
       router.push('/profile')
     },
-    onError: () => toast.error('Gagal memperbarui profil'),
+    onError: (error: unknown) => {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message
+        ?? 'Gagal memperbarui profil'
+      toast.error(message)
+    },
   })
 
   const { register, handleSubmit, formState: { errors } } = useForm<ProfileFormValues>({

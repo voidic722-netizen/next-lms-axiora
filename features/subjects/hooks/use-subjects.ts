@@ -14,6 +14,12 @@ export const SUBJECT_KEYS = {
   detail: (id: number | string) => ['subjects', Number(id)] as const,
 }
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
+}
+
 export function useSubjects() {
   return useQuery({
     queryKey: SUBJECT_KEYS.all,
@@ -39,7 +45,7 @@ export function useCreateSubject() {
       qc.invalidateQueries({ queryKey: SUBJECT_KEYS.all })
       toast.success('Mata pelajaran berhasil ditambahkan')
     },
-    onError: () => toast.error('Gagal menambahkan mata pelajaran'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menambahkan mata pelajaran')),
   })
 }
 
@@ -52,7 +58,7 @@ export function useUpdateSubject(id: number) {
       qc.invalidateQueries({ queryKey: SUBJECT_KEYS.detail(id) })
       toast.success('Mata pelajaran berhasil diperbarui')
     },
-    onError: () => toast.error('Gagal memperbarui mata pelajaran'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal memperbarui mata pelajaran')),
   })
 }
 
@@ -64,6 +70,6 @@ export function useDeleteSubject() {
       qc.invalidateQueries({ queryKey: SUBJECT_KEYS.all })
       toast.success('Mata pelajaran berhasil dihapus')
     },
-    onError: () => toast.error('Gagal menghapus mata pelajaran'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menghapus mata pelajaran')),
   })
 }

@@ -19,6 +19,7 @@ export function useLogin() {
 
       setUser(user)
       setToken(token)
+      document.cookie = `auth_token=${token}; path=/; SameSite=Lax`
 
       const target =
         user.role === USER_ROLE.Admin
@@ -28,9 +29,10 @@ export function useLogin() {
             : '/'
 
       router.replace(target)
-    } catch (error) {
+    } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : 'Login gagal. Periksa email dan password Anda.'
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message
+        ?? 'Login gagal. Periksa email dan password Anda.'
       toast.error(message)
     } finally {
       setIsLoading(false)

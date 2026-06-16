@@ -6,11 +6,10 @@ import { TabBar } from '@/components/layout/tab-bar'
 import { Breadcrumb } from '@/components/layout/breadcrumb'
 import type { User } from '@/types/user'
 
-const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME ?? 'laravel_session'
+const AUTH_TOKEN_COOKIE = process.env.AUTH_TOKEN_COOKIE_NAME ?? 'auth_token'
 const API_URL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? ''
 const IS_MSW_ACTIVE = process.env.NEXT_PUBLIC_MSW === 'true'
 
-// ── Dev mode: ambil mock user berdasarkan dev_role cookie ────────────────────
 function getMockUser(role: string): User {
   const base = {
     image: null, position: null, nidn: null, nim: null,
@@ -38,60 +37,69 @@ function getMockUser(role: string): User {
       classroom: { id: 1, name: 'TI-A 2024' },
     }
   }
-  // default: admin
   return { ...base, id: 1, name: 'Admin Utama', email: 'admin@lms.id', role: '1' }
 }
 
-// ── Production: ambil user dari backend via session cookie ────────────────────
 async function getCurrentUser(): Promise<User | null> {
   const cookieStore = await cookies()
-  const session = cookieStore.get(SESSION_COOKIE)
-  if (!session?.value) return null
+  const token = cookieStore.get(AUTH_TOKEN_COOKIE)
+  if (!token?.value) return null
 
   try {
     const res = await fetch(`${API_URL}/auth/me`, {
       headers: {
-        Cookie: `${SESSION_COOKIE}=${session.value}`,
+        Authorization: `Bearer ${token.value}`,
         Accept: 'application/json',
       },
       cache: 'no-store',
     })
     if (!res.ok) return null
 
-    const raw = await res.json() as {
-      user: {
-        id: number; name: string; email: string; role: string
-        image: string | null; position: string | null; nidn: string | null
-        nim: string | null; createdAt: string; updatedAt: string; deletedAt: string | null
-        fakultas_id: number | null; jurusan_id: number | null
-        kelas_id: number | null; mata_pelajaran_id: number | null
-        jurusan?: { id: number; name: string } | null
-        fakultas?: { id: number; name: string } | null
-        kelas?: { id: number; name: string } | null
-        mata_pelajaran?: { id: number; name: string } | null
+    const json = await res.json() as {
+      data: {
+        id: number
+        name: string
+        email: string
+        role: number
+        image: string | null
+        position: string | null
+        nidn: string | null
+        nim: string | null
+        created_at: string
+        updated_at: string
+        faculty_id: number | null
+        department_id: number | null
+        classroom_id: number | null
+        subject_id: number | null
+        faculty?: { id: number; name: string } | null
+        department?: { id: number; name: string } | null
+        classroom?: { id: number; name: string } | null
+        subject?: { id: number; name: string } | null
       }
     }
 
+    const raw = json.data
+
     return {
-      id: raw.user.id,
-      name: raw.user.name,
-      email: raw.user.email,
-      role: raw.user.role as User['role'],
-      image: raw.user.image,
-      position: raw.user.position as User['position'],
-      nidn: raw.user.nidn,
-      nim: raw.user.nim,
-      createdAt: raw.user.createdAt,
-      updatedAt: raw.user.updatedAt,
-      deletedAt: raw.user.deletedAt,
-      facultyId: raw.user.fakultas_id,
-      departmentId: raw.user.jurusan_id,
-      classroomId: raw.user.kelas_id,
-      subjectId: raw.user.mata_pelajaran_id,
-      faculty: raw.user.fakultas ?? null,
-      department: raw.user.jurusan ?? null,
-      classroom: raw.user.kelas ?? null,
-      subject: raw.user.mata_pelajaran ?? null,
+      id: raw.id,
+      name: raw.name,
+      email: raw.email,
+      role: String(raw.role) as User['role'],
+      image: raw.image,
+      position: raw.position as User['position'],
+      nidn: raw.nidn,
+      nim: raw.nim,
+      createdAt: raw.created_at,
+      updatedAt: raw.updated_at,
+      deletedAt: null,
+      facultyId: raw.faculty_id,
+      departmentId: raw.department_id,
+      classroomId: raw.classroom_id,
+      subjectId: raw.subject_id,
+      faculty: raw.faculty ?? null,
+      department: raw.department ?? null,
+      classroom: raw.classroom ?? null,
+      subject: raw.subject ?? null,
     }
   } catch {
     return null
@@ -106,12 +114,10 @@ export default async function ProtectedLayout({
   let user: User | null = null
 
   if (IS_MSW_ACTIVE) {
-    // Dev mode: pakai mock user dari cookie dev_role
     const cookieStore = await cookies()
     const devRole = cookieStore.get('dev_role')?.value ?? 'admin'
     user = getMockUser(devRole)
   } else {
-    // Production: autentikasi via backend
     user = await getCurrentUser()
     if (!user) redirect('/login')
   }

@@ -15,6 +15,12 @@ export const ASSIGNMENT_KEYS = {
   detail: (id: number | string) => ['assignments', Number(id)] as const,
 }
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
+}
+
 export function useAssignments() {
   return useQuery({
     queryKey: ASSIGNMENT_KEYS.all,
@@ -42,7 +48,7 @@ export function useCreateAssignment() {
       qc.invalidateQueries({ queryKey: ASSIGNMENT_KEYS.all })
       toast.success('Tugas berhasil ditambahkan')
     },
-    onError: () => toast.error('Gagal menambahkan tugas'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menambahkan tugas')),
   })
 }
 
@@ -55,7 +61,7 @@ export function useUpdateAssignment(id: number | string) {
       qc.invalidateQueries({ queryKey: ASSIGNMENT_KEYS.detail(id) })
       toast.success('Tugas berhasil diperbarui')
     },
-    onError: () => toast.error('Gagal memperbarui tugas'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal memperbarui tugas')),
   })
 }
 
@@ -67,7 +73,7 @@ export function useDeleteAssignment() {
       qc.invalidateQueries({ queryKey: ASSIGNMENT_KEYS.all })
       toast.success('Tugas berhasil dihapus')
     },
-    onError: () => toast.error('Gagal menghapus tugas'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menghapus tugas')),
   })
 }
 
@@ -79,6 +85,6 @@ export function useDeleteAssignmentModule() {
       qc.invalidateQueries({ queryKey: ASSIGNMENT_KEYS.all })
       toast.success('Modul berhasil dihapus')
     },
-    onError: () => toast.error('Gagal menghapus modul'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menghapus modul')),
   })
 }

@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   getSchedulesService,
-  getScheduleByIdService,
   createScheduleService,
   updateScheduleService,
   deleteScheduleService,
@@ -11,7 +10,12 @@ import type { CreateSchedulePayload, UpdateSchedulePayload } from '@/types/sched
 
 export const SCHEDULE_KEYS = {
   all: ['schedules'] as const,
-  detail: (id: number | string) => ['schedules', Number(id)] as const,
+}
+
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
 }
 
 export function useSchedules() {
@@ -23,15 +27,6 @@ export function useSchedules() {
   })
 }
 
-export function useScheduleDetail(id: number | string) {
-  return useQuery({
-    queryKey: SCHEDULE_KEYS.detail(id),
-    queryFn: () => getScheduleByIdService(id),
-    enabled: !!id,
-    staleTime: 60_000,
-  })
-}
-
 export function useCreateSchedule() {
   const qc = useQueryClient()
   return useMutation({
@@ -40,7 +35,7 @@ export function useCreateSchedule() {
       qc.invalidateQueries({ queryKey: SCHEDULE_KEYS.all })
       toast.success('Jadwal berhasil ditambahkan')
     },
-    onError: () => toast.error('Gagal menambahkan jadwal'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menambahkan jadwal')),
   })
 }
 
@@ -50,10 +45,9 @@ export function useUpdateSchedule(id: number | string) {
     mutationFn: (payload: UpdateSchedulePayload) => updateScheduleService(id, payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: SCHEDULE_KEYS.all })
-      qc.invalidateQueries({ queryKey: SCHEDULE_KEYS.detail(id) })
       toast.success('Jadwal berhasil diperbarui')
     },
-    onError: () => toast.error('Gagal memperbarui jadwal'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal memperbarui jadwal')),
   })
 }
 
@@ -65,6 +59,6 @@ export function useDeleteSchedule() {
       qc.invalidateQueries({ queryKey: SCHEDULE_KEYS.all })
       toast.success('Jadwal berhasil dihapus')
     },
-    onError: () => toast.error('Gagal menghapus jadwal'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menghapus jadwal')),
   })
 }

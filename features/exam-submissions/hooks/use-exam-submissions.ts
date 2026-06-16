@@ -14,12 +14,18 @@ export const EXAM_SUBMISSION_KEYS = {
     ['exam-submissions', 'all', Number(examId)] as const,
 }
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
+}
+
 export function useMyExamSubmission(examId: number | string) {
   return useQuery({
     queryKey: EXAM_SUBMISSION_KEYS.my(examId),
     queryFn: () => getMyExamSubmissionService(examId),
     enabled: !!examId,
-    staleTime: 0, // always fresh — drives redirect on exam page
+    staleTime: 0,
   })
 }
 
@@ -41,6 +47,6 @@ export function useSubmitExam(examId: number | string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: EXAM_SUBMISSION_KEYS.my(examId) })
     },
-    onError: () => toast.error('Gagal mengumpulkan ujian'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal mengumpulkan ujian')),
   })
 }

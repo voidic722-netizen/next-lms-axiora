@@ -15,6 +15,12 @@ export const ASSIGNMENT_SUBMISSION_KEYS = {
     ['assignment-submissions', 'all', Number(assignmentId)] as const,
 }
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+  return (
+    (error as { response?: { data?: { message?: string } } })?.response?.data?.message ?? fallback
+  )
+}
+
 export function useMyAssignmentSubmission(assignmentId: number | string) {
   return useQuery({
     queryKey: ASSIGNMENT_SUBMISSION_KEYS.my(assignmentId),
@@ -42,7 +48,7 @@ export function useSubmitAssignment(assignmentId: number | string) {
       qc.invalidateQueries({ queryKey: ASSIGNMENT_SUBMISSION_KEYS.my(assignmentId) })
       toast.success('Tugas berhasil dikumpulkan')
     },
-    onError: () => toast.error('Gagal mengumpulkan tugas'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal mengumpulkan tugas')),
   })
 }
 
@@ -55,6 +61,6 @@ export function useGradeSubmission(assignmentId: number | string) {
       qc.invalidateQueries({ queryKey: ASSIGNMENT_SUBMISSION_KEYS.all(assignmentId) })
       toast.success('Nilai berhasil disimpan')
     },
-    onError: () => toast.error('Gagal menyimpan nilai'),
+    onError: (error) => toast.error(extractErrorMessage(error, 'Gagal menyimpan nilai')),
   })
 }
