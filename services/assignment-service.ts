@@ -1,0 +1,96 @@
+import api from '@/lib/axios'
+import type { Assignment, CreateAssignmentPayload, UpdateAssignmentPayload } from '@/types/assignment'
+
+interface RawModule {
+  id: number
+  tugas_id: number
+  name: string
+  file_path: string
+  format: string
+  file_size: string
+}
+
+interface RawAssignment {
+  id: number
+  title: string
+  description: string
+  task_types: string[]
+  kelas_ids: number[]
+  due_date: string
+  max_file_size: number
+  mata_pelajaran_id: number
+  mata_pelajaran?: { id: number; name: string }
+  moduls: RawModule[]
+  created_at: string
+}
+
+function mapAssignment(raw: RawAssignment): Assignment {
+  return {
+    id: raw.id,
+    title: raw.title,
+    description: raw.description,
+    types: raw.task_types,
+    classroomIds: raw.kelas_ids,
+    dueDate: raw.due_date,
+    maxFileSize: raw.max_file_size,
+    subjectId: raw.mata_pelajaran_id,
+    subject: raw.mata_pelajaran,
+    modules: raw.moduls.map((m) => ({
+      id: m.id,
+      assignmentId: m.tugas_id,
+      name: m.name,
+      filePath: m.file_path,
+      format: m.format,
+      fileSize: m.file_size,
+    })),
+    createdAt: raw.created_at,
+  }
+}
+
+export async function getAssignmentsService(): Promise<Assignment[]> {
+  const { data } = await api.get<{ tugas: RawAssignment[] }>('/tugas')
+  return data.tugas.map(mapAssignment)
+}
+
+export async function getAssignmentByIdService(id: number | string): Promise<Assignment> {
+  const { data } = await api.get<{ tugas: RawAssignment }>(`/tugas/${id}`)
+  return mapAssignment(data.tugas)
+}
+
+function buildAssignmentFormData(payload: CreateAssignmentPayload | UpdateAssignmentPayload): FormData {
+  const form = new FormData()
+  form.append('title', payload.title)
+  form.append('description', payload.description)
+  form.append('task_types', JSON.stringify(payload.types))
+  form.append('kelas_ids', JSON.stringify(payload.classroomIds))
+  form.append('due_date', payload.dueDate)
+  form.append('max_file_size', String(payload.maxFileSize))
+  form.append('mata_pelajaran_id', String(payload.subjectId))
+  payload.modules?.forEach((file) => form.append('moduls[]', file))
+  if ('deletedModuleIds' in payload) {
+    payload.deletedModuleIds?.forEach((id) => form.append('deleted_modul_ids[]', String(id)))
+  }
+  return form
+}
+
+export async function createAssignmentService(payload: CreateAssignmentPayload): Promise<Assignment> {
+  const { data } = await api.post<{ tugas: RawAssignment }>('/tugas', buildAssignmentFormData(payload), {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return mapAssignment(data.tugas)
+}
+
+export async function updateAssignmentService(id: number | string, payload: UpdateAssignmentPayload): Promise<Assignment> {
+  const { data } = await api.put<{ tugas: RawAssignment }>(`/tugas/${id}`, buildAssignmentFormData(payload), {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return mapAssignment(data.tugas)
+}
+
+export async function deleteAssignmentService(id: number): Promise<void> {
+  await api.delete(`/tugas/${id}`)
+}
+
+export async function deleteAssignmentModuleService(id: number): Promise<void> {
+  await api.delete(`/tugas-modul/${id}`)
+}
