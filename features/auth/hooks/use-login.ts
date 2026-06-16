@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { loginService } from '@/services/auth-service'
 import { USER_ROLE } from '@/types/roles'
-import type { LoginFormValues } from '../schemas/login-schema'
+import type { LoginFormValues } from '@/schemas/login-schema'
 
 export function useLogin() {
   const router = useRouter()

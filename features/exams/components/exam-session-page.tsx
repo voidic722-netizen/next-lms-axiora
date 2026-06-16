@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { withStorageUrl } from '@/lib/storage'
-import { useExamSession } from '../hooks/use-exam-session'
+import { useExamSession } from '@/hooks/use-exam-session'
 
 export function ExamSessionPage({ id }: { id: string }) {
   const {

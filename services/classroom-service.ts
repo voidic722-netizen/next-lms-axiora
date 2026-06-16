@@ -3,6 +3,7 @@ import type {
   Classroom,
   ClassroomDetail,
   CreateClassroomPayload,
+  UpdateClassroomPayload,
 } from '@/types/classroom'
 
 interface RawClassroom {
@@ -89,4 +90,18 @@ export async function createClassroomService(payload: CreateClassroomPayload): P
     subject_id: payload.subjectId,
   })
   return mapClassroom(data)
+}
+
+export async function updateClassroomService(id: number | string, payload: UpdateClassroomPayload): Promise<Classroom> {
+  const { data } = await api.put<RawClassroom>(`/classrooms/${id}`, {
+    name: payload.name,
+    department_id: payload.departmentId,
+    semester_id: payload.semesterId,
+    subject_id: payload.subjectId,
+  })
+  return mapClassroom(data)
+}
+
+export async function deleteClassroomService(id: number | string): Promise<void> {
+  await api.delete(`/classrooms/${id}`)
 }

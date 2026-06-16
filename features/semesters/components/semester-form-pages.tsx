@@ -10,8 +10,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { semesterSchema, type SemesterFormValues } from '../schemas/semester-schema'
-import { useCreateSemester, useUpdateSemester, useSemesters } from '../hooks/use-semesters'
+import { semesterSchema, type SemesterFormValues } from '@/schemas/semester-schema'
+import { useCreateSemester, useUpdateSemester, useSemesters } from '@/hooks/use-semesters'
 
 function SemesterForm({
   defaultValues,

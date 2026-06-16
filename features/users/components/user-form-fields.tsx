@@ -16,7 +16,7 @@ import type { Faculty } from '@/types/faculty'
 import type { Department } from '@/types/department'
 import type { Classroom } from '@/types/classroom'
 import type { Subject } from '@/types/subject'
-import type { CreateUserFormValues, UpdateUserFormValues } from '../schemas/user-schema'
+import type { CreateUserFormValues, UpdateUserFormValues } from '@/schemas/user-schema'
 
 type UserFormValues = CreateUserFormValues | UpdateUserFormValues
 

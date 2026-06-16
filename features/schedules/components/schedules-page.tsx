@@ -18,11 +18,11 @@ import {
 } from '@/components/ui/select'
 import { formatDay } from '@/lib/format-date'
 import { sortByNearestDateAsc } from '@/utils/sort'
-import { scheduleSchema, type ScheduleFormValues } from '../schemas/schedule-schema'
+import { scheduleSchema, type ScheduleFormValues } from '@/features/schedules/schemas/schedule-schema'
 import {
   useSchedules, useScheduleDetail, useCreateSchedule,
   useUpdateSchedule, useDeleteSchedule,
-} from '../hooks/use-schedules'
+} from '@/features/schedules/hooks/use-schedules'
 import { useClassrooms } from '@/features/classrooms/hooks/use-classrooms'
 import type { Schedule } from '@/types/schedule'
 

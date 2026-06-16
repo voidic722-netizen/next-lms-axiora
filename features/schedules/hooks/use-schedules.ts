@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
   getSchedulesService,
+  getScheduleByIdService,
   createScheduleService,
   updateScheduleService,
   deleteScheduleService,
@@ -10,6 +11,7 @@ import type { CreateSchedulePayload, UpdateSchedulePayload } from '@/types/sched
 
 export const SCHEDULE_KEYS = {
   all: ['schedules'] as const,
+  detail: (id: number | string) => ['schedules', Number(id)] as const,
 }
 
 function extractErrorMessage(error: unknown, fallback: string): string {
@@ -24,6 +26,15 @@ export function useSchedules() {
     queryFn: getSchedulesService,
     staleTime: 30_000,
     refetchOnWindowFocus: true,
+  })
+}
+
+export function useScheduleDetail(id: number | string) {
+  return useQuery({
+    queryKey: SCHEDULE_KEYS.detail(id),
+    queryFn: () => getScheduleByIdService(id),
+    enabled: !!id,
+    staleTime: 30_000,
   })
 }
 

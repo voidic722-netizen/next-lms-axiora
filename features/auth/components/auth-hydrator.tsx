@@ -15,18 +15,18 @@ export function AuthHydrator({ user, children }: AuthHydratorProps) {
   const setLoading = useAuthStore((s) => s.setLoading)
   const hydrated = useRef(false)
 
-  if (!hydrated.current) {
-    const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]+)/)
-    const token = match ? match[1] : null
-    setUser(user)
-    if (token) setToken(token)
-    setLoading(false)
-    hydrated.current = true
-  }
-
   useEffect(() => {
-    setUser(user)
-  }, [user, setUser])
+    if (!hydrated.current) {
+      const match = document.cookie.match(/(?:^|;\s*)auth_token=([^;]+)/)
+      const token = match ? match[1] : null
+      setUser(user)
+      if (token) setToken(token)
+      setLoading(false)
+      hydrated.current = true
+    } else {
+      setUser(user)
+    }
+  }, [user, setUser, setToken, setLoading])
 
   return <>{children}</>
 }

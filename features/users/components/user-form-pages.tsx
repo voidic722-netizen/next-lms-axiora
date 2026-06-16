@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { UserFormFields } from './user-form-fields'
-import { useCreateUser, useUpdateUser, useUsers, useUserReferenceData } from '../hooks/use-users'
-import { createUserSchema, updateUserSchema } from '../schemas/user-schema'
-import type { CreateUserFormValues, UpdateUserFormValues } from '../schemas/user-schema'
+import { useCreateUser, useUpdateUser, useUsers, useUserReferenceData } from '@/hooks/use-users'
+import { createUserSchema, updateUserSchema } from '@/schemas/user-schema'
+import type { CreateUserFormValues, UpdateUserFormValues } from '@/schemas/user-schema'
 import type { CreateUserPayload, UpdateUserPayload } from '@/types/user'
 
 // ── Add User ─────────────────────────────────────────────────────────────────

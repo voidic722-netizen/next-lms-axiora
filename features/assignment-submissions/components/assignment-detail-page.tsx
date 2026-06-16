@@ -18,9 +18,9 @@ import {
 import { formatDate, isPast } from '@/lib/format-date'
 import { formatMaxFileSize, resolveMaxFileSizeBytes } from '@/utils/format'
 import { downloadFile } from '@/lib/download-file'
-import { ASSIGNMENT_TYPE_LABELS } from '../constants/assignment-type-labels'
-import { useAssignmentDetail, useDeleteAssignment } from '../hooks/use-assignments'
-import { useFileUpload } from '../hooks/use-file-upload'
+import { ASSIGNMENT_TYPE_LABELS } from '@/features/assignments/constants/assignment-type-labels'
+import { useAssignmentDetail, useDeleteAssignment } from '@/features/assignments/hooks/use-assignments'
+import { useFileUpload } from '@/features/assignments/hooks/use-file-upload'
 import {
   useMyAssignmentSubmission,
   useAssignmentSubmissions,

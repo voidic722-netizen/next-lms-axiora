@@ -28,6 +28,11 @@ export async function getSchedulesService(): Promise<Schedule[]> {
   return data.map(mapSchedule)
 }
 
+export async function getScheduleByIdService(id: number | string): Promise<Schedule> {
+  const { data } = await api.get<RawSchedule>(`/schedules/${id}`)
+  return mapSchedule(data)
+}
+
 export async function createScheduleService(payload: CreateSchedulePayload): Promise<Schedule> {
   const { data } = await api.post<RawSchedule>('/schedules', {
     date: payload.date,
