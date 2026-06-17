@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME ?? 'laravel_session'
+const AUTH_TOKEN_COOKIE = process.env.AUTH_TOKEN_COOKIE_NAME ?? 'auth_token'
 
 export default async function AuthLayout({
   children,
@@ -9,9 +9,9 @@ export default async function AuthLayout({
   children: React.ReactNode
 }) {
   const cookieStore = await cookies()
-  const session = cookieStore.get(SESSION_COOKIE)
+  const token = cookieStore.get(AUTH_TOKEN_COOKIE)
 
-  if (session?.value) {
+  if (token?.value) {
     redirect('/')
   }
 

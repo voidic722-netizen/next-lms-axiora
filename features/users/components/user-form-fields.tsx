@@ -148,11 +148,8 @@ function TeacherFormSection({
   departments: Department[]
   subjects: Subject[]
 }) {
-  const { register, setValue, getValues, watch } = form
+  const { register, setValue, watch } = form
   const position = watch('position' as keyof UserFormValues)
-  const facultyId = watch('facultyId' as keyof UserFormValues)
-  const departmentId = watch('departmentId' as keyof UserFormValues)
-  const subjectId = watch('subjectId' as keyof UserFormValues)
 
   return (
     <div className="space-y-4 border-t border-[#E2E8F0] pt-4">
