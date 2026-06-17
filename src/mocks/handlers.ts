@@ -7,10 +7,8 @@ import {
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'
 
-// Simulasi delay jaringan agar terasa realistis
 const DELAY = 300
 
-// Helper: ambil role dari cookie dev
 function getDevRole(): 'admin' | 'teacher' | 'student' {
   if (typeof document === 'undefined') return 'admin'
   const match = document.cookie.match(/dev_role=([^;]+)/)
@@ -18,7 +16,6 @@ function getDevRole(): 'admin' | 'teacher' | 'student' {
 }
 
 export const handlers = [
-  // ── Auth ────────────────────────────────────────────────────────────────────
   http.post(`${API}/auth/login`, async ({ request }) => {
     await delay(DELAY)
     const body = await request.json() as { email: string; password: string }
@@ -26,14 +23,25 @@ export const handlers = [
       : body.email.includes('student') ? 'student'
       : 'admin'
     const user = DEV_USERS[role]
-    return HttpResponse.json({ user: toRawUser(user) })
+    return HttpResponse.json({
+      success: true,
+      message: 'Login successful',
+      data: {
+        user: toRawUser(user),
+        token: 'mock-token-dev',
+      },
+    })
   }),
 
   http.get(`${API}/auth/me`, async () => {
     await delay(DELAY / 2)
     const role = getDevRole()
     const user = DEV_USERS[role]
-    return HttpResponse.json({ user: toRawUser(user) })
+    return HttpResponse.json({
+      success: true,
+      message: '',
+      data: toRawUser(user),
+    })
   }),
 
   http.post(`${API}/auth/logout`, async () => {
@@ -46,7 +54,6 @@ export const handlers = [
     return HttpResponse.json({ msg: 'Profile updated' })
   }),
 
-  // ── Users ────────────────────────────────────────────────────────────────────
   http.get(`${API}/users`, async ({ request }) => {
     await delay(DELAY)
     const url = new URL(request.url)
@@ -78,7 +85,6 @@ export const handlers = [
     return HttpResponse.json({ msg: 'User deleted' })
   }),
 
-  // ── Faculties ─────────────────────────────────────────────────────────────────
   http.get(`${API}/fakultas`, async () => {
     await delay(DELAY)
     return HttpResponse.json({ fakultas: MOCK_FACULTIES })
@@ -127,7 +133,6 @@ export const handlers = [
     return HttpResponse.json({ msg: 'Deleted' })
   }),
 
-  // ── Departments (jurusan) ─────────────────────────────────────────────────────
   http.get(`${API}/jurusan`, async () => {
     await delay(DELAY)
     return HttpResponse.json({ jurusan: MOCK_DEPARTMENTS.map(d => ({
@@ -167,7 +172,6 @@ export const handlers = [
   http.put(`${API}/jurusan/:id`, async () => { await delay(DELAY); return HttpResponse.json({ jurusan: { ...MOCK_DEPARTMENTS[0], fakultas_id: 1, created_at: new Date().toISOString() } }) }),
   http.delete(`${API}/jurusan/:id`, async () => { await delay(DELAY); return HttpResponse.json({ msg: 'Deleted' }) }),
 
-  // ── Semesters ────────────────────────────────────────────────────────────────
   http.get(`${API}/semester`, async () => {
     await delay(DELAY)
     return HttpResponse.json({ semesters: MOCK_SEMESTERS.map(s => ({ id: s.id, name: s.name, academic_year: s.academicYear, created_at: s.createdAt })) })
@@ -176,7 +180,6 @@ export const handlers = [
   http.put(`${API}/semester/:id`, async () => { await delay(DELAY); return HttpResponse.json({ semester: { id: 1, name: 'Updated', academic_year: '2024/2025', created_at: new Date().toISOString() } }) }),
   http.delete(`${API}/semester/:id`, async () => { await delay(DELAY); return HttpResponse.json({ msg: 'Deleted' }) }),
 
-  // ── Subjects (mata-pelajaran) ─────────────────────────────────────────────────
   http.get(`${API}/mata-pelajaran`, async () => {
     await delay(DELAY)
     return HttpResponse.json({ mata_pelajaran: MOCK_SUBJECTS.map(s => ({ id: s.id, name: s.name, type: s.type, jurusan_id: s.departmentId, description: s.description, thumbnail: null, created_at: s.createdAt })) })
@@ -191,7 +194,6 @@ export const handlers = [
   http.put(`${API}/mata-pelajaran/:id`, async () => { await delay(DELAY); return HttpResponse.json({ mataPelajaran: { id: 1, name: 'Updated', type: 'wajib', jurusan_id: 1, description: '', thumbnail: null, created_at: new Date().toISOString() } }) }),
   http.delete(`${API}/mata-pelajaran/:id`, async () => { await delay(DELAY); return HttpResponse.json({ msg: 'Deleted' }) }),
 
-  // ── Classrooms (kelas) ────────────────────────────────────────────────────────
   http.get(`${API}/kelas`, async () => {
     await delay(DELAY)
     return HttpResponse.json({ kelas: MOCK_CLASSROOMS.map(toRawClassroom) })
@@ -226,7 +228,6 @@ export const handlers = [
   http.put(`${API}/kelas/:id`, async () => { await delay(DELAY); return HttpResponse.json({ kelas: toRawClassroom(MOCK_CLASSROOMS[0]!) }) }),
   http.delete(`${API}/kelas/:id`, async () => { await delay(DELAY); return HttpResponse.json({ msg: 'Deleted' }) }),
 
-  // ── Schedules (jadwal) ────────────────────────────────────────────────────────
   http.get(`${API}/jadwal`, async () => {
     await delay(DELAY)
     return HttpResponse.json({ jadwal: MOCK_SCHEDULES.map(s => ({ id: s.id, date: s.date, kelas_id: s.classroomId, topic: s.topic, created_at: s.createdAt, kelas: s.classroom })) })
@@ -241,7 +242,6 @@ export const handlers = [
   http.put(`${API}/jadwal/:id`, async () => { await delay(DELAY); return HttpResponse.json({ jadwal: { id: 1, date: new Date().toISOString(), kelas_id: 1, topic: 'Updated', created_at: new Date().toISOString() } }) }),
   http.delete(`${API}/jadwal/:id`, async () => { await delay(DELAY); return HttpResponse.json({ msg: 'Deleted' }) }),
 
-  // ── Assignments (tugas) ────────────────────────────────────────────────────────
   http.get(`${API}/tugas`, async () => {
     await delay(DELAY)
     return HttpResponse.json({ tugas: MOCK_ASSIGNMENTS.map(toRawAssignment) })
@@ -257,7 +257,6 @@ export const handlers = [
   http.delete(`${API}/tugas/:id`, async () => { await delay(DELAY); return HttpResponse.json({ msg: 'Deleted' }) }),
   http.delete(`${API}/tugas-modul/:id`, async () => { await delay(DELAY); return HttpResponse.json({ msg: 'Deleted' }) }),
 
-  // Submissions
   http.get(`${API}/tugas/:id/my-submission`, async () => {
     await delay(DELAY)
     return HttpResponse.json({ submission: null })
@@ -272,7 +271,6 @@ export const handlers = [
   http.post(`${API}/tugas/:id/submit`, async () => { await delay(DELAY); return HttpResponse.json({ submission: { id: 1, files: [], status: 'submitted', submitted_at: new Date().toISOString() } }) }),
   http.post(`${API}/tugas-pengumpulan/:id/grade`, async () => { await delay(DELAY); return HttpResponse.json({ submission: { id: 1, grade: 90, feedback: 'Excellent' } }) }),
 
-  // ── Exams (ujian) ─────────────────────────────────────────────────────────────
   http.get(`${API}/ujian`, async () => {
     await delay(DELAY)
     return HttpResponse.json({ ujian: MOCK_EXAMS.map(toRawExam) })
@@ -304,7 +302,6 @@ export const handlers = [
   }),
 ]
 
-// ── Raw Mappers (frontend → backend shape untuk mock response) ────────────────
 function toRawUser(u: typeof MOCK_USERS[0]) {
   return {
     id: u.id, name: u.name, email: u.email, role: u.role, image: u.image,
