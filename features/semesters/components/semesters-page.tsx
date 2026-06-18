@@ -37,21 +37,30 @@ export function SemestersPage() {
 
   function startEdit(sem: Semester) {
     setEditing(sem)
-    reset({ name: sem.name, academicYear: sem.academicYear })
+    reset({
+      name: sem.name,
+      academicYear: sem.academicYear,
+      startDate: sem.startDate?.split('T')[0] ?? '',
+      endDate: sem.endDate?.split('T')[0] ?? '',
+    })
   }
 
   function cancelEdit() {
     setEditing(null)
-    reset({ name: '', academicYear: '' })
+    reset({ name: '', academicYear: '', startDate: '', endDate: '' })
   }
 
   async function onSubmit(values: SemesterFormValues) {
-    if (editing) {
-      await updateMutation.mutateAsync(values as any)
-      cancelEdit()
-    } else {
-      await createMutation.mutateAsync(values as any)
-      reset()
+    try {
+      if (editing) {
+        await updateMutation.mutateAsync(values)
+        cancelEdit()
+      } else {
+        await createMutation.mutateAsync(values)
+        reset()
+      }
+    } catch {
+      // error handling delegated to react-query onError
     }
   }
 
@@ -64,7 +73,6 @@ export function SemestersPage() {
       <PageHeader title="Semester" description={`${semesters.length} semester terdaftar`} />
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Form */}
         {isAdmin && (
           <Card>
             <CardHeader className="pb-3">
@@ -84,6 +92,16 @@ export function SemestersPage() {
                   <Input id="sem-year" placeholder="2024/2025" {...register('academicYear')} />
                   {errors.academicYear && <p className="text-xs text-[#EF4444]">{errors.academicYear.message}</p>}
                 </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="sem-start">Tanggal Mulai</Label>
+                  <Input id="sem-start" type="date" {...register('startDate')} />
+                  {errors.startDate && <p className="text-xs text-[#EF4444]">{errors.startDate.message}</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="sem-end">Tanggal Selesai</Label>
+                  <Input id="sem-end" type="date" {...register('endDate')} />
+                  {errors.endDate && <p className="text-xs text-[#EF4444]">{errors.endDate.message}</p>}
+                </div>
                 <div className="flex gap-2">
                   <Button type="submit" size="sm" className="flex-1" disabled={isPending}>
                     {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -100,7 +118,6 @@ export function SemestersPage() {
           </Card>
         )}
 
-        {/* Table */}
         <div className={isAdmin ? 'lg:col-span-2' : 'lg:col-span-3'}>
           <DataTable
             data={semesters as unknown as Record<string, unknown>[]}

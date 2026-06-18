@@ -89,8 +89,12 @@ export function AddSemesterPage() {
         <CardContent className="pt-6">
           <SemesterForm
             onSubmit={async (v) => {
-              await mutation.mutateAsync(v as any)
-              router.push('/semesters')
+              try {
+                await mutation.mutateAsync(v)
+                router.push('/semesters')
+              } catch {
+                // error handling delegated to react-query onError
+              }
             }}
             isPending={mutation.isPending}
             submitLabel="Simpan"
@@ -129,8 +133,12 @@ export function EditSemesterPage({ id }: { id: string }) {
                 : undefined
             }
             onSubmit={async (v) => {
-              await mutation.mutateAsync(v as any)
-              router.push('/semesters')
+              try {
+                await mutation.mutateAsync(v)
+                router.push('/semesters')
+              } catch {
+                // error handling delegated to react-query onError
+              }
             }}
             isPending={mutation.isPending}
             submitLabel="Simpan Perubahan"
