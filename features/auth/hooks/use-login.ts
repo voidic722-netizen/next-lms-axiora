@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
 import { loginService } from '@/services/auth-service'
 import { USER_ROLE } from '@/types/roles'
+import { AUTH_TOKEN_COOKIE_NAME } from '@/lib/config'
 import type { LoginFormValues } from '@/features/auth/schemas/login-schema'
 
 export function useLogin() {
@@ -12,7 +13,7 @@ export function useLogin() {
   const setToken = useAuthStore((s) => s.setToken)
   const [isLoading, setIsLoading] = useState(false)
 
-  async function login(values: LoginFormValues) {
+  async function login(values: LoginFormValues, redirectTo?: string | null) {
     setIsLoading(true)
     try {
       const { user, token } = await loginService(values.email, values.password)
@@ -26,17 +27,18 @@ export function useLogin() {
       setToken(token)
 
       const isProd = process.env.NODE_ENV === 'production'
-      document.cookie = `auth_token=${token}; path=/; SameSite=Lax${isProd ? '; Secure' : ''}`
+      document.cookie = `${AUTH_TOKEN_COOKIE_NAME}=${token}; path=/; SameSite=Lax${isProd ? '; Secure' : ''}`
 
-      const role = String(user.role)
-      const target =
-        role === String(USER_ROLE.Admin)
+      const defaultTarget =
+        user.role === USER_ROLE.Admin
           ? '/admin'
-          : role === String(USER_ROLE.Teacher)
+          : user.role === USER_ROLE.Teacher
             ? '/teacher'
             : '/'
 
-      router.replace(target)
+      const isSafeRedirect = !!redirectTo && redirectTo.startsWith('/') && !redirectTo.startsWith('//')
+
+      router.replace(isSafeRedirect ? redirectTo! : defaultTarget)
     } catch (error: unknown) {
       const message =
         (error as { response?: { data?: { message?: string } } })?.response?.data?.message
