@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Pencil, Building2, Loader2 } from 'lucide-react'
+import { Plus, Pencil, Building2, Loader2, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { PageHeader } from '@/components/shared/page-header'
@@ -30,7 +30,6 @@ import {
 import { useFaculties } from '@/features/faculties/hooks/use-faculties'
 import type { Department } from '@/types/department'
 
-// ── List Page ────────────────────────────────────────────────────────────────
 export function DepartmentsPage() {
   const { isAdmin } = useAuth()
   const { data: departments = [], isLoading } = useDepartments()
@@ -100,7 +99,6 @@ function DepartmentCard({ department: d, isAdmin, onDelete }: {
   )
 }
 
-// ── Detail Page ──────────────────────────────────────────────────────────────
 export function DepartmentDetailPage({ id }: { id: string }) {
   const { data: dept, isLoading } = useDepartmentDetail(id)
   if (isLoading) return <Skeleton className="h-96 rounded-lg bg-[#E2E8F0]" />
@@ -174,7 +172,6 @@ export function DepartmentDetailPage({ id }: { id: string }) {
   )
 }
 
-// ── Form Pages ───────────────────────────────────────────────────────────────
 function DepartmentForm({ defaultValues, onSubmit, isPending, submitLabel, onCancel }: {
   defaultValues?: Partial<DepartmentFormValues>
   onSubmit: (v: DepartmentFormValues) => Promise<void>
@@ -189,6 +186,12 @@ function DepartmentForm({ defaultValues, onSubmit, isPending, submitLabel, onCan
   })
   const fileRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
+
+  function clearThumbnail() {
+    setValue('thumbnail', undefined)
+    setPreview(null)
+    if (fileRef.current) fileRef.current.value = ''
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -214,9 +217,24 @@ function DepartmentForm({ defaultValues, onSubmit, isPending, submitLabel, onCan
       </div>
       <div className="space-y-1.5">
         <Label>Thumbnail (opsional)</Label>
-        {preview
-          ? <img src={preview} alt="preview" className="h-32 rounded border border-[#E2E8F0] object-cover" />
-          : <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>Pilih Gambar</Button>}
+        {preview ? (
+          <div className="relative inline-block">
+            <img src={preview} alt="preview" className="h-32 rounded border border-[#E2E8F0] object-cover" />
+            <Button
+              type="button"
+              variant="destructive"
+              size="icon"
+              className="absolute top-1.5 right-1.5 h-6 w-6"
+              onClick={clearThumbnail}
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        ) : (
+          <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+            Pilih Gambar
+          </Button>
+        )}
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
           const f = e.target.files?.[0]; if (!f) return
           setValue('thumbnail', f); setPreview(URL.createObjectURL(f))
@@ -267,7 +285,6 @@ export function EditDepartmentPage({ id }: { id: string }) {
   )
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
 function EmptyState({ icon, text }: { icon: React.ReactNode; text: string }) {
   return <div className="flex flex-col items-center justify-center py-16 text-center gap-3">{icon}<p className="text-[#64748B]">{text}</p></div>
 }

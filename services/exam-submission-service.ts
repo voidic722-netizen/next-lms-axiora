@@ -1,4 +1,5 @@
 import api from '@/lib/axios'
+import { useAuthStore } from '@/stores/auth-store'
 import type {
   ExamSubmission,
   ExamSubmissionResult,
@@ -83,20 +84,26 @@ export async function submitExamService(
   options?: SubmitExamOptions,
 ): Promise<ExamSubmissionResult> {
   if (options?.keepalive) {
+    const token = useAuthStore.getState().token
     const body = JSON.stringify({ answers: payload.answers })
+
     const sent = navigator.sendBeacon(
       `${process.env.NEXT_PUBLIC_API_URL}/exams/${examId}/submit`,
       new Blob([body], { type: 'application/json' }),
     )
+
     if (!sent) {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/exams/${examId}/submit`, {
         method: 'POST',
-        credentials: 'include',
         keepalive: true,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body,
       })
     }
+
     return { score: 0, correctCount: 0, totalQuestions: 0 }
   }
 

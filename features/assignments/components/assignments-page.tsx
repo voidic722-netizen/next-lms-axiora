@@ -183,6 +183,7 @@ function AssignmentForm({
 
   const selectedTypes = watch('types') ?? []
   const selectedClassrooms = watch('classroomIds') ?? []
+  const subjectId = watch('subjectId')
 
   function toggleType(type: string) {
     const next = selectedTypes.includes(type)
@@ -245,7 +246,10 @@ function AssignmentForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label>Mata Pelajaran</Label>
-          <Select onValueChange={(v) => setValue('subjectId', Number(v))}>
+          <Select
+              value={subjectId ? String(subjectId) : ''}
+              onValueChange={(v) => setValue('subjectId', Number(v))}
+            >
             <SelectTrigger>
               <SelectValue placeholder="Pilih mata pelajaran" />
             </SelectTrigger>
@@ -367,7 +371,7 @@ export function EditAssignmentPage({ id }: { id: string }) {
                     description: assignment.description,
                     types: assignment.types,
                     classroomIds: assignment.classroomIds,
-                    dueDate: assignment.dueDate,
+                    dueDate: assignment.dueDate?.slice(0, 16) ?? '',
                     maxFileSize: assignment.maxFileSize,
                     subjectId: assignment.subjectId,
                   }

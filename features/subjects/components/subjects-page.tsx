@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Pencil, BookText, Loader2 } from 'lucide-react'
+import { Plus, Pencil, BookText, Loader2, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { PageHeader } from '@/components/shared/page-header'
@@ -192,6 +192,12 @@ function SubjectForm({
   const fileRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
 
+  function clearThumbnail() {
+    setValue('thumbnail', undefined)
+    setPreview(null)
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-1.5">
@@ -201,13 +207,13 @@ function SubjectForm({
       </div>
       <div className="space-y-1.5">
         <Label>Tipe</Label>
-        <Select value={type} onValueChange={(v) => setValue('type', v as 'umum' | 'wajib')}>
+        <Select value={type} onValueChange={(v) => setValue('type', v as 'general' | 'compulsory')}>
           <SelectTrigger>
             <SelectValue placeholder="Pilih tipe" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="wajib">Wajib</SelectItem>
-            <SelectItem value="umum">Umum</SelectItem>
+            <SelectItem value="compulsory">Wajib</SelectItem>
+            <SelectItem value="general">Umum</SelectItem>
           </SelectContent>
         </Select>
         {errors.type && <p className="text-xs text-[#EF4444]">{errors.type.message}</p>}
@@ -235,7 +241,18 @@ function SubjectForm({
       <div className="space-y-1.5">
         <Label>Thumbnail (opsional)</Label>
         {preview ? (
-          <img src={preview} alt="preview" className="h-32 rounded border border-[#E2E8F0] object-cover" />
+          <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-[#E2E8F0] bg-[#F8FAFC]">
+            <img src={preview} alt="preview" className="w-full h-full object-cover" />
+            <Button
+              type="button"
+              variant="destructive"
+              size="icon"
+              className="absolute top-2 right-2 h-7 w-7"
+              onClick={clearThumbnail}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         ) : (
           <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
             Pilih Gambar
@@ -253,6 +270,7 @@ function SubjectForm({
             setPreview(URL.createObjectURL(f))
           }}
         />
+        {errors.thumbnail && <p className="text-xs text-[#EF4444]">{errors.thumbnail.message}</p>}
       </div>
       <div className="flex gap-3">
         <Button type="submit" disabled={isPending}>
@@ -305,7 +323,7 @@ export function EditSubjectPage({ id }: { id: string }) {
               subject
                 ? ({
                     name: subject.name,
-                    type: subject.type,
+                    type: subject.type as 'general' | 'compulsory',
                     description: subject.description,
                     departmentId: subject.departmentId ?? undefined,
                   } as any)

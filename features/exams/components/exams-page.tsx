@@ -39,7 +39,13 @@ import { useExamList } from "../hooks/use-exam-list";
 import type { Exam } from "@/types/exam";
 import type { StudentExamSubmissionRecord } from "@/types/exam-submission";
 
-// ── List Page ────────────────────────────────────────────────────────────────
+const EXAM_TYPE_OPTIONS = [
+  { value: 'UTS', label: 'UTS' },
+  { value: 'UAS', label: 'UAS' },
+  { value: 'Kuis', label: 'Kuis' },
+  { value: 'Ulangan Harian', label: 'Ulangan Harian' },
+]
+
 export function ExamsPage() {
   const { user, isTeacherOrAdmin } = useAuth();
   const { data: exams = [], isLoading } = useExams();
@@ -106,48 +112,31 @@ export function ExamsPage() {
         </div>
       )}
 
-      {/* Dialog konfirmasi mulai ujian */}
       {isStartDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 max-w-sm w-full space-y-4 shadow-xl">
-            <h2 className="text-lg font-semibold text-[#0F172A]">
-              Mulai Ujian?
-            </h2>
+            <h2 className="text-lg font-semibold text-[#0F172A]">Mulai Ujian?</h2>
             <p className="text-sm text-[#64748B]">
-              Pastikan koneksi internet stabil. Ujian akan dimulai dalam mode
-              layar penuh. Berpindah tab dihitung sebagai pelanggaran.
+              Pastikan koneksi internet stabil. Ujian akan dimulai dalam mode layar penuh. Berpindah tab dihitung sebagai pelanggaran.
             </p>
             <div className="flex gap-3 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => setIsStartDialogOpen(false)}
-              >
-                Batal
-              </Button>
+              <Button variant="outline" onClick={() => setIsStartDialogOpen(false)}>Batal</Button>
               <Button onClick={handleStartExam}>Mulai</Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Dialog ujian belum tersedia */}
       {isNotAvailableOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 max-w-sm w-full space-y-4 shadow-xl">
-            <h2 className="text-lg font-semibold text-[#0F172A]">
-              Ujian Belum Dibuka
-            </h2>
+            <h2 className="text-lg font-semibold text-[#0F172A]">Ujian Belum Dibuka</h2>
             <p className="text-sm text-[#64748B]">
               Ujian ini baru bisa diakses mulai{" "}
-              <span className="font-medium text-[#0F172A]">
-                {formatDate(notAvailableFrom ?? "")}
-              </span>
-              .
+              <span className="font-medium text-[#0F172A]">{formatDate(notAvailableFrom ?? "")}</span>.
             </p>
             <div className="flex justify-end">
-              <Button onClick={() => setIsNotAvailableOpen(false)}>
-                Mengerti
-              </Button>
+              <Button onClick={() => setIsNotAvailableOpen(false)}>Mengerti</Button>
             </div>
           </div>
         </div>
@@ -164,12 +153,7 @@ function ExamCard({
 }: {
   exam: Exam;
   isTeacherOrAdmin: boolean;
-  onExamClick: (
-    ev: React.MouseEvent,
-    id: number,
-    isCompleted: boolean,
-    availableFrom?: string,
-  ) => void;
+  onExamClick: (ev: React.MouseEvent, id: number, isCompleted: boolean, availableFrom?: string) => void;
   onDelete: () => Promise<void>;
 }) {
   const notYet = isFuture(e.availableDate);
@@ -185,36 +169,24 @@ function ExamCard({
             <p className="font-semibold text-[#0F172A] truncate">{e.title}</p>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {e.examTypes.map((t) => (
-                <Badge key={t} variant="secondary" className="text-xs">
-                  {t}
-                </Badge>
+                <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
               ))}
-              <Badge
-                className={`text-xs border-0 ${expired ? "bg-[#EF4444] text-white" : notYet ? "bg-[#EEF1FF] text-[#4B5CF0]" : "bg-[#4B5CF0] text-white"}`}
-              >
+              <Badge className={`text-xs border-0 ${expired ? "bg-[#EF4444] text-white" : notYet ? "bg-[#EEF1FF] text-[#4B5CF0]" : "bg-[#4B5CF0] text-white"}`}>
                 {expired ? "Berakhir" : notYet ? "Belum Dimulai" : "Aktif"}
               </Badge>
             </div>
             <p className="text-xs text-[#64748B] mt-1.5">
-              {formatDate(e.availableDate)} — {formatDate(e.deadlineDate)} ·{" "}
-              {e.durationMinutes} menit · {e.questions.length} soal
+              {formatDate(e.availableDate)} — {formatDate(e.deadlineDate)} · {e.durationMinutes} menit · {e.questions.length} soal
             </p>
           </div>
           {isTeacherOrAdmin && (
-            <div
-              className="flex gap-1 shrink-0"
-              onClick={(ev) => ev.stopPropagation()}
-            >
+            <div className="flex gap-1 shrink-0" onClick={(ev) => ev.stopPropagation()}>
               <Button asChild variant="ghost" size="sm">
                 <Link href={`/exams/${e.id}/edit`}>Edit</Link>
               </Button>
               <ConfirmDialog
                 trigger={
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200"
-                  >
+                  <Button variant="ghost" size="sm" className="text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200">
                     Hapus
                   </Button>
                 }
@@ -231,16 +203,10 @@ function ExamCard({
   );
 }
 
-// ── Submitted Page ───────────────────────────────────────────────────────────
 export function ExamSubmittedPage({ id }: { id: string }) {
   const { data: submission, isLoading } = useMyExamSubmission(id);
   const { data: exam } = useExamDetail(id);
-
-  if (isLoading)
-    return (
-      <Skeleton className="h-64 rounded-lg max-w-md mx-auto bg-[#E2E8F0]" />
-    );
-
+  if (isLoading) return <Skeleton className="h-64 rounded-lg max-w-md mx-auto bg-[#E2E8F0]" />;
   return (
     <div className="max-w-md mx-auto py-12 space-y-6 text-center">
       <CheckCircle2 className="h-16 w-16 text-[#22C55E] mx-auto" />
@@ -250,15 +216,8 @@ export function ExamSubmittedPage({ id }: { id: string }) {
       </div>
       {submission && (
         <div className="grid grid-cols-3 gap-4">
-          <ResultCard
-            label="Nilai"
-            value={String(submission.score)}
-            highlight
-          />
-          <ResultCard
-            label="Benar"
-            value={`${submission.correctCount}/${submission.totalQuestions}`}
-          />
+          <ResultCard label="Nilai" value={String(submission.score)} highlight />
+          <ResultCard label="Benar" value={`${submission.correctCount}/${submission.totalQuestions}`} />
           <ResultCard label="Status" value="Selesai" />
         </div>
       )}
@@ -269,34 +228,19 @@ export function ExamSubmittedPage({ id }: { id: string }) {
   );
 }
 
-function ResultCard({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
+function ResultCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="rounded-lg border border-[#E2E8F0] bg-white p-3 shadow-sm">
       <p className="text-xs text-[#64748B]">{label}</p>
-      <p
-        className={`text-xl font-bold mt-0.5 ${highlight ? "text-[#4B5CF0]" : "text-[#0F172A]"}`}
-      >
-        {value}
-      </p>
+      <p className={`text-xl font-bold mt-0.5 ${highlight ? "text-[#4B5CF0]" : "text-[#0F172A]"}`}>{value}</p>
     </div>
   );
 }
 
-// ── Submissions Page ─────────────────────────────────────────────────────────
 export function ExamSubmissionsPage({ id }: { id: string }) {
   const { data: exam } = useExamDetail(id);
   const { data: submissions = [] } = useExamSubmissions(id);
-
   const submitted = submissions.filter((s) => s.isSubmitted).length;
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -310,60 +254,35 @@ export function ExamSubmissionsPage({ id }: { id: string }) {
         searchKeys={["studentName"]}
         columns={[
           {
-            key: "student",
-            header: "Mahasiswa",
+            key: "student", header: "Mahasiswa",
             render: (row) => {
               const s = row as unknown as StudentExamSubmissionRecord;
-              return (
-                <div>
-                  <p className="font-medium text-sm text-[#0F172A]">
-                    {s.studentName}
-                  </p>
-                  <p className="text-xs text-[#64748B]">{s.classroomName}</p>
-                </div>
-              );
+              return <div><p className="font-medium text-sm text-[#0F172A]">{s.studentName}</p><p className="text-xs text-[#64748B]">{s.classroomName}</p></div>;
             },
           },
           {
-            key: "status",
-            header: "Status",
+            key: "status", header: "Status",
             render: (row) => {
               const s = row as unknown as StudentExamSubmissionRecord;
-              return s.isSubmitted ? (
-                <Badge className="bg-[#22C55E] text-white border-0">
-                  Selesai
-                </Badge>
-              ) : (
-                <Badge variant="secondary">Belum</Badge>
-              );
+              return s.isSubmitted
+                ? <Badge className="bg-[#22C55E] text-white border-0">Selesai</Badge>
+                : <Badge variant="secondary">Belum</Badge>;
             },
           },
           {
-            key: "score",
-            header: "Nilai",
+            key: "score", header: "Nilai",
             render: (row) => {
               const s = row as unknown as StudentExamSubmissionRecord;
-              if (!s.submission)
-                return <span className="text-[#64748B] text-sm">-</span>;
-              return (
-                <span className="font-semibold text-[#0F172A]">
-                  {s.submission.score}
-                </span>
-              );
+              if (!s.submission) return <span className="text-[#64748B] text-sm">-</span>;
+              return <span className="font-semibold text-[#0F172A]">{s.submission.score}</span>;
             },
           },
           {
-            key: "correct",
-            header: "Benar",
+            key: "correct", header: "Benar",
             render: (row) => {
               const s = row as unknown as StudentExamSubmissionRecord;
-              if (!s.submission)
-                return <span className="text-[#64748B] text-sm">-</span>;
-              return (
-                <span className="text-sm text-[#0F172A]">
-                  {s.submission.correctCount}/{s.submission.totalQuestions}
-                </span>
-              );
+              if (!s.submission) return <span className="text-[#64748B] text-sm">-</span>;
+              return <span className="text-sm text-[#0F172A]">{s.submission.correctCount}/{s.submission.totalQuestions}</span>;
             },
           },
         ]}
@@ -372,7 +291,6 @@ export function ExamSubmissionsPage({ id }: { id: string }) {
   );
 }
 
-// ── Add/Edit Form ────────────────────────────────────────────────────────────
 function ExamForm({
   defaultValues,
   onSubmit,
@@ -387,33 +305,26 @@ function ExamForm({
   onCancel: () => void;
 }) {
   const { data: classrooms = [] } = useClassrooms();
-  const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<ExamFormValues>({
+  const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<ExamFormValues>({
     resolver: zodResolver(examSchema),
-    defaultValues: {
-      examTypes: [],
-      classroomIds: [],
-      questions: [],
-      ...defaultValues,
-    },
+    defaultValues: { examTypes: [], classroomIds: [], questions: [], ...defaultValues },
   });
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "questions",
-  });
+  const { fields, append, remove } = useFieldArray({ control, name: "questions" });
   const selectedClassrooms = watch("classroomIds") ?? [];
+  const selectedExamTypes = watch("examTypes") ?? [];
 
   function toggleClassroom(id: number) {
     const next = selectedClassrooms.includes(id)
       ? selectedClassrooms.filter((c) => c !== id)
       : [...selectedClassrooms, id];
     setValue("classroomIds", next, { shouldValidate: true });
+  }
+
+  function toggleExamType(type: string) {
+    const next = selectedExamTypes.includes(type)
+      ? selectedExamTypes.filter((t) => t !== type)
+      : [...selectedExamTypes, type];
+    setValue("examTypes", next, { shouldValidate: true });
   }
 
   function addQuestion() {
@@ -432,13 +343,7 @@ function ExamForm({
   }
 
   const handleFormSubmit = (data: ExamFormValues) => {
-    const cleaned = {
-      ...data,
-      questions: data.questions.map((q) => ({
-        ...q,
-        image: q.image ?? null,
-      })),
-    };
+    const cleaned = { ...data, questions: data.questions.map((q) => ({ ...q, image: q.image ?? null })) };
     onSubmit(cleaned);
   };
 
@@ -448,96 +353,73 @@ function ExamForm({
         <div className="space-y-1.5 sm:col-span-2">
           <Label>Judul Ujian</Label>
           <Input placeholder="UTS Semester 1" {...register("title")} />
-          {errors.title && (
-            <p className="text-xs text-[#EF4444]">{errors.title.message}</p>
-          )}
+          {errors.title && <p className="text-xs text-[#EF4444]">{errors.title.message}</p>}
         </div>
+
+        <div className="space-y-1.5 sm:col-span-2">
+          <Label>Kategori Ujian</Label>
+          <div className="flex flex-wrap gap-2">
+            {EXAM_TYPE_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => toggleExamType(opt.value)}
+                className={`px-3 py-1.5 rounded-full border text-sm transition-colors duration-200 ${
+                  selectedExamTypes.includes(opt.value)
+                    ? 'bg-[#4B5CF0] text-white border-[#4B5CF0]'
+                    : 'border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          {errors.examTypes && <p className="text-xs text-[#EF4444]">{errors.examTypes.message}</p>}
+        </div>
+
         <div className="space-y-1.5">
           <Label>Tanggal Mulai</Label>
           <Input type="datetime-local" {...register("availableDate")} />
-          {errors.availableDate && (
-            <p className="text-xs text-[#EF4444]">
-              {errors.availableDate.message}
-            </p>
-          )}
+          {errors.availableDate && <p className="text-xs text-[#EF4444]">{errors.availableDate.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Tenggat Waktu</Label>
           <Input type="datetime-local" {...register("deadlineDate")} />
-          {errors.deadlineDate && (
-            <p className="text-xs text-[#EF4444]">
-              {errors.deadlineDate.message}
-            </p>
-          )}
+          {errors.deadlineDate && <p className="text-xs text-[#EF4444]">{errors.deadlineDate.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Durasi (menit)</Label>
-          <Input
-            type="number"
-            min={1}
-            placeholder="90"
-            {...register("durationMinutes", { valueAsNumber: true })}
-          />
-          {errors.durationMinutes && (
-            <p className="text-xs text-[#EF4444]">
-              {errors.durationMinutes.message}
-            </p>
-          )}
+          <Input type="number" min={1} placeholder="90" {...register("durationMinutes", { valueAsNumber: true })} />
+          {errors.durationMinutes && <p className="text-xs text-[#EF4444]">{errors.durationMinutes.message}</p>}
         </div>
         <div className="space-y-1.5">
           <Label>Kelas</Label>
           <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto border border-[#E2E8F0] rounded-md p-2">
             {classrooms.map((c) => (
-              <label
-                key={c.id}
-                className="flex items-center gap-2 text-sm text-[#0F172A] cursor-pointer"
-              >
-                <Checkbox
-                  checked={selectedClassrooms.includes(c.id)}
-                  onCheckedChange={() => toggleClassroom(c.id)}
-                />
+              <label key={c.id} className="flex items-center gap-2 text-sm text-[#0F172A] cursor-pointer">
+                <Checkbox checked={selectedClassrooms.includes(c.id)} onCheckedChange={() => toggleClassroom(c.id)} />
                 {c.name}
               </label>
             ))}
           </div>
-          {errors.classroomIds && (
-            <p className="text-xs text-[#EF4444]">
-              {errors.classroomIds.message}
-            </p>
-          )}
+          {errors.classroomIds && <p className="text-xs text-[#EF4444]">{errors.classroomIds.message}</p>}
         </div>
       </div>
 
-      {/* Questions */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Label className="text-base">Soal ({fields.length})</Label>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addQuestion}
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Tambah Soal
+          <Button type="button" variant="outline" size="sm" onClick={addQuestion}>
+            <PlusCircle className="mr-2 h-4 w-4" />Tambah Soal
           </Button>
         </div>
-        {errors.questions && (
-          <p className="text-xs text-[#EF4444]">{errors.questions.message}</p>
-        )}
+        {errors.questions && <p className="text-xs text-[#EF4444]">{errors.questions.message}</p>}
         {fields.map((field, qi) => (
-          <Card
-            key={field.id}
-            className="border border-[#E2E8F0] bg-white shadow-sm"
-          >
+          <Card key={field.id} className="border border-[#E2E8F0] bg-white shadow-sm">
             <CardHeader className="pb-2 flex-row items-center justify-between">
-              <CardTitle className="text-sm font-medium text-[#0F172A]">
-                Soal {qi + 1}
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-[#0F172A]">Soal {qi + 1}</CardTitle>
               <Button
-                type="button"
-                variant="ghost"
-                size="icon"
+                type="button" variant="ghost" size="icon"
                 className="h-7 w-7 text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200"
                 onClick={() => remove(qi)}
               >
@@ -545,25 +427,15 @@ function ExamForm({
               </Button>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Input
-                placeholder="Teks pertanyaan..."
-                {...register(`questions.${qi}.text`)}
-              />
+              <Input placeholder="Teks pertanyaan..." {...register(`questions.${qi}.text`)} />
               {errors.questions?.[qi]?.text && (
-                <p className="text-xs text-[#EF4444]">
-                  {errors.questions[qi]?.text?.message}
-                </p>
+                <p className="text-xs text-[#EF4444]">{errors.questions[qi]?.text?.message}</p>
               )}
               <div className="space-y-2">
                 {(field.options ?? []).map((_, oi) => (
                   <div key={oi} className="flex items-center gap-2">
-                    <Checkbox
-                      {...register(`questions.${qi}.options.${oi}.isCorrect`)}
-                    />
-                    <Input
-                      placeholder={`Pilihan ${oi + 1}`}
-                      {...register(`questions.${qi}.options.${oi}.label`)}
-                    />
+                    <Checkbox {...register(`questions.${qi}.options.${oi}.isCorrect`)} />
+                    <Input placeholder={`Pilihan ${oi + 1}`} {...register(`questions.${qi}.options.${oi}.label`)} />
                   </div>
                 ))}
               </div>
@@ -577,9 +449,7 @@ function ExamForm({
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {submitLabel}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Batal
-        </Button>
+        <Button type="button" variant="outline" onClick={onCancel}>Batal</Button>
       </div>
     </form>
   );
@@ -595,14 +465,7 @@ export function AddExamPage() {
         <CardContent className="pt-6">
           <ExamForm
             onSubmit={async (v) => {
-              const cleaned = {
-                ...v,
-                questions: v.questions.map((q) => ({
-                  ...q,
-                  image: q.image ?? null,
-                })),
-              };
-              await mutation.mutateAsync(cleaned as any);
+              await mutation.mutateAsync(v as any);
               router.push("/exams");
             }}
             isPending={mutation.isPending}
@@ -619,8 +482,7 @@ export function EditExamPage({ id }: { id: string }) {
   const router = useRouter();
   const { data: exam, isLoading } = useExamDetail(id);
   const mutation = useUpdateExam(id);
-  if (isLoading)
-    return <Skeleton className="h-[600px] max-w-3xl rounded-lg bg-[#E2E8F0]" />;
+  if (isLoading) return <Skeleton className="h-[600px] max-w-3xl rounded-lg bg-[#E2E8F0]" />;
   return (
     <div className="space-y-6 max-w-3xl">
       <PageHeader title="Edit Ujian" />
@@ -637,22 +499,12 @@ export function EditExamPage({ id }: { id: string }) {
                     availableDate: exam.availableDate,
                     deadlineDate: exam.deadlineDate,
                     durationMinutes: exam.durationMinutes,
-                    questions: exam.questions.map((q) => ({
-                      ...q,
-                      image: q.image,
-                    })),
+                    questions: exam.questions.map((q) => ({ ...q, image: q.image })),
                   }
                 : undefined
             }
             onSubmit={async (v) => {
-              const cleaned = {
-                ...v,
-                questions: v.questions.map((q) => ({
-                  ...q,
-                  image: q.image ?? null,
-                })),
-              };
-              await mutation.mutateAsync(cleaned as any);
+              await mutation.mutateAsync(v as any);
               router.push(`/exams/${id}`);
             }}
             isPending={mutation.isPending}

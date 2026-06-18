@@ -147,16 +147,21 @@ function ScheduleForm({
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<ScheduleFormValues>({
     resolver: zodResolver(scheduleSchema),
     defaultValues,
   })
+  const classroomId = watch('classroomId')
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-1.5">
         <Label>Kelas</Label>
-        <Select onValueChange={(v) => setValue('classroomId', Number(v))}>
+        <Select
+          value={classroomId ? String(classroomId) : ''}
+          onValueChange={(v) => setValue('classroomId', Number(v))}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Pilih kelas" />
           </SelectTrigger>
@@ -229,7 +234,7 @@ export function EditSchedulePage({ id }: { id: string }) {
           <ScheduleForm
             defaultValues={
               schedule
-                ? { classroomId: schedule.classroomId, date: schedule.date, topic: schedule.topic }
+                ? { classroomId: schedule.classroomId, date: schedule.date?.split('T')[0] ?? '', topic: schedule.topic }
                 : undefined
             }
             onSubmit={async (v) => {

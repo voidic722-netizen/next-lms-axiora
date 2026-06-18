@@ -229,11 +229,13 @@ function ClassroomForm({
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<ClassroomFormValues>({
     resolver: zodResolver(classroomSchema),
     defaultValues,
   })
+  const formValues = watch()
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -249,7 +251,10 @@ function ClassroomForm({
       ].map(({ label, key, items, error }) => (
         <div key={key} className="space-y-1.5">
           <Label>{label}</Label>
-          <Select onValueChange={(v) => setValue(key as keyof ClassroomFormValues, Number(v) as never)}>
+          <Select
+            value={formValues[key as keyof ClassroomFormValues] ? String(formValues[key as keyof ClassroomFormValues]) : ''}
+            onValueChange={(v) => setValue(key as keyof ClassroomFormValues, Number(v) as never)}
+          >
             <SelectTrigger><SelectValue placeholder={`Pilih ${label.toLowerCase()}`} /></SelectTrigger>
             <SelectContent>
               {items.map((i) => (

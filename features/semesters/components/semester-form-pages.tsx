@@ -49,6 +49,22 @@ function SemesterForm({
           <p className="text-xs text-[#EF4444]">{errors.academicYear.message}</p>
         )}
       </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="sem-start">Tanggal Mulai</Label>
+          <Input id="sem-start" type="date" {...register('startDate')} />
+          {errors.startDate && (
+            <p className="text-xs text-[#EF4444]">{errors.startDate.message}</p>
+          )}
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="sem-end">Tanggal Selesai</Label>
+          <Input id="sem-end" type="date" {...register('endDate')} />
+          {errors.endDate && (
+            <p className="text-xs text-[#EF4444]">{errors.endDate.message}</p>
+          )}
+        </div>
+      </div>
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={isPending}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -94,7 +110,7 @@ export function EditSemesterPage({ id }: { id: string }) {
 
   const semester = semesters.find((s) => s.id === numericId)
 
-  if (isLoading) return <Skeleton className="h-64 max-w-md rounded-lg bg-[#E2E8F0]" />
+  if (isLoading) return <Skeleton className="h-80 max-w-md rounded-lg bg-[#E2E8F0]" />
 
   return (
     <div className="space-y-6 max-w-md">
@@ -104,7 +120,12 @@ export function EditSemesterPage({ id }: { id: string }) {
           <SemesterForm
             defaultValues={
               semester
-                ? { name: semester.name, academicYear: semester.academicYear }
+                ? {
+                    name: semester.name,
+                    academicYear: semester.academicYear,
+                    startDate: semester.startDate?.split('T')[0] ?? '',
+                    endDate: semester.endDate?.split('T')[0] ?? '',
+                  }
                 : undefined
             }
             onSubmit={async (v) => {
