@@ -1,4 +1,5 @@
 import api from '@/lib/axios'
+import { AUTH_TOKEN_COOKIE_NAME } from '@/lib/config'
 import type { User } from '@/types/user'
 
 interface RawUser {
@@ -62,7 +63,7 @@ export async function getMeService(): Promise<User | null> {
 
 export async function logoutService(): Promise<void> {
   await api.post('/auth/logout')
-  document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax'
+  document.cookie = `${AUTH_TOKEN_COOKIE_NAME}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`
 }
 
 export async function updateProfileService(payload: { name: string; email: string }): Promise<void> {

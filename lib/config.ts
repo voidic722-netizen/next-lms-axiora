@@ -13,3 +13,5 @@ export const siteConfig = {
 } as const;
 
 export type NavItem = (typeof siteConfig.nav)[number];
+
+export const AUTH_TOKEN_COOKIE_NAME = 'auth_token'

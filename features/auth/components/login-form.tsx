@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,6 +17,8 @@ import { useLogin } from '../hooks/use-login'
 export function LoginForm() {
   const { login, isLoading } = useLogin()
   const [showPassword, setShowPassword] = useState(false)
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect')
 
   const {
     register,
@@ -47,7 +50,11 @@ export function LoginForm() {
           <CardTitle className="text-base font-medium">Masuk</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(login)} className="space-y-4" noValidate>
+          <form
+            onSubmit={handleSubmit((values) => login(values, redirectTo))}
+            className="space-y-4"
+            noValidate
+          >
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const AUTH_TOKEN_COOKIE = process.env.AUTH_TOKEN_COOKIE_NAME ?? 'auth_token'
+import { AUTH_TOKEN_COOKIE_NAME } from '@/lib/config'
 
 const PUBLIC_PATHS = ['/login']
 
@@ -11,7 +10,7 @@ function isPublicPath(pathname: string): boolean {
 export function middleware(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl
 
-  const tokenCookie = request.cookies.get(AUTH_TOKEN_COOKIE)
+  const tokenCookie = request.cookies.get(AUTH_TOKEN_COOKIE_NAME)
   const isAuthenticated = Boolean(tokenCookie?.value)
 
   if (!isAuthenticated && !isPublicPath(pathname) && pathname !== '/') {

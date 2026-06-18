@@ -17,14 +17,22 @@ export function useLogin() {
     try {
       const { user, token } = await loginService(values.email, values.password)
 
+      if (!token || !user) {
+        toast.error('Login gagal. Periksa email dan password Anda.')
+        return
+      }
+
       setUser(user)
       setToken(token)
-      document.cookie = `auth_token=${token}; path=/; SameSite=Lax`
 
+      const isProd = process.env.NODE_ENV === 'production'
+      document.cookie = `auth_token=${token}; path=/; SameSite=Lax${isProd ? '; Secure' : ''}`
+
+      const role = String(user.role)
       const target =
-        user.role === USER_ROLE.Admin
+        role === String(USER_ROLE.Admin)
           ? '/admin'
-          : user.role === USER_ROLE.Teacher
+          : role === String(USER_ROLE.Teacher)
             ? '/teacher'
             : '/'
 

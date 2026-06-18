@@ -116,15 +116,20 @@ export function ClassroomsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
+                              disabled={deleteMutation.isPending}
                               className="text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200"
                             >
-                              Hapus
+                              {deleteMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                'Hapus'
+                              )}
                             </Button>
                           }
                           title="Hapus Kelas"
                           description={`Yakin menghapus "${c.name}"?`}
                           confirmLabel="Hapus"
-                          onConfirm={() => deleteMutation.mutateAsync(c.id)}
+                          onConfirm={() => deleteMutation.mutateAsync(c.id).catch(() => {})}
                         />
                       </div>
                     )
@@ -139,9 +144,16 @@ export function ClassroomsPage() {
 }
 
 export function ClassroomDetailPage({ id }: { id: string }) {
-  const { data: classroom, isLoading } = useClassroomDetail(id)
+  const { data: classroom, isLoading, isError } = useClassroomDetail(id)
+
   if (isLoading) return <Skeleton className="h-96 rounded-lg bg-[#E2E8F0]" />
-  if (!classroom) return <p className="text-[#64748B]">Kelas tidak ditemukan.</p>
+  if (isError || !classroom) return <p className="text-[#EF4444]">Kelas tidak ditemukan atau terjadi kesalahan.</p>
+
+  const students = classroom.students ?? []
+  const assignments = classroom.assignments ?? []
+  const exams = classroom.exams ?? []
+  const schedules = classroom.schedules ?? []
+
   return (
     <div className="space-y-6">
       <PageHeader title={classroom.name} description={classroom.subject?.name} />
@@ -152,14 +164,14 @@ export function ClassroomDetailPage({ id }: { id: string }) {
       </div>
       <Tabs defaultValue="students">
         <TabsList>
-          <TabsTrigger value="students">Mahasiswa ({classroom.students.length})</TabsTrigger>
-          <TabsTrigger value="assignments">Tugas ({classroom.assignments.length})</TabsTrigger>
-          <TabsTrigger value="exams">Ujian ({classroom.exams.length})</TabsTrigger>
-          <TabsTrigger value="schedules">Jadwal ({classroom.schedules.length})</TabsTrigger>
+          <TabsTrigger value="students">Mahasiswa ({students.length})</TabsTrigger>
+          <TabsTrigger value="assignments">Tugas ({assignments.length})</TabsTrigger>
+          <TabsTrigger value="exams">Ujian ({exams.length})</TabsTrigger>
+          <TabsTrigger value="schedules">Jadwal ({schedules.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="students" className="mt-4">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {classroom.students.map((s) => (
+            {students.map((s) => (
               <Card key={s.id} className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
                 <CardContent className="pt-4 flex items-center gap-3">
                   <Avatar>
@@ -175,7 +187,7 @@ export function ClassroomDetailPage({ id }: { id: string }) {
           </div>
         </TabsContent>
         <TabsContent value="assignments" className="mt-4 space-y-2">
-          {classroom.assignments.map((a) => (
+          {assignments.map((a) => (
             <Card key={a.id} className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
               <CardContent className="py-3 px-4 flex items-center justify-between">
                 <Link href={`/assignments/${a.id}`} className="font-medium text-sm text-[#0F172A] hover:underline">{a.title}</Link>
@@ -185,7 +197,7 @@ export function ClassroomDetailPage({ id }: { id: string }) {
           ))}
         </TabsContent>
         <TabsContent value="exams" className="mt-4 space-y-2">
-          {classroom.exams.map((e) => (
+          {exams.map((e) => (
             <Card key={e.id} className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
               <CardContent className="py-3 px-4 flex items-center justify-between">
                 <Link href={`/exams/${e.id}`} className="font-medium text-sm text-[#0F172A] hover:underline">{e.title}</Link>
@@ -195,7 +207,7 @@ export function ClassroomDetailPage({ id }: { id: string }) {
           ))}
         </TabsContent>
         <TabsContent value="schedules" className="mt-4 space-y-2">
-          {classroom.schedules.map((s) => (
+          {schedules.map((s) => (
             <Card key={s.id} className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
               <CardContent className="py-3 px-4 flex items-center justify-between">
                 <p className="text-sm text-[#0F172A]">{s.topic}</p>
@@ -253,7 +265,9 @@ function ClassroomForm({
           <Label>{label}</Label>
           <Select
             value={formValues[key as keyof ClassroomFormValues] ? String(formValues[key as keyof ClassroomFormValues]) : ''}
-            onValueChange={(v) => setValue(key as keyof ClassroomFormValues, Number(v) as never)}
+            onValueChange={(v) =>
+              setValue(key as keyof ClassroomFormValues, Number(v) as never, { shouldValidate: true })
+            }
           >
             <SelectTrigger><SelectValue placeholder={`Pilih ${label.toLowerCase()}`} /></SelectTrigger>
             <SelectContent>
@@ -289,8 +303,11 @@ export function AddClassroomPage() {
         <CardContent className="pt-6">
           <ClassroomForm
             onSubmit={async (v) => {
-              await mutation.mutateAsync(v)
-              router.push('/classrooms')
+              try {
+                await mutation.mutateAsync(v)
+                router.push('/classrooms')
+              } catch {
+              }
             }}
             isPending={mutation.isPending}
             submitLabel="Simpan"
@@ -304,10 +321,13 @@ export function AddClassroomPage() {
 
 export function EditClassroomPage({ id }: { id: string }) {
   const router = useRouter()
-  const { data: classroom, isLoading } = useClassroomDetail(id)
+  const { data: classroom, isLoading, isError } = useClassroomDetail(id)
   const mutation = useUpdateClassroom(id)
 
   if (isLoading) return <Skeleton className="h-96 max-w-xl rounded-lg bg-[#E2E8F0]" />
+  if (isError || !classroom) return (
+    <p className="text-[#EF4444]">Kelas tidak ditemukan atau terjadi kesalahan.</p>
+  )
 
   return (
     <div className="space-y-6 max-w-xl">
@@ -315,19 +335,18 @@ export function EditClassroomPage({ id }: { id: string }) {
       <Card>
         <CardContent className="pt-6">
           <ClassroomForm
-            defaultValues={
-              classroom
-                ? {
-                    name: classroom.name,
-                    departmentId: classroom.departmentId,
-                    semesterId: classroom.semesterId,
-                    subjectId: classroom.subjectId,
-                  }
-                : undefined
-            }
+            defaultValues={{
+              name: classroom.name,
+              departmentId: classroom.departmentId,
+              semesterId: classroom.semesterId,
+              subjectId: classroom.subjectId,
+            }}
             onSubmit={async (v) => {
-              await mutation.mutateAsync(v)
-              router.push(`/classrooms/${id}`)
+              try {
+                await mutation.mutateAsync(v)
+                router.push(`/classrooms/${id}`)
+              } catch {
+              }
             }}
             isPending={mutation.isPending}
             submitLabel="Simpan Perubahan"
