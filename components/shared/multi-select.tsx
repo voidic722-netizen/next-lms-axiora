@@ -62,8 +62,9 @@ export function MultiSelect({
         disabled={disabled}
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          'flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-md border border-[#E2E8F0] bg-white px-3 py-2 text-sm transition-all duration-200',
-          'focus-visible:outline-none focus-visible:border-[#4B5CF0] focus-visible:ring-2 focus-visible:ring-[#4B5CF0]/20',
+          'flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-lg border border-[#E2E8F0] bg-white px-3.5 py-2 text-sm shadow-sm transition-all duration-200',
+          'hover:border-[#CBD5E1]',
+          'focus-visible:outline-none focus-visible:border-[#4B5CF0] focus-visible:ring-[3px] focus-visible:ring-[#4B5CF0]/10',
           disabled && 'cursor-not-allowed opacity-50',
         )}
       >
@@ -74,23 +75,23 @@ export function MultiSelect({
                 <button
                   type="button"
                   onClick={(e) => removeItem(item.value, e)}
-                  className="ml-0.5 hover:text-[#0F172A] rounded-sm transition-colors duration-200"
+                  className="ml-0.5 rounded-sm hover:text-[#0F172A] hover:bg-[#4B5CF0]/10 transition-colors duration-150 p-0.5"
                 >
                   <X className="h-3 w-3" />
                 </button>
               </Badge>
             ))
-          : <span className="text-[#64748B]">{placeholder}</span>}
+          : <span className="text-[#94A3B8]">{placeholder}</span>}
         <ChevronDown
           className={cn(
-            'h-4 w-4 text-[#64748B] ml-auto shrink-0 transition-transform duration-200',
+            'h-4 w-4 text-[#94A3B8] ml-auto shrink-0 transition-transform duration-200',
             open && 'rotate-180',
           )}
         />
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-60 overflow-y-auto">
+        <div className="absolute z-50 mt-1.5 w-full rounded-xl border border-[#E2E8F0] bg-white shadow-[0_8px_30px_-8px_rgba(0,0,0,0.12)] max-h-60 overflow-y-auto p-1.5 animate-fade-in">
           {options.length === 0 ? (
             <div className="py-6 text-center text-sm text-[#64748B]">Tidak ada pilihan</div>
           ) : (
@@ -100,11 +101,11 @@ export function MultiSelect({
                 <div
                   key={option.value}
                   onClick={() => toggle(option.value)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-[#0F172A] cursor-pointer hover:bg-[#F8FAFC] transition-colors duration-200"
+                  className="flex items-center gap-2.5 px-2.5 py-2 text-sm text-[#0F172A] cursor-pointer rounded-lg hover:bg-[#F8FAFC] transition-colors duration-150"
                 >
                   <div
                     className={cn(
-                      'flex h-4 w-4 items-center justify-center rounded border shrink-0 transition-colors duration-200',
+                      'flex h-4 w-4 items-center justify-center rounded-[4px] border shrink-0 transition-colors duration-150',
                       isSelected
                         ? 'border-[#4B5CF0] bg-[#4B5CF0] text-white'
                         : 'border-[#E2E8F0] bg-white',
@@ -112,7 +113,7 @@ export function MultiSelect({
                   >
                     {isSelected && <Check className="h-3 w-3" />}
                   </div>
-                  {option.label}
+                  <span className={cn(isSelected && 'font-medium')}>{option.label}</span>
                 </div>
               )
             })

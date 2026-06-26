@@ -78,9 +78,7 @@ export async function createDepartmentService(payload: CreateDepartmentPayload):
   form.append('description', payload.description)
   form.append('faculty_id', String(payload.facultyId))
   if (payload.thumbnail) form.append('thumbnail', payload.thumbnail)
-  const { data } = await api.post<RawDepartment>('/departments', form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawDepartment>('/departments', form)
   return mapDepartment(data)
 }
 

@@ -1,5 +1,7 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
+
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
@@ -36,10 +38,13 @@ export function TabBar({ user }: TabBarProps) {
 
   const pinnedItems = allItems.slice(0, 4)
 
+  const queryClient = useQueryClient()
+
   async function handleLogout() {
     try {
       await logoutService()
       clearUser()
+      queryClient.clear()
       router.push('/login')
       setOpen(false)
     } catch {
@@ -48,7 +53,7 @@ export function TabBar({ user }: TabBarProps) {
   }
 
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-[#E2E8F0] bg-white flex items-center">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-[#E2E8F0] bg-white/95 backdrop-blur-sm flex items-center pb-[env(safe-area-inset-bottom)]">
       {pinnedItems.map((item) => {
         const isActive =
           item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
@@ -59,10 +64,10 @@ export function TabBar({ user }: TabBarProps) {
             key={item.href}
             href={item.href}
             className={cn(
-              'flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium transition-all duration-200',
+              'relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] transition-colors duration-200',
               isActive
-                ? 'text-[#4B5CF0]'
-                : 'text-[#64748B] hover:text-[#0F172A]',
+                ? 'text-[#4B5CF0] font-bold after:absolute after:-top-[1px] after:w-8 after:h-0.5 after:bg-[#4B5CF0] after:rounded-b-full'
+                : 'text-[#94A3B8] font-medium',
             )}
           >
             <Icon className="h-5 w-5" />
@@ -75,17 +80,17 @@ export function TabBar({ user }: TabBarProps) {
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <button className="flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium text-[#64748B] hover:text-[#0F172A] transition-all duration-200">
+          <button className="flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-medium text-[#94A3B8] transition-colors duration-200">
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             <span>Menu</span>
           </button>
         </SheetTrigger>
 
-        <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-2xl bg-white">
+        <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-2xl bg-white pb-[env(safe-area-inset-bottom)]">
           <div className="py-4 space-y-5">
             {groups.map((group) => (
               <div key={group.group}>
-                <p className="px-2 mb-2 text-xs font-semibold text-[#64748B] uppercase tracking-wider">
+                <p className="px-2 mb-2 text-[10px] font-bold text-[#94A3B8] uppercase tracking-[0.08em]">
                   {group.group}
                 </p>
                 <div className="grid grid-cols-2 gap-1">
@@ -102,10 +107,10 @@ export function TabBar({ user }: TabBarProps) {
                         href={item.href}
                         onClick={() => setOpen(false)}
                         className={cn(
-                          'flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                          'relative flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] transition-all duration-200',
                           isActive
-                            ? 'bg-[#EEF1FF] text-[#4B5CF0]'
-                            : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]',
+                            ? 'bg-[#EEF1FF] text-[#4B5CF0] font-semibold before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:bg-[#4B5CF0] before:rounded-r-full'
+                            : 'font-medium text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]',
                         )}
                       >
                         <Icon className="h-4 w-4 shrink-0" />
@@ -117,13 +122,13 @@ export function TabBar({ user }: TabBarProps) {
               </div>
             ))}
 
-            <Separator className="bg-[#E2E8F0]" />
+            <Separator />
 
             <div className="space-y-1">
               <Link
                 href="/profile"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-200"
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px] font-medium text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-200"
               >
                 Profil Saya
               </Link>
@@ -132,7 +137,7 @@ export function TabBar({ user }: TabBarProps) {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="w-full justify-start gap-2 px-3 text-[#EF4444] hover:text-[#EF4444] hover:bg-[#EF4444]/10 transition-all duration-200"
+                className="w-full justify-start gap-2.5 px-3 text-[#EF4444] hover:text-[#EF4444] hover:bg-[#EF4444]/8"
               >
                 <LogOut className="h-4 w-4" />
                 Keluar

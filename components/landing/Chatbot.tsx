@@ -145,13 +145,14 @@ export function Chatbot() {
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setMessages([{
-          id: Date.now().toString(),
+          id: Date.now().toString() + "-" + Math.random().toString(36).substring(2, 9),
           text: "Halo! Ada yang ingin ditanyakan seputar Axiora? 😊",
           sender: "bot",
         }]);
       }, 400);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, messages.length]);
 
@@ -181,21 +182,21 @@ export function Chatbot() {
     if (!text.trim()) return;
 
     setMessages((prev) => [...prev, {
-      id: Date.now().toString(),
+      id: Date.now().toString() + "-" + Math.random().toString(36).substring(2, 9),
       text,
       sender: "user",
     }]);
     setInput("");
 
     const bestMatch = findBestMatch(text);
-    const typingId = (Date.now() + 1).toString();
+    const typingId = Date.now().toString() + "-" + Math.random().toString(36).substring(2, 9);
 
     setMessages((prev) => [...prev, { id: typingId, text: "", sender: "bot", isTyping: true }]);
 
     setTimeout(() => {
       setMessages((prev) =>
         prev.filter((m) => m.id !== typingId).concat([{
-          id: (Date.now() + 2).toString(),
+          id: Date.now().toString() + "-" + Math.random().toString(36).substring(2, 9),
           text: bestMatch
             ? bestMatch.answer
             : "Maaf, saya belum memiliki informasi tentang itu. Silakan hubungi admin Axiora untuk pertanyaan lebih lanjut.",
@@ -343,32 +344,6 @@ export function Chatbot() {
             </div>
           )}
 
-          <div style={{
-            padding: "10px 12px", borderTop: "1px solid #e2e8f0",
-            backgroundColor: "white", display: "flex", gap: "8px", flexShrink: 0,
-          }}>
-            <input
-              type="text" value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ketik pesan Anda..."
-              aria-label="Ketik pesan Anda"
-              style={{
-                flex: 1, padding: "8px 14px", border: "1px solid #cbd5e1",
-                borderRadius: "999px", fontSize: "13px", outline: "none",
-                backgroundColor: "#f8fafc",
-              }}
-            />
-            <button onClick={() => handleSendMessage(input)} aria-label="Kirim pesan"
-              style={{
-                height: "38px", width: "38px", borderRadius: "50%",
-                backgroundColor: "#7c3aed", color: "white", border: "none",
-                cursor: "pointer", display: "flex", alignItems: "center",
-                justifyContent: "center", flexShrink: 0,
-              }}>
-              <Send size={15} />
-            </button>
-          </div>
         </div>
       )}
     </>

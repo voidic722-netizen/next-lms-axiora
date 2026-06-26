@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Plus, Pencil, Building2 } from 'lucide-react'
+import { useState } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { PageHeader } from '@/components/shared/page-header'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
@@ -10,12 +11,26 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { withStorageUrl } from '@/lib/storage'
 import { useFaculties, useDeleteFaculty } from '../hooks/use-faculties'
+import { FacultyFormModal } from './faculty-form-modal'
 import type { Faculty } from '@/types/faculty'
 
 export function FacultiesPage() {
   const { isAdmin } = useAuth()
   const { data: faculties = [], isLoading } = useFaculties()
   const deleteMutation = useDeleteFaculty()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingFaculty, setEditingFaculty] = useState<Faculty | null>(null)
+
+  function openAddModal() {
+    setEditingFaculty(null)
+    setIsModalOpen(true)
+  }
+
+  function openEditModal(faculty: Faculty) {
+    setEditingFaculty(faculty)
+    setIsModalOpen(true)
+  }
 
   if (isLoading) return <FacultiesPageSkeleton />
 
@@ -26,11 +41,9 @@ export function FacultiesPage() {
         description={`${faculties.length} fakultas terdaftar`}
         action={
           isAdmin ? (
-            <Button asChild size="sm">
-              <Link href="/faculties/new">
-                <Plus className="mr-2 h-4 w-4" />
-                Tambah Fakultas
-              </Link>
+            <Button size="sm" onClick={openAddModal}>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Fakultas
             </Button>
           ) : undefined
         }
@@ -48,10 +61,19 @@ export function FacultiesPage() {
               key={faculty.id}
               faculty={faculty}
               isAdmin={isAdmin}
+              onEdit={() => openEditModal(faculty)}
               onDelete={() => deleteMutation.mutateAsync(faculty.id)}
             />
           ))}
         </div>
+      )}
+
+      {isAdmin && (
+        <FacultyFormModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          faculty={editingFaculty}
+        />
       )}
     </div>
   )
@@ -60,10 +82,12 @@ export function FacultiesPage() {
 function FacultyCard({
   faculty,
   isAdmin,
+  onEdit,
   onDelete,
 }: {
   faculty: Faculty
   isAdmin: boolean
+  onEdit: () => void
   onDelete: () => Promise<void>
 }) {
   const thumb = withStorageUrl(faculty.thumbnail)
@@ -92,11 +116,9 @@ function FacultyCard({
         <p className="text-sm text-[#64748B] line-clamp-2 mt-1">{faculty.description}</p>
         {isAdmin && (
           <div className="flex gap-2 mt-3 pt-3 border-t border-[#E2E8F0]">
-            <Button asChild variant="outline" size="sm" className="flex-1">
-              <Link href={`/faculties/${faculty.id}/edit`}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                Edit
-              </Link>
+            <Button variant="outline" size="sm" className="flex-1" onClick={onEdit}>
+              <Pencil className="mr-1.5 h-3.5 w-3.5" />
+              Edit
             </Button>
             <ConfirmDialog
               trigger={

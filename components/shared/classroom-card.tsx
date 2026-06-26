@@ -27,19 +27,21 @@ export function ClassroomCard({
     <Link href={`/classrooms/${id}`}>
       <Card
         className={cn(
-          'border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200 h-full',
+          'group border border-[#E2E8F0] bg-white shadow-premium hover:border-[#4B5CF0]/40 hover:shadow-premium-hover hover:-translate-y-0.5 transition-all duration-200 h-full',
           className
         )}
       >
         <CardContent className="pt-4">
           <div className="flex items-start gap-3">
-            <School className="h-5 w-5 text-[#4B5CF0] shrink-0 mt-0.5" />
+            <div className="inline-flex items-center justify-center size-9 rounded-lg bg-[#EEF1FF] text-[#4B5CF0] shrink-0">
+              <School className="h-4.5 w-4.5" />
+            </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-[#0F172A] truncate">{name}</p>
               {subjectName && (
                 <p className="text-sm text-[#64748B] truncate mt-0.5">{subjectName}</p>
               )}
-              <div className="flex gap-2 mt-2 flex-wrap">
+              <div className="flex gap-1.5 mt-2.5 flex-wrap">
                 {semesterName && (
                   <Badge variant="secondary" className="text-xs">{semesterName}</Badge>
                 )}
@@ -77,7 +79,7 @@ export function StudentCard({
   return (
     <Card
       className={cn(
-        'border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200',
+        'border border-[#E2E8F0] bg-white shadow-premium hover:border-[#4B5CF0]/40 hover:shadow-premium-hover hover:-translate-y-0.5 transition-all duration-200',
         className
       )}
     >
@@ -124,7 +126,7 @@ export function TeacherCard({
   return (
     <Card
       className={cn(
-        'border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200',
+        'border border-[#E2E8F0] bg-white shadow-premium hover:border-[#4B5CF0]/40 hover:shadow-premium-hover hover:-translate-y-0.5 transition-all duration-200',
         className
       )}
     >
@@ -139,10 +141,10 @@ export function TeacherCard({
           <p className="font-medium text-sm text-[#0F172A] truncate">{name}</p>
           <p className="text-xs text-[#64748B] truncate">{nidn ?? email}</p>
           {position && (
-            <Badge variant="secondary" className="text-xs mt-1">{position}</Badge>
+            <Badge variant="secondary" className="text-xs mt-1.5">{position}</Badge>
           )}
           {departmentName && (
-            <p className="text-xs text-[#64748B] truncate">{departmentName}</p>
+            <p className="text-xs text-[#64748B] truncate mt-0.5">{departmentName}</p>
           )}
         </div>
       </CardContent>

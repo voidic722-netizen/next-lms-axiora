@@ -1,7 +1,5 @@
 'use client'
 
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, CalendarDays, Trash2, Pencil, Loader2 } from 'lucide-react'
@@ -10,17 +8,18 @@ import { PageHeader } from '@/components/shared/page-header'
 import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useState } from 'react'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { formatDay } from '@/lib/format-date'
 import { sortByNearestDateAsc } from '@/utils/sort'
 import { scheduleSchema, type ScheduleFormValues } from '@/features/schedules/schemas/schedule-schema'
 import {
-  useSchedules, useScheduleDetail, useCreateSchedule,
+  useSchedules, useCreateSchedule,
   useUpdateSchedule, useDeleteSchedule,
 } from '@/features/schedules/hooks/use-schedules'
 import { useClassrooms } from '@/features/classrooms/hooks/use-classrooms'
@@ -30,6 +29,19 @@ export function SchedulesPage() {
   const { isTeacherOrAdmin } = useAuth()
   const { data: schedules = [], isLoading } = useSchedules()
   const deleteMutation = useDeleteSchedule()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
+
+  function openAddModal() {
+    setEditingSchedule(null)
+    setIsModalOpen(true)
+  }
+
+  function openEditModal(s: Schedule) {
+    setEditingSchedule(s)
+    setIsModalOpen(true)
+  }
 
   const sorted = sortByNearestDateAsc(schedules, (s) => s.date)
 
@@ -49,10 +61,8 @@ export function SchedulesPage() {
         description={`${schedules.length} jadwal`}
         action={
           isTeacherOrAdmin ? (
-            <Button asChild size="sm">
-              <Link href="/schedules/new">
-                <Plus className="mr-2 h-4 w-4" />Tambah Jadwal
-              </Link>
+            <Button size="sm" onClick={openAddModal}>
+              <Plus className="mr-2 h-4 w-4" />Tambah Jadwal
             </Button>
           ) : undefined
         }
@@ -69,10 +79,19 @@ export function SchedulesPage() {
               key={s.id}
               schedule={s}
               isTeacherOrAdmin={isTeacherOrAdmin}
+              onEdit={() => openEditModal(s)}
               onDelete={() => deleteMutation.mutateAsync(s.id)}
             />
           ))}
         </div>
+      )}
+
+      {isTeacherOrAdmin && (
+        <ScheduleFormModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          schedule={editingSchedule}
+        />
       )}
     </div>
   )
@@ -81,10 +100,12 @@ export function SchedulesPage() {
 function ScheduleCard({
   schedule: s,
   isTeacherOrAdmin,
+  onEdit,
   onDelete,
 }: {
   schedule: Schedule
   isTeacherOrAdmin: boolean
+  onEdit: () => void
   onDelete: () => Promise<void>
 }) {
   return (
@@ -102,10 +123,8 @@ function ScheduleCard({
         </div>
         {isTeacherOrAdmin && (
           <div className="flex items-center gap-1 shrink-0">
-            <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-              <Link href={`/schedules/${s.id}/edit`}>
-                <Pencil className="h-3.5 w-3.5" />
-              </Link>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+              <Pencil className="h-3.5 w-3.5" />
             </Button>
             <ConfirmDialog
               trigger={
@@ -129,124 +148,152 @@ function ScheduleCard({
   )
 }
 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { handleApiError } from '@/lib/error-handler'
+
 function ScheduleForm({
-  defaultValues,
+  form,
   onSubmit,
   isPending,
   submitLabel,
   onCancel,
 }: {
-  defaultValues?: Partial<ScheduleFormValues>
+  form: any
   onSubmit: (v: ScheduleFormValues) => Promise<void>
   isPending: boolean
   submitLabel: string
   onCancel: () => void
 }) {
   const { data: classrooms = [] } = useClassrooms()
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<ScheduleFormValues>({
+  const { control } = form
+  
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={control}
+          name="classroomId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Kelas</FormLabel>
+              <Select
+                onValueChange={(v) => field.onChange(Number(v))}
+                value={field.value ? String(field.value) : undefined}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih kelas" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {classrooms.map((c) => (
+                    <SelectItem key={c.id} value={String(c.id)}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={control}
+          name="date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tanggal</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={control}
+          name="topic"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Topik</FormLabel>
+              <FormControl>
+                <Input placeholder="Pengenalan Algoritma" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <div className="flex gap-3 pt-2">
+          <Button type="submit" disabled={isPending}>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {submitLabel}
+          </Button>
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Batal
+          </Button>
+        </div>
+      </form>
+    </Form>
+  )
+}
+
+export function ScheduleFormModal({ isOpen, onClose, schedule }: {
+  isOpen: boolean
+  onClose: () => void
+  schedule?: Schedule | null
+}) {
+  const isEditing = !!schedule
+  const createMutation = useCreateSchedule()
+  const updateMutation = useUpdateSchedule(String(schedule?.id ?? ''))
+  const isPending = createMutation.isPending || updateMutation.isPending
+
+  const form = useForm<ScheduleFormValues>({
     resolver: zodResolver(scheduleSchema),
-    defaultValues,
+    values: schedule
+      ? { classroomId: schedule.classroomId, date: schedule.date?.split('T')[0] ?? '', topic: schedule.topic }
+      : undefined,
   })
-  const classroomId = watch('classroomId')
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-1.5">
-        <Label>Kelas</Label>
-        <Select
-          value={classroomId ? String(classroomId) : ''}
-          onValueChange={(v) => setValue('classroomId', Number(v))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Pilih kelas" />
-          </SelectTrigger>
-          <SelectContent>
-            {classrooms.map((c) => (
-              <SelectItem key={c.id} value={String(c.id)}>
-                {c.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {errors.classroomId && <p className="text-xs text-[#EF4444]">{errors.classroomId.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label>Tanggal</Label>
-        <Input type="date" {...register('date')} />
-        {errors.date && <p className="text-xs text-[#EF4444]">{errors.date.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label>Topik</Label>
-        <Input placeholder="Pengenalan Algoritma" {...register('topic')} />
-        {errors.topic && <p className="text-xs text-[#EF4444]">{errors.topic.message}</p>}
-      </div>
-      <div className="flex gap-3">
-        <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {submitLabel}
-        </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Batal
-        </Button>
-      </div>
-    </form>
-  )
-}
 
-export function AddSchedulePage() {
-  const router = useRouter()
-  const mutation = useCreateSchedule()
-  return (
-    <div className="space-y-6 max-w-md">
-      <PageHeader title="Tambah Jadwal" />
-      <Card>
-        <CardContent className="pt-6">
-          <ScheduleForm
-            onSubmit={async (v) => {
-              await mutation.mutateAsync(v)
-              router.push('/schedules')
-            }}
-            isPending={mutation.isPending}
-            submitLabel="Simpan"
-            onCancel={() => router.back()}
-          />
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+  async function onSubmit(v: ScheduleFormValues) {
+    try {
+      if (isEditing) {
+        await updateMutation.mutateAsync(v)
+      } else {
+        await createMutation.mutateAsync(v)
+      }
+      form.reset()
+      onClose()
+    } catch (error) {
+      handleApiError(error, form.setError)
+    }
+  }
 
-export function EditSchedulePage({ id }: { id: string }) {
-  const router = useRouter()
-  const { data: schedule, isLoading } = useScheduleDetail(id)
-  const mutation = useUpdateSchedule(id)
-  if (isLoading) return <Skeleton className="h-80 max-w-md rounded-lg bg-[#E2E8F0]" />
   return (
-    <div className="space-y-6 max-w-md">
-      <PageHeader title="Edit Jadwal" />
-      <Card>
-        <CardContent className="pt-6">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{isEditing ? 'Edit Jadwal' : 'Tambah Jadwal'}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
           <ScheduleForm
-            defaultValues={
-              schedule
-                ? { classroomId: schedule.classroomId, date: schedule.date?.split('T')[0] ?? '', topic: schedule.topic }
-                : undefined
-            }
-            onSubmit={async (v) => {
-              await mutation.mutateAsync(v)
-              router.push('/schedules')
-            }}
-            isPending={mutation.isPending}
-            submitLabel="Simpan Perubahan"
-            onCancel={() => router.back()}
+            form={form}
+            onSubmit={onSubmit}
+            isPending={isPending}
+            submitLabel={isEditing ? 'Simpan Perubahan' : 'Simpan'}
+            onCancel={onClose}
           />
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

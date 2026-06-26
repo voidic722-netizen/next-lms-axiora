@@ -154,20 +154,20 @@ export function Breadcrumb() {
   if (crumbs.length === 0) return null
 
   return (
-    <header className="sticky top-0 z-10 border-b border-[#E2E8F0] bg-white/80 backdrop-blur">
-      <div className="flex h-12 items-center gap-1 px-4 md:px-6 text-sm">
+    <header className="sticky top-0 z-10 border-b border-[#E2E8F0] bg-white/90 backdrop-blur-sm">
+      <div className="flex h-14 items-center gap-1.5 px-4 md:px-6 text-[13px]">
         <Link
           href="/"
-          className="text-[#64748B] hover:text-[#4B5CF0] transition-colors duration-200 flex items-center"
+          className="inline-flex items-center justify-center size-7 rounded-md text-[#94A3B8] hover:text-[#4B5CF0] hover:bg-[#EEF1FF] transition-all duration-200"
         >
           <Home className="h-3.5 w-3.5" />
         </Link>
 
         {crumbs.map((crumb, index) => (
-          <span key={crumb.href} className="flex items-center gap-1">
-            <ChevronRight className="h-3.5 w-3.5 text-[#64748B] shrink-0" />
+          <span key={crumb.href} className="flex items-center gap-1.5">
+            <ChevronRight className="h-3 w-3 text-[#CBD5E1] shrink-0" />
             {index === crumbs.length - 1 ? (
-              <span className="font-medium text-[#0F172A] truncate max-w-[200px]">
+              <span className="font-semibold text-[#0F172A] truncate max-w-[200px]">
                 {crumb.label}
               </span>
             ) : (

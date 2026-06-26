@@ -63,7 +63,8 @@ export async function getMeService(): Promise<User | null> {
 
 export async function logoutService(): Promise<void> {
   await api.post('/auth/logout')
-  document.cookie = `${AUTH_TOKEN_COOKIE_NAME}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`
+  const isProd = process.env.NODE_ENV === 'production'
+  document.cookie = `${AUTH_TOKEN_COOKIE_NAME}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax${isProd ? '; Secure' : ''}`
 }
 
 export async function updateProfileService(payload: { name: string; email: string }): Promise<void> {

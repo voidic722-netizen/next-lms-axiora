@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { type UseFormReturn, useWatch } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -11,6 +10,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from '@/components/ui/form'
 import { USER_ROLE } from '@/types/roles'
 import type { Faculty } from '@/types/faculty'
 import type { Department } from '@/types/department'
@@ -43,7 +49,7 @@ export function UserFormFields({
   subjects,
   isCreate = false,
 }: UserFormFieldsProps) {
-  const { register, setValue, formState: { errors }, control } = form
+  const { setValue, control } = form
   const role = useWatch({ control, name: 'role' })
   const facultyId = useWatch({ control, name: 'facultyId' as keyof UserFormValues })
   const departmentId = useWatch({ control, name: 'departmentId' as keyof UserFormValues })
@@ -70,50 +76,78 @@ export function UserFormFields({
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="u-name">Nama</Label>
-          <Input id="u-name" placeholder="Nama lengkap" {...register('name')} />
-          {errors.name && <p className="text-xs text-[#EF4444]">{errors.name.message}</p>}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="u-email">Email</Label>
-          <Input id="u-email" type="email" placeholder="email@domain.com" {...register('email')} />
-          {errors.email && <p className="text-xs text-[#EF4444]">{errors.email.message}</p>}
-        </div>
+        <FormField
+          control={control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nama</FormLabel>
+              <FormControl>
+                <Input placeholder="Nama lengkap" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="email@domain.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label htmlFor="u-role">Role</Label>
-          <Select
-            value={role}
-            onValueChange={(v) => setValue('role', v as UserFormValues['role'])}
-          >
-            <SelectTrigger id="u-role">
-              <SelectValue placeholder="Pilih role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={USER_ROLE.Admin}>Admin</SelectItem>
-              <SelectItem value={USER_ROLE.Teacher}>Teacher</SelectItem>
-              <SelectItem value={USER_ROLE.Student}>Student</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.role && <p className="text-xs text-[#EF4444]">{errors.role.message}</p>}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="u-pass">
-            Password{!isCreate && <span className="text-[#64748B] ml-1">(opsional)</span>}
-          </Label>
-          <Input
-            id="u-pass"
-            type="password"
-            placeholder={isCreate ? 'Min. 6 karakter' : 'Kosongkan jika tidak diubah'}
-            {...register('password')}
-          />
-          {errors.password && (
-            <p className="text-xs text-[#EF4444]">{errors.password.message}</p>
+        <FormField
+          control={control}
+          name="role"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Role</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih role" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value={USER_ROLE.Admin}>Admin</SelectItem>
+                  <SelectItem value={USER_ROLE.Teacher}>Teacher</SelectItem>
+                  <SelectItem value={USER_ROLE.Student}>Student</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
           )}
-        </div>
+        />
+        
+        <FormField
+          control={control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Password{!isCreate && <span className="text-[#64748B] ml-1">(opsional)</span>}
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder={isCreate ? 'Min. 6 karakter' : 'Kosongkan jika tidak diubah'}
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
 
       {role === USER_ROLE.Teacher && (
@@ -148,45 +182,65 @@ function TeacherFormSection({
   departments: Department[]
   subjects: Subject[]
 }) {
-  const { register, setValue, watch } = form
-  const position = watch('position' as keyof UserFormValues)
+  const { control } = form
 
   return (
     <div className="space-y-4 border-t border-[#E2E8F0] pt-4">
       <p className="text-sm font-medium text-[#64748B]">Data Pengajar</p>
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5">
-          <Label>Posisi</Label>
-          <Select value={position as string} onValueChange={(v) => setValue('position' as keyof UserFormValues, v as never)}>
-            <SelectTrigger><SelectValue placeholder="Pilih posisi" /></SelectTrigger>
-            <SelectContent>
-              {POSITION_OPTIONS.map((o) => (
-                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="u-nidn">NIDN</Label>
-          <Input id="u-nidn" placeholder="NIDN" {...register('nidn' as keyof UserFormValues)} />
-        </div>
+        <FormField
+          control={control}
+          name={'position' as any}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Posisi</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger><SelectValue placeholder="Pilih posisi" /></SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {POSITION_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name={'nidn' as any}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>NIDN</FormLabel>
+              <FormControl>
+                <Input placeholder="NIDN" {...field} value={field.value ?? ''} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        <SelectField
+        <SelectFormField
+          control={control}
+          name="facultyId"
           label="Fakultas"
           options={faculties.map((f) => ({ value: f.id, label: f.name }))}
-          onValueChange={(v) => setValue('facultyId' as keyof UserFormValues, Number(v) as never)}
         />
-        <SelectField
+        <SelectFormField
+          control={control}
+          name="departmentId"
           label="Jurusan"
           options={departments.map((d) => ({ value: d.id, label: d.name }))}
-          onValueChange={(v) => setValue('departmentId' as keyof UserFormValues, Number(v) as never)}
         />
       </div>
-      <SelectField
+      <SelectFormField
+        control={control}
+        name="subjectId"
         label="Mata Pelajaran"
         options={subjects.map((s) => ({ value: s.id, label: s.name }))}
-        onValueChange={(v) => setValue('subjectId' as keyof UserFormValues, Number(v) as never)}
       />
     </div>
   )
@@ -203,59 +257,82 @@ function StudentFormSection({
   departments: Department[]
   classrooms: Classroom[]
 }) {
-  const { register, setValue } = form
+  const { control } = form
   return (
     <div className="space-y-4 border-t border-[#E2E8F0] pt-4">
       <p className="text-sm font-medium text-[#64748B]">Data Mahasiswa</p>
-      <div className="space-y-1.5">
-        <Label htmlFor="u-nim">NIM</Label>
-        <Input id="u-nim" placeholder="NIM" {...register('nim' as keyof UserFormValues)} />
-      </div>
+      <FormField
+        control={control}
+        name={'nim' as any}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>NIM</FormLabel>
+            <FormControl>
+              <Input placeholder="NIM" {...field} value={field.value ?? ''} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       <div className="grid gap-4 sm:grid-cols-2">
-        <SelectField
+        <SelectFormField
+          control={control}
+          name="facultyId"
           label="Fakultas"
           options={faculties.map((f) => ({ value: f.id, label: f.name }))}
-          onValueChange={(v) => setValue('facultyId' as keyof UserFormValues, Number(v) as never)}
         />
-        <SelectField
+        <SelectFormField
+          control={control}
+          name="departmentId"
           label="Jurusan"
           options={departments.map((d) => ({ value: d.id, label: d.name }))}
-          onValueChange={(v) => setValue('departmentId' as keyof UserFormValues, Number(v) as never)}
         />
       </div>
-      <SelectField
+      <SelectFormField
+        control={control}
+        name="classroomId"
         label="Kelas"
         options={classrooms.map((c) => ({ value: c.id, label: c.name }))}
-        onValueChange={(v) => setValue('classroomId' as keyof UserFormValues, Number(v) as never)}
       />
     </div>
   )
 }
 
-function SelectField({
+function SelectFormField({
+  control,
+  name,
   label,
   options,
-  onValueChange,
 }: {
+  control: any
+  name: string
   label: string
   options: { value: number; label: string }[]
-  onValueChange: (value: string) => void
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label>{label}</Label>
-      <Select onValueChange={onValueChange}>
-        <SelectTrigger>
-          <SelectValue placeholder={`Pilih ${label.toLowerCase()}`} />
-        </SelectTrigger>
-        <SelectContent>
-          {options.map((o) => (
-            <SelectItem key={o.value} value={String(o.value)}>
-              {o.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? String(field.value) : undefined}>
+            <FormControl>
+              <SelectTrigger>
+                <SelectValue placeholder={`Pilih ${label.toLowerCase()}`} />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              {options.map((o) => (
+                <SelectItem key={o.value} value={String(o.value)}>
+                  {o.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   )
 }

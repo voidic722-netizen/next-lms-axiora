@@ -3,6 +3,7 @@ import { ExamSubmittedPage } from '@/features/exam-submissions/components/exam-s
 
 export const metadata: Metadata = { title: 'Hasil Ujian' }
 
-export default function Page({ params }: { params: { id: string } }) {
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return <ExamSubmittedPage id={params.id} />
 }

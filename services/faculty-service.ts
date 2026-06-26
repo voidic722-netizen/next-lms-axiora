@@ -102,9 +102,7 @@ export async function createFacultyService(payload: CreateFacultyPayload): Promi
   form.append('name', payload.name)
   form.append('description', payload.description)
   if (payload.thumbnail) form.append('thumbnail', payload.thumbnail)
-  const { data } = await api.post<RawFaculty>('/faculties', form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawFaculty>('/faculties', form)
   return mapFaculty(data)
 }
 

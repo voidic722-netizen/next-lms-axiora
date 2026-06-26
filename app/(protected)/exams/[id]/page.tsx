@@ -3,6 +3,7 @@ import { ExamSessionPage } from '@/features/exams/components/exam-session-page'
 
 export const metadata: Metadata = { title: 'Ujian' }
 
-export default function ExamTakePage({ params }: { params: { id: string } }) {
+export default async function ExamTakePage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return <ExamSessionPage id={params.id} />
 }

@@ -32,20 +32,22 @@ export function ModuleCard({
   }
 
   return (
-    <Card className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
+    <Card className="border border-[#E2E8F0] bg-white shadow-premium hover:border-[#4B5CF0]/40 hover:shadow-premium-hover transition-all duration-200">
       <CardContent className="py-3 px-4 flex items-center gap-3">
-        <FileText className="h-5 w-5 text-[#4B5CF0] shrink-0" />
+        <div className="inline-flex items-center justify-center size-9 rounded-lg bg-[#EEF1FF] text-[#4B5CF0] shrink-0">
+          <FileText className="h-4.5 w-4.5" />
+        </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-[#0F172A] truncate">{name}</p>
-          <p className="text-xs text-[#64748B]">
+          <p className="text-sm font-semibold text-[#0F172A] truncate">{name}</p>
+          <p className="text-xs text-[#64748B] mt-0.5">
             {format.toUpperCase()} · {fileSize}
           </p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <Button
             variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-[#64748B] hover:text-[#4B5CF0] hover:bg-[#EEF1FF]"
+            size="icon-sm"
+            className="text-[#64748B] hover:text-[#4B5CF0] hover:bg-[#EEF1FF]"
             onClick={handleDownload}
           >
             <Download className="h-4 w-4" />
@@ -53,8 +55,8 @@ export function ModuleCard({
           {onDelete && (
             <Button
               variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10"
+              size="icon-sm"
+              className="text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10"
               onClick={onDelete}
               disabled={isDeleting}
             >

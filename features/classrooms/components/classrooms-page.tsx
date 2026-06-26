@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
 import { Plus, Loader2 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
 import { PageHeader } from '@/components/shared/page-header'
@@ -11,7 +11,6 @@ import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { DataTable } from '@/components/shared/data-table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -20,6 +19,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { formatDate } from '@/lib/format-date'
 import { classroomSchema, type ClassroomFormValues } from '../schemas/classroom-schema'
 import {
@@ -35,6 +35,19 @@ export function ClassroomsPage() {
   const { isAdmin } = useAuth()
   const { data: classrooms = [], isLoading } = useClassrooms()
   const deleteMutation = useDeleteClassroom()
+  
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingClassroom, setEditingClassroom] = useState<Classroom | null>(null)
+
+  function openAddModal() {
+    setEditingClassroom(null)
+    setIsModalOpen(true)
+  }
+
+  function openEditModal(c: Classroom) {
+    setEditingClassroom(c)
+    setIsModalOpen(true)
+  }
 
   if (isLoading)
     return (
@@ -52,10 +65,8 @@ export function ClassroomsPage() {
         description={`${classrooms.length} kelas`}
         action={
           isAdmin ? (
-            <Button asChild size="sm">
-              <Link href="/classrooms/new">
-                <Plus className="mr-2 h-4 w-4" />Tambah Kelas
-              </Link>
+            <Button size="sm" onClick={openAddModal}>
+              <Plus className="mr-2 h-4 w-4" />Tambah Kelas
             </Button>
           ) : undefined
         }
@@ -108,8 +119,8 @@ export function ClassroomsPage() {
                     const c = row as unknown as Classroom
                     return (
                       <div className="flex gap-1 justify-end">
-                        <Button asChild variant="ghost" size="sm">
-                          <Link href={`/classrooms/${c.id}/edit`}>Edit</Link>
+                        <Button variant="ghost" size="sm" onClick={() => openEditModal(c)}>
+                          Edit
                         </Button>
                         <ConfirmDialog
                           trigger={
@@ -139,6 +150,14 @@ export function ClassroomsPage() {
             : []),
         ]}
       />
+      
+      {isAdmin && (
+        <ClassroomFormModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          classroom={editingClassroom}
+        />
+      )}
     </div>
   )
 }
@@ -221,14 +240,24 @@ export function ClassroomDetailPage({ id }: { id: string }) {
   )
 }
 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { handleApiError } from '@/lib/error-handler'
+
 function ClassroomForm({
-  defaultValues,
+  form,
   onSubmit,
   isPending,
   submitLabel,
   onCancel,
 }: {
-  defaultValues?: Partial<ClassroomFormValues>
+  form: any
   onSubmit: (v: ClassroomFormValues) => Promise<void>
   isPending: boolean
   submitLabel: string
@@ -237,124 +266,119 @@ function ClassroomForm({
   const { data: departments = [] } = useDepartments()
   const { data: semesters = [] } = useSemesters()
   const { data: subjects = [] } = useSubjects()
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<ClassroomFormValues>({
-    resolver: zodResolver(classroomSchema),
-    defaultValues,
-  })
-  const formValues = watch()
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-1.5">
-        <Label>Nama Kelas</Label>
-        <Input placeholder="Kelas A" {...register('name')} />
-        {errors.name && <p className="text-xs text-[#EF4444]">{errors.name.message}</p>}
-      </div>
-      {[
-        { label: 'Jurusan', key: 'departmentId', items: departments.map((d) => ({ id: d.id, name: d.name })), error: errors.departmentId },
-        { label: 'Semester', key: 'semesterId', items: semesters.map((s) => ({ id: s.id, name: `${s.name} — ${s.academicYear}` })), error: errors.semesterId },
-        { label: 'Mata Pelajaran', key: 'subjectId', items: subjects.map((s) => ({ id: s.id, name: s.name })), error: errors.subjectId },
-      ].map(({ label, key, items, error }) => (
-        <div key={key} className="space-y-1.5">
-          <Label>{label}</Label>
-          <Select
-            value={formValues[key as keyof ClassroomFormValues] ? String(formValues[key as keyof ClassroomFormValues]) : ''}
-            onValueChange={(v) =>
-              setValue(key as keyof ClassroomFormValues, Number(v) as never, { shouldValidate: true })
-            }
-          >
-            <SelectTrigger><SelectValue placeholder={`Pilih ${label.toLowerCase()}`} /></SelectTrigger>
-            <SelectContent>
-              {items.map((i) => (
-                <SelectItem key={i.id} value={String(i.id)}>{i.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {error && <p className="text-xs text-[#EF4444]">{error.message}</p>}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nama Kelas</FormLabel>
+              <FormControl>
+                <Input placeholder="Kelas A" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        {[
+          { label: 'Jurusan', key: 'departmentId', items: departments.map((d) => ({ id: d.id, name: d.name })) },
+          { label: 'Semester', key: 'semesterId', items: semesters.map((s) => ({ id: s.id, name: `${s.name} — ${s.academicYear}` })) },
+          { label: 'Mata Pelajaran', key: 'subjectId', items: subjects.map((s) => ({ id: s.id, name: s.name })) },
+        ].map(({ label, key, items }) => (
+          <FormField
+            key={key}
+            control={form.control}
+            name={key as any}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{label}</FormLabel>
+                <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? String(field.value) : undefined}>
+                  <FormControl>
+                    <SelectTrigger><SelectValue placeholder={`Pilih ${label.toLowerCase()}`} /></SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {items.map((i) => (
+                      <SelectItem key={i.id} value={String(i.id)}>{i.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ))}
+
+        <div className="flex gap-3">
+          <Button type="submit" disabled={isPending}>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {submitLabel}
+          </Button>
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Batal
+          </Button>
         </div>
-      ))}
-      <div className="flex gap-3">
-        <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {submitLabel}
-        </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Batal
-        </Button>
-      </div>
-    </form>
+      </form>
+    </Form>
   )
 }
 
-export function AddClassroomPage() {
-  const router = useRouter()
-  const mutation = useCreateClassroom()
+export function ClassroomFormModal({ isOpen, onClose, classroom }: {
+  isOpen: boolean
+  onClose: () => void
+  classroom?: Classroom | null
+}) {
+  const isEditing = !!classroom
+  const createMutation = useCreateClassroom()
+  const updateMutation = useUpdateClassroom(String(classroom?.id ?? ''))
+  const isPending = createMutation.isPending || updateMutation.isPending
+
+  const form = useForm<ClassroomFormValues>({
+    resolver: zodResolver(classroomSchema),
+    values: classroom
+      ? {
+          name: classroom.name,
+          departmentId: classroom.departmentId,
+          semesterId: classroom.semesterId,
+          subjectId: classroom.subjectId,
+        }
+      : undefined,
+  })
+
+  async function onSubmit(v: ClassroomFormValues) {
+    try {
+      if (isEditing) {
+        await updateMutation.mutateAsync(v)
+      } else {
+        await createMutation.mutateAsync(v)
+      }
+      form.reset()
+      onClose()
+    } catch (error) {
+      handleApiError(error, form.setError)
+    }
+  }
 
   return (
-    <div className="space-y-6 max-w-xl">
-      <PageHeader title="Tambah Kelas" />
-      <Card>
-        <CardContent className="pt-6">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{isEditing ? 'Edit Kelas' : 'Tambah Kelas'}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
           <ClassroomForm
-            onSubmit={async (v) => {
-              try {
-                await mutation.mutateAsync(v)
-                router.push('/classrooms')
-              } catch {
-              }
-            }}
-            isPending={mutation.isPending}
-            submitLabel="Simpan"
-            onCancel={() => router.back()}
+            form={form}
+            onSubmit={onSubmit}
+            isPending={isPending}
+            submitLabel={isEditing ? 'Simpan Perubahan' : 'Simpan'}
+            onCancel={onClose}
           />
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
-
-export function EditClassroomPage({ id }: { id: string }) {
-  const router = useRouter()
-  const { data: classroom, isLoading, isError } = useClassroomDetail(id)
-  const mutation = useUpdateClassroom(id)
-
-  if (isLoading) return <Skeleton className="h-96 max-w-xl rounded-lg bg-[#E2E8F0]" />
-  if (isError || !classroom) return (
-    <p className="text-[#EF4444]">Kelas tidak ditemukan atau terjadi kesalahan.</p>
-  )
-
-  return (
-    <div className="space-y-6 max-w-xl">
-      <PageHeader title="Edit Kelas" />
-      <Card>
-        <CardContent className="pt-6">
-          <ClassroomForm
-            defaultValues={{
-              name: classroom.name,
-              departmentId: classroom.departmentId,
-              semesterId: classroom.semesterId,
-              subjectId: classroom.subjectId,
-            }}
-            onSubmit={async (v) => {
-              try {
-                await mutation.mutateAsync(v)
-                router.push(`/classrooms/${id}`)
-              } catch {
-              }
-            }}
-            isPending={mutation.isPending}
-            submitLabel="Simpan Perubahan"
-            onCancel={() => router.back()}
-          />
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 

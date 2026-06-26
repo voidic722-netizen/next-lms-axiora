@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useState } from 'react'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
@@ -14,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Skeleton } from '@/components/ui/skeleton'
 import { USER_ROLE, USER_ROLE_LABEL } from '@/types/roles'
 import { useUsers, useDeleteUser } from '../hooks/use-users'
+import { UserFormModal } from './user-form-modal'
 import type { User } from '@/types/user'
 
 export function UsersPage() {
@@ -22,6 +22,19 @@ export function UsersPage() {
 
   const { data: users = [], isLoading } = useUsers(tab)
   const deleteMutation = useDeleteUser()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+
+  function openAddModal() {
+    setEditingUser(null)
+    setIsModalOpen(true)
+  }
+
+  function openEditModal(u: User) {
+    setEditingUser(u)
+    setIsModalOpen(true)
+  }
 
   if (isLoading) return <UsersPageSkeleton />
 
@@ -77,10 +90,8 @@ export function UsersPage() {
               const u = row as unknown as User
               return (
                 <div className="flex items-center gap-1 justify-end">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                    <Link href={`/users/${u.id}/edit`}>
-                      <Pencil className="h-3.5 w-3.5" />
-                    </Link>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEditModal(u)}>
+                    <Pencil className="h-3.5 w-3.5" />
                   </Button>
                   <ConfirmDialog
                     trigger={
@@ -112,11 +123,9 @@ export function UsersPage() {
         description={`${users.length} user`}
         action={
           isAdmin ? (
-            <Button asChild size="sm">
-              <Link href="/users/new">
-                <Plus className="mr-2 h-4 w-4" />
-                Tambah User
-              </Link>
+            <Button size="sm" onClick={openAddModal}>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah User
             </Button>
           ) : undefined
         }
@@ -138,6 +147,14 @@ export function UsersPage() {
           />
         </TabsContent>
       </Tabs>
+      
+      {isAdmin && (
+        <UserFormModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          user={editingUser}
+        />
+      )}
     </div>
   )
 }

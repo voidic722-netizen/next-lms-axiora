@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { downloadFile } from '@/lib/download-file'
 import { formatDate } from '@/lib/format-date'
@@ -44,16 +45,16 @@ export function UserSubmissionCard({
   }
 
   return (
-    <Card className="border border-[#E2E8F0] bg-white shadow-sm">
+    <Card className="border border-[#E2E8F0] bg-white shadow-premium">
       <CardContent className="pt-4 space-y-3">
         {/* Header */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9 shrink-0">
-              <AvatarFallback className="text-sm">{studentName.charAt(0).toUpperCase()}</AvatarFallback>
+              <AvatarFallback className="text-sm bg-[#EEF1FF] text-[#4B5CF0] font-semibold">{studentName.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium text-sm text-[#0F172A]">{studentName}</p>
+              <p className="font-semibold text-sm text-[#0F172A]">{studentName}</p>
               {classroomName && <p className="text-xs text-[#64748B]">{classroomName}</p>}
             </div>
           </div>
@@ -68,52 +69,54 @@ export function UserSubmissionCard({
 
         {/* Files */}
         {submission && submission.files.length > 0 && (
-          <div className="space-y-1.5 border-t border-[#E2E8F0] pt-2">
+          <div className="space-y-2 border-t border-[#E2E8F0]/60 pt-3">
             {submission.files.map((f, i) => (
               <div key={i} className="flex items-center gap-2 text-sm">
-                <FileText className="h-4 w-4 text-[#64748B] shrink-0" />
-                <span className="truncate flex-1 text-[#0F172A]">{f.fileName}</span>
-                <span className="text-xs text-[#64748B] shrink-0">{f.fileSize}</span>
+                <div className="inline-flex items-center justify-center size-7 rounded-md bg-[#F1F5F9] shrink-0">
+                  <FileText className="h-3.5 w-3.5 text-[#64748B]" />
+                </div>
+                <span className="truncate flex-1 text-[#0F172A] font-medium">{f.fileName}</span>
+                <span className="text-xs text-[#94A3B8] shrink-0">{f.fileSize}</span>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 shrink-0"
+                  size="icon-xs"
+                  className="shrink-0 text-[#64748B] hover:text-[#4B5CF0]"
                   onClick={() => downloadFile(f.filePath, f.fileName).catch(() => toast.error('Gagal mengunduh'))}
                 >
                   <Download className="h-3.5 w-3.5" />
                 </Button>
               </div>
             ))}
-            <p className="text-xs text-[#64748B]">Dikumpulkan: {formatDate(submission.submittedAt)}</p>
+            <p className="text-xs text-[#94A3B8]">Dikumpulkan: {formatDate(submission.submittedAt)}</p>
           </div>
         )}
 
         {/* Grading */}
         {submission && onGrade && (
-          <div className="border-t border-[#E2E8F0] pt-3 space-y-2">
+          <div className="border-t border-[#E2E8F0]/60 pt-3 space-y-2.5">
             <div className="flex items-center gap-2">
-              <input
+              <Input
                 type="number"
                 min={0}
                 max={100}
                 placeholder="Nilai (0-100)"
                 value={grade}
                 onChange={(e) => setGrade(e.target.value)}
-                className="flex h-8 w-28 rounded-md border border-[#E2E8F0] bg-white px-3 text-sm text-[#0F172A] placeholder:text-[#64748B] focus-visible:border-[#4B5CF0] focus-visible:ring-2 focus-visible:ring-[#4B5CF0]/20 outline-none transition-all duration-200"
+                className="w-28 h-8 text-sm"
               />
               <Button size="sm" onClick={handleGradeSubmit} disabled={isSaving || !grade}>
                 {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Simpan'}
               </Button>
               {submission.grade != null && (
-                <span className="text-sm text-[#64748B]">Nilai: {submission.grade}</span>
+                <span className="text-sm text-[#64748B]">Nilai: <strong className="text-[#0F172A]">{submission.grade}</strong></span>
               )}
             </div>
-            <input
+            <Input
               type="text"
               placeholder="Feedback (opsional)"
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              className="flex h-8 w-full rounded-md border border-[#E2E8F0] bg-white px-3 text-sm text-[#0F172A] placeholder:text-[#64748B] focus-visible:border-[#4B5CF0] focus-visible:ring-2 focus-visible:ring-[#4B5CF0]/20 outline-none transition-all duration-200"
+              className="h-8 text-sm"
             />
           </div>
         )}

@@ -3,6 +3,7 @@ import { SubjectExamsPage } from '@/features/subjects/components/subject-sub-pag
 
 export const metadata: Metadata = { title: 'Ujian - Mata Pelajaran' }
 
-export default function Page({ params }: { params: { id: string } }) {
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return <SubjectExamsPage id={params.id} />
 }

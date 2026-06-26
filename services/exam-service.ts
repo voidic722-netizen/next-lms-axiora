@@ -101,9 +101,7 @@ export async function getExamByIdService(id: number | string): Promise<Exam> {
 }
 
 export async function createExamService(payload: CreateOrUpdateExamPayload): Promise<Exam> {
-  const { data } = await api.post<RawExam>('/exams', buildExamFormData(payload), {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawExam>('/exams', buildExamFormData(payload))
   return mapExam(data)
 }
 

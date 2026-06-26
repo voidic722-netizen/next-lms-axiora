@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Pencil, BookText, Loader2, X } from 'lucide-react'
@@ -12,13 +11,13 @@ import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { withStorageUrl } from '@/lib/storage'
 import { subjectSchema, type SubjectFormValues } from '../schemas/subject-schema'
 import {
@@ -32,6 +31,19 @@ export function SubjectsPage() {
   const { isAdmin } = useAuth()
   const { data: subjects = [], isLoading } = useSubjects()
   const deleteMutation = useDeleteSubject()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingSubject, setEditingSubject] = useState<Subject | null>(null)
+
+  function openAddModal() {
+    setEditingSubject(null)
+    setIsModalOpen(true)
+  }
+
+  function openEditModal(s: Subject) {
+    setEditingSubject(s)
+    setIsModalOpen(true)
+  }
 
   if (isLoading)
     return (
@@ -49,10 +61,8 @@ export function SubjectsPage() {
         description={`${subjects.length} mata pelajaran`}
         action={
           isAdmin ? (
-            <Button asChild size="sm">
-              <Link href="/subjects/new">
-                <Plus className="mr-2 h-4 w-4" />Tambah
-              </Link>
+            <Button size="sm" onClick={openAddModal}>
+              <Plus className="mr-2 h-4 w-4" />Tambah
             </Button>
           ) : undefined
         }
@@ -65,9 +75,23 @@ export function SubjectsPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {subjects.map((s) => (
-            <SubjectCard key={s.id} subject={s} isAdmin={isAdmin} onDelete={() => deleteMutation.mutateAsync(s.id)} />
+            <SubjectCard 
+              key={s.id} 
+              subject={s} 
+              isAdmin={isAdmin} 
+              onEdit={() => openEditModal(s)}
+              onDelete={() => deleteMutation.mutateAsync(s.id)} 
+            />
           ))}
         </div>
+      )}
+
+      {isAdmin && (
+        <SubjectFormModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          subject={editingSubject}
+        />
       )}
     </div>
   )
@@ -76,10 +100,12 @@ export function SubjectsPage() {
 function SubjectCard({
   subject: s,
   isAdmin,
+  onEdit,
   onDelete,
 }: {
   subject: Subject
   isAdmin: boolean
+  onEdit: () => void
   onDelete: () => Promise<void>
 }) {
   const thumb = withStorageUrl(s.thumbnail)
@@ -112,10 +138,8 @@ function SubjectCard({
         <p className="text-sm text-[#64748B] line-clamp-2 mt-1">{s.description}</p>
         {isAdmin && (
           <div className="flex gap-2 mt-3 pt-3 border-t border-[#E2E8F0]">
-            <Button asChild variant="outline" size="sm" className="flex-1">
-              <Link href={`/subjects/${s.id}/edit`}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" />Edit
-              </Link>
+            <Button variant="outline" size="sm" className="flex-1" onClick={onEdit}>
+              <Pencil className="mr-1.5 h-3.5 w-3.5" />Edit
             </Button>
             <ConfirmDialog
               trigger={
@@ -164,181 +188,229 @@ export function SubjectDetailPage({ id }: { id: string }) {
   )
 }
 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { handleApiError } from '@/lib/error-handler'
+
 function SubjectForm({
-  defaultValues,
+  form,
   onSubmit,
   isPending,
   submitLabel,
   onCancel,
 }: {
-  defaultValues?: Partial<SubjectFormValues>
+  form: any
   onSubmit: (v: SubjectFormValues) => Promise<void>
   isPending: boolean
   submitLabel: string
   onCancel: () => void
 }) {
   const { data: departments = [] } = useDepartments()
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<SubjectFormValues>({
-    resolver: zodResolver(subjectSchema),
-    defaultValues,
-  })
-  const type = watch('type')
   const fileRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
 
   function clearThumbnail() {
-    setValue('thumbnail', undefined)
+    form.setValue('thumbnail', undefined)
     setPreview(null)
     if (fileRef.current) fileRef.current.value = ''
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-1.5">
-        <Label>Nama</Label>
-        <Input placeholder="Algoritma & Pemrograman" {...register('name')} />
-        {errors.name && <p className="text-xs text-[#EF4444]">{errors.name.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label>Tipe</Label>
-        <Select value={type} onValueChange={(v) => setValue('type', v as 'general' | 'compulsory')}>
-          <SelectTrigger>
-            <SelectValue placeholder="Pilih tipe" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="compulsory">Wajib</SelectItem>
-            <SelectItem value="general">Umum</SelectItem>
-          </SelectContent>
-        </Select>
-        {errors.type && <p className="text-xs text-[#EF4444]">{errors.type.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label>Deskripsi</Label>
-        <Textarea rows={3} {...register('description')} />
-        {errors.description && <p className="text-xs text-[#EF4444]">{errors.description.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label>Jurusan (opsional)</Label>
-        <Select onValueChange={(v) => setValue('departmentId', Number(v))}>
-          <SelectTrigger>
-            <SelectValue placeholder="Pilih jurusan" />
-          </SelectTrigger>
-          <SelectContent>
-            {departments.map((d) => (
-              <SelectItem key={d.id} value={String(d.id)}>
-                {d.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="space-y-1.5">
-        <Label>Thumbnail (opsional)</Label>
-        {preview ? (
-          <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-[#E2E8F0] bg-[#F8FAFC]">
-            <img src={preview} alt="preview" className="w-full h-full object-cover" />
-            <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              className="absolute top-2 right-2 h-7 w-7"
-              onClick={clearThumbnail}
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        ) : (
-          <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
-            Pilih Gambar
-          </Button>
-        )}
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0]
-            if (!f) return
-            setValue('thumbnail', f)
-            setPreview(URL.createObjectURL(f))
-          }}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nama</FormLabel>
+              <FormControl>
+                <Input placeholder="Algoritma & Pemrograman" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-        {errors.thumbnail && <p className="text-xs text-[#EF4444]">{errors.thumbnail.message}</p>}
-      </div>
-      <div className="flex gap-3">
-        <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {submitLabel}
-        </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Batal
-        </Button>
-      </div>
-    </form>
+        
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tipe</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih tipe" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="compulsory">Wajib</SelectItem>
+                  <SelectItem value="general">Umum</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Deskripsi</FormLabel>
+              <FormControl>
+                <Textarea rows={3} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="departmentId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Jurusan (opsional)</FormLabel>
+              <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? String(field.value) : undefined}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih jurusan" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {departments.map((d) => (
+                    <SelectItem key={d.id} value={String(d.id)}>
+                      {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="thumbnail"
+          render={({ field: { value, onChange, ref, ...field } }) => (
+            <FormItem>
+              <FormLabel>Thumbnail (opsional)</FormLabel>
+              <FormControl>
+                <div>
+                  {preview ? (
+                    <div className="relative w-full aspect-video rounded-lg overflow-hidden border border-[#E2E8F0] bg-[#F8FAFC]">
+                      <img src={preview} alt="preview" className="w-full h-full object-cover" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2 h-7 w-7"
+                        onClick={clearThumbnail}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+                      Pilih Gambar
+                    </Button>
+                  )}
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (!f) return
+                      form.setValue('thumbnail', f)
+                      setPreview(URL.createObjectURL(f))
+                    }}
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <div className="flex gap-3">
+          <Button type="submit" disabled={isPending}>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {submitLabel}
+          </Button>
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Batal
+          </Button>
+        </div>
+      </form>
+    </Form>
   )
 }
 
-export function AddSubjectPage() {
-  const router = useRouter()
-  const mutation = useCreateSubject()
-  return (
-    <div className="space-y-6 max-w-xl">
-      <PageHeader title="Tambah Mata Pelajaran" />
-      <Card>
-        <CardContent className="pt-6">
-          <SubjectForm
-            onSubmit={async (v) => {
-              await mutation.mutateAsync(v as any)
-              router.push('/subjects')
-            }}
-            isPending={mutation.isPending}
-            submitLabel="Simpan"
-            onCancel={() => router.back()}
-          />
-        </CardContent>
-      </Card>
-    </div>
-  )
-}
+export function SubjectFormModal({ isOpen, onClose, subject }: {
+  isOpen: boolean
+  onClose: () => void
+  subject?: Subject | null
+}) {
+  const isEditing = !!subject
+  const createMutation = useCreateSubject()
+  const updateMutation = useUpdateSubject(subject?.id ?? 0)
+  const isPending = createMutation.isPending || updateMutation.isPending
 
-export function EditSubjectPage({ id }: { id: string }) {
-  const router = useRouter()
-  const { data: subject, isLoading } = useSubjectDetail(id)
-  const mutation = useUpdateSubject(Number(id))
-  if (isLoading) return <Skeleton className="h-96 rounded-lg max-w-xl bg-[#E2E8F0]" />
+  const form = useForm<SubjectFormValues>({
+    resolver: zodResolver(subjectSchema),
+    values: subject
+      ? ({
+          name: subject.name,
+          type: subject.type as 'general' | 'compulsory',
+          description: subject.description,
+          departmentId: subject.departmentId ?? undefined,
+        } as any)
+      : undefined,
+  })
+
+  async function onSubmit(v: SubjectFormValues) {
+    try {
+      if (isEditing) {
+        await updateMutation.mutateAsync(v as any)
+      } else {
+        await createMutation.mutateAsync(v as any)
+      }
+      form.reset()
+      onClose()
+    } catch (error) {
+      handleApiError(error, form.setError)
+    }
+  }
+
   return (
-    <div className="space-y-6 max-w-xl">
-      <PageHeader title="Edit Mata Pelajaran" />
-      <Card>
-        <CardContent className="pt-6">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{isEditing ? 'Edit Mata Pelajaran' : 'Tambah Mata Pelajaran'}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
           <SubjectForm
-            defaultValues={
-              subject
-                ? ({
-                    name: subject.name,
-                    type: subject.type as 'general' | 'compulsory',
-                    description: subject.description,
-                    departmentId: subject.departmentId ?? undefined,
-                  } as any)
-                : undefined
-            }
-            onSubmit={async (v) => {
-              await mutation.mutateAsync(v as any)
-              router.push(`/subjects/${id}`)
-            }}
-            isPending={mutation.isPending}
-            submitLabel="Simpan Perubahan"
-            onCancel={() => router.back()}
+            form={form}
+            onSubmit={onSubmit}
+            isPending={isPending}
+            submitLabel={isEditing ? 'Simpan Perubahan' : 'Simpan'}
+            onCancel={onClose}
           />
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

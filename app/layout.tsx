@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" suppressHydrationWarning>
-      <body className="bg-[#F8FAFC] text-[#0F172A] antialiased">
+      <body className="bg-[#F8FAFC] text-[#0F172A] antialiased font-[var(--font-sans)]" suppressHydrationWarning>
         <QueryProvider>
           {children}
           <ToastProvider />

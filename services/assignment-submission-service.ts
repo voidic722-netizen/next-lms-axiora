@@ -101,9 +101,7 @@ export async function submitAssignmentService(
 ): Promise<AssignmentSubmission> {
   const form = new FormData()
   files.forEach((file) => form.append('files[]', file))
-  const { data } = await api.post<RawSubmission>(`/assignments/${assignmentId}/submit`, form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawSubmission>(`/assignments/${assignmentId}/submit`, form)
   return mapSubmission(data)
 }
 

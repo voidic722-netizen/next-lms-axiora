@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Pencil, Building2, Loader2, X } from 'lucide-react'
@@ -12,7 +11,6 @@ import { ConfirmDialog } from '@/components/shared/confirm-dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -21,6 +19,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { withStorageUrl } from '@/lib/storage'
 import { departmentSchema, type DepartmentFormValues } from '../schemas/department-schema'
 import {
@@ -34,6 +33,19 @@ export function DepartmentsPage() {
   const { isAdmin } = useAuth()
   const { data: departments = [], isLoading } = useDepartments()
   const deleteMutation = useDeleteDepartment()
+  
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingDept, setEditingDept] = useState<Department | null>(null)
+
+  function openAddModal() {
+    setEditingDept(null)
+    setIsModalOpen(true)
+  }
+
+  function openEditModal(dept: Department) {
+    setEditingDept(dept)
+    setIsModalOpen(true)
+  }
 
   if (isLoading) return <GridSkeleton />
 
@@ -44,8 +56,8 @@ export function DepartmentsPage() {
         description={`${departments.length} jurusan terdaftar`}
         action={
           isAdmin ? (
-            <Button asChild size="sm">
-              <Link href="/departments/new"><Plus className="mr-2 h-4 w-4" />Tambah Jurusan</Link>
+            <Button size="sm" onClick={openAddModal}>
+              <Plus className="mr-2 h-4 w-4" />Tambah Jurusan
             </Button>
           ) : undefined
         }
@@ -56,16 +68,25 @@ export function DepartmentsPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {departments.map((d) => (
             <DepartmentCard key={d.id} department={d} isAdmin={isAdmin}
+              onEdit={() => openEditModal(d)}
               onDelete={() => deleteMutation.mutateAsync(d.id)} />
           ))}
         </div>
+      )}
+      
+      {isAdmin && (
+        <DepartmentFormModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          department={editingDept}
+        />
       )}
     </div>
   )
 }
 
-function DepartmentCard({ department: d, isAdmin, onDelete }: {
-  department: Department; isAdmin: boolean; onDelete: () => Promise<void>
+function DepartmentCard({ department: d, isAdmin, onEdit, onDelete }: {
+  department: Department; isAdmin: boolean; onEdit: () => void; onDelete: () => Promise<void>
 }) {
   const thumb = withStorageUrl(d.thumbnail)
   return (
@@ -84,8 +105,8 @@ function DepartmentCard({ department: d, isAdmin, onDelete }: {
         <p className="text-sm text-[#64748B] line-clamp-2 mt-1">{d.description}</p>
         {isAdmin && (
           <div className="flex gap-2 mt-3 pt-3 border-t border-[#E2E8F0]">
-            <Button asChild variant="outline" size="sm" className="flex-1">
-              <Link href={`/departments/${d.id}/edit`}><Pencil className="mr-1.5 h-3.5 w-3.5" />Edit</Link>
+            <Button variant="outline" size="sm" className="flex-1" onClick={onEdit}>
+              <Pencil className="mr-1.5 h-3.5 w-3.5" />Edit
             </Button>
             <ConfirmDialog
               trigger={<Button variant="outline" size="sm" className="text-[#EF4444] hover:text-[#DC2626] border-[#EF4444]/30 hover:border-[#EF4444]/50">Hapus</Button>}
@@ -172,116 +193,175 @@ export function DepartmentDetailPage({ id }: { id: string }) {
   )
 }
 
-function DepartmentForm({ defaultValues, onSubmit, isPending, submitLabel, onCancel }: {
-  defaultValues?: Partial<DepartmentFormValues>
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { handleApiError } from '@/lib/error-handler'
+
+function DepartmentForm({ form, onSubmit, isPending, submitLabel, onCancel }: {
+  form: any
   onSubmit: (v: DepartmentFormValues) => Promise<void>
   isPending: boolean
   submitLabel: string
   onCancel: () => void
 }) {
   const { data: faculties = [] } = useFaculties()
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<DepartmentFormValues>({
-    resolver: zodResolver(departmentSchema),
-    defaultValues,
-  })
   const fileRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
 
   function clearThumbnail() {
-    setValue('thumbnail', undefined)
+    form.setValue('thumbnail', undefined)
     setPreview(null)
     if (fileRef.current) fileRef.current.value = ''
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div className="space-y-1.5">
-        <Label>Nama Jurusan</Label>
-        <Input placeholder="Teknik Informatika" {...register('name')} />
-        {errors.name && <p className="text-xs text-[#EF4444]">{errors.name.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label>Deskripsi</Label>
-        <Textarea rows={3} {...register('description')} />
-        {errors.description && <p className="text-xs text-[#EF4444]">{errors.description.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label>Fakultas</Label>
-        <Select onValueChange={(v) => setValue('facultyId', Number(v))}>
-          <SelectTrigger><SelectValue placeholder="Pilih fakultas" /></SelectTrigger>
-          <SelectContent>
-            {faculties.map((f) => <SelectItem key={f.id} value={String(f.id)}>{f.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        {errors.facultyId && <p className="text-xs text-[#EF4444]">{errors.facultyId.message}</p>}
-      </div>
-      <div className="space-y-1.5">
-        <Label>Thumbnail (opsional)</Label>
-        {preview ? (
-          <div className="relative inline-block">
-            <img src={preview} alt="preview" className="h-32 rounded border border-[#E2E8F0] object-cover" />
-            <Button
-              type="button"
-              variant="destructive"
-              size="icon"
-              className="absolute top-1.5 right-1.5 h-6 w-6"
-              onClick={clearThumbnail}
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        ) : (
-          <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
-            Pilih Gambar
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nama Jurusan</FormLabel>
+              <FormControl>
+                <Input placeholder="Teknik Informatika" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Deskripsi</FormLabel>
+              <FormControl>
+                <Textarea rows={3} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="facultyId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Fakultas</FormLabel>
+              <Select onValueChange={(v) => field.onChange(Number(v))} value={field.value ? String(field.value) : undefined}>
+                <FormControl>
+                  <SelectTrigger><SelectValue placeholder="Pilih fakultas" /></SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {faculties.map((f) => <SelectItem key={f.id} value={String(f.id)}>{f.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="thumbnail"
+          render={({ field: { value, onChange, ref, ...field } }) => (
+            <FormItem>
+              <FormLabel>Thumbnail (opsional)</FormLabel>
+              <FormControl>
+                <div>
+                  {preview ? (
+                    <div className="relative inline-block">
+                      <img src={preview} alt="preview" className="h-32 rounded border border-[#E2E8F0] object-cover" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1.5 right-1.5 h-6 w-6"
+                        onClick={clearThumbnail}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+                      Pilih Gambar
+                    </Button>
+                  )}
+                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
+                    const f = e.target.files?.[0]; if (!f) return
+                    form.setValue('thumbnail', f); setPreview(URL.createObjectURL(f))
+                  }} {...field} />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="flex gap-3">
+          <Button type="submit" disabled={isPending}>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{submitLabel}
           </Button>
-        )}
-        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => {
-          const f = e.target.files?.[0]; if (!f) return
-          setValue('thumbnail', f); setPreview(URL.createObjectURL(f))
-        }} />
-      </div>
-      <div className="flex gap-3">
-        <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{submitLabel}
-        </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>Batal</Button>
-      </div>
-    </form>
+          <Button type="button" variant="outline" onClick={onCancel}>Batal</Button>
+        </div>
+      </form>
+    </Form>
   )
 }
 
-export function AddDepartmentPage() {
-  const router = useRouter()
-  const mutation = useCreateDepartment()
-  return (
-    <div className="space-y-6 max-w-xl">
-      <PageHeader title="Tambah Jurusan" />
-      <Card><CardContent className="pt-6">
-        <DepartmentForm
-          onSubmit={async (v) => { await mutation.mutateAsync(v); router.push('/departments') }}
-          isPending={mutation.isPending} submitLabel="Simpan" onCancel={() => router.back()}
-        />
-      </CardContent></Card>
-    </div>
-  )
-}
+export function DepartmentFormModal({ isOpen, onClose, department }: {
+  isOpen: boolean
+  onClose: () => void
+  department?: Department | null
+}) {
+  const isEditing = !!department
+  const createMutation = useCreateDepartment()
+  const updateMutation = useUpdateDepartment(department?.id ?? 0)
+  const isPending = createMutation.isPending || updateMutation.isPending
 
-export function EditDepartmentPage({ id }: { id: string }) {
-  const router = useRouter()
-  const { data: dept, isLoading } = useDepartmentDetail(id)
-  const mutation = useUpdateDepartment(Number(id))
-  if (isLoading) return <Skeleton className="h-96 rounded-lg max-w-xl bg-[#E2E8F0]" />
+  const form = useForm<DepartmentFormValues>({
+    resolver: zodResolver(departmentSchema),
+    values: department ? { name: department.name, description: department.description, facultyId: department.facultyId } : undefined,
+  })
+
+  async function onSubmit(v: DepartmentFormValues) {
+    try {
+      if (isEditing) {
+        await updateMutation.mutateAsync(v)
+      } else {
+        await createMutation.mutateAsync(v)
+      }
+      form.reset()
+      onClose()
+    } catch (error) {
+      handleApiError(error, form.setError)
+    }
+  }
+
   return (
-    <div className="space-y-6 max-w-xl">
-      <PageHeader title="Edit Jurusan" />
-      <Card><CardContent className="pt-6">
-        <DepartmentForm
-          defaultValues={dept ? { name: dept.name, description: dept.description, facultyId: dept.facultyId } : undefined}
-          onSubmit={async (v) => { await mutation.mutateAsync(v); router.push(`/departments/${id}`) }}
-          isPending={mutation.isPending} submitLabel="Simpan Perubahan" onCancel={() => router.back()}
-        />
-      </CardContent></Card>
-    </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{isEditing ? 'Edit Jurusan' : 'Tambah Jurusan'}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
+          <DepartmentForm
+            form={form}
+            onSubmit={onSubmit}
+            isPending={isPending} submitLabel={isEditing ? 'Simpan Perubahan' : 'Simpan'} onCancel={onClose}
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -32,14 +32,16 @@ export function AssignmentCard({
   return (
     <Link href={`/assignments/${id}`}>
       <Card className={cn(
-        'border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200',
+        'group border border-[#E2E8F0] bg-white shadow-premium hover:border-[#4B5CF0]/40 hover:shadow-premium-hover hover:-translate-y-0.5 transition-all duration-200',
         className
       )}>
-        <CardContent className="py-3 px-4">
+        <CardContent className="py-3.5 px-4">
           <div className="flex items-start gap-3">
-            <LayoutList className="h-4 w-4 text-[#4B5CF0] shrink-0 mt-0.5" />
+            <div className="inline-flex items-center justify-center size-8 rounded-lg bg-[#EEF1FF] text-[#4B5CF0] shrink-0 mt-0.5">
+              <LayoutList className="h-4 w-4" />
+            </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm text-[#0F172A] truncate">{title}</p>
+              <p className="font-semibold text-sm text-[#0F172A] truncate">{title}</p>
               <p className="text-xs text-[#64748B] truncate mt-0.5">{description}</p>
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {types.map((t) => (

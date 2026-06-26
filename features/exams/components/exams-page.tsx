@@ -1,17 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Plus,
-  GraduationCap,
-  Loader2,
-  Trash2,
-  PlusCircle,
-  CheckCircle2,
-} from "lucide-react";
+import { useState } from "react";
+import { Plus, GraduationCap, Loader2, Trash2, PlusCircle, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { PageHeader } from "@/components/shared/page-header";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
@@ -22,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DataTable } from "@/components/shared/data-table";
 import { formatDate, isFuture } from "@/lib/format-date";
 import { examSchema, type ExamFormValues } from "../schemas/exam-schema";
@@ -60,6 +54,19 @@ export function ExamsPage() {
     notAvailableFrom,
   } = useExamList();
 
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingExam, setEditingExam] = useState<Exam | null>(null)
+
+  function openAddModal() {
+    setEditingExam(null)
+    setIsModalOpen(true)
+  }
+
+  function openEditModal(e: Exam) {
+    setEditingExam(e)
+    setIsModalOpen(true)
+  }
+
   const visible = exams.filter((e) => {
     if (isTeacherOrAdmin) return true;
     return (
@@ -84,11 +91,9 @@ export function ExamsPage() {
         description={`${visible.length} ujian`}
         action={
           isTeacherOrAdmin ? (
-            <Button asChild size="sm">
-              <Link href="/exams/new">
-                <Plus className="mr-2 h-4 w-4" />
-                Tambah Ujian
-              </Link>
+            <Button size="sm" onClick={openAddModal}>
+              <Plus className="mr-2 h-4 w-4" />
+              Tambah Ujian
             </Button>
           ) : undefined
         }
@@ -106,6 +111,7 @@ export function ExamsPage() {
               exam={e}
               isTeacherOrAdmin={isTeacherOrAdmin}
               onExamClick={handleExamClick}
+              onEdit={() => openEditModal(e)}
               onDelete={() => deleteMutation.mutateAsync(e.id)}
             />
           ))}
@@ -141,6 +147,14 @@ export function ExamsPage() {
           </div>
         </div>
       )}
+
+      {isTeacherOrAdmin && (
+        <ExamFormModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          exam={editingExam}
+        />
+      )}
     </div>
   );
 }
@@ -149,11 +163,13 @@ function ExamCard({
   exam: e,
   isTeacherOrAdmin,
   onExamClick,
+  onEdit,
   onDelete,
 }: {
   exam: Exam;
   isTeacherOrAdmin: boolean;
   onExamClick: (ev: React.MouseEvent, id: number, isCompleted: boolean, availableFrom?: string) => void;
+  onEdit: () => void;
   onDelete: () => Promise<void>;
 }) {
   const notYet = isFuture(e.availableDate);
@@ -181,8 +197,8 @@ function ExamCard({
           </div>
           {isTeacherOrAdmin && (
             <div className="flex gap-1 shrink-0" onClick={(ev) => ev.stopPropagation()}>
-              <Button asChild variant="ghost" size="sm">
-                <Link href={`/exams/${e.id}/edit`}>Edit</Link>
+              <Button variant="ghost" size="sm" onClick={onEdit}>
+                Edit
               </Button>
               <ConfirmDialog
                 trigger={
@@ -291,40 +307,48 @@ export function ExamSubmissionsPage({ id }: { id: string }) {
   );
 }
 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { handleApiError } from '@/lib/error-handler'
+
 function ExamForm({
-  defaultValues,
+  form,
   onSubmit,
   isPending,
   submitLabel,
   onCancel,
 }: {
-  defaultValues?: Partial<ExamFormValues>;
+  form: any;
   onSubmit: (v: ExamFormValues) => Promise<void>;
   isPending: boolean;
   submitLabel: string;
   onCancel: () => void;
 }) {
   const { data: classrooms = [] } = useClassrooms();
-  const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm<ExamFormValues>({
-    resolver: zodResolver(examSchema),
-    defaultValues: { examTypes: [], classroomIds: [], questions: [], ...defaultValues },
-  });
+  const { control, watch } = form;
   const { fields, append, remove } = useFieldArray({ control, name: "questions" });
+  
   const selectedClassrooms = watch("classroomIds") ?? [];
   const selectedExamTypes = watch("examTypes") ?? [];
 
   function toggleClassroom(id: number) {
     const next = selectedClassrooms.includes(id)
-      ? selectedClassrooms.filter((c) => c !== id)
+      ? selectedClassrooms.filter((c: number) => c !== id)
       : [...selectedClassrooms, id];
-    setValue("classroomIds", next, { shouldValidate: true });
+    form.setValue("classroomIds", next, { shouldValidate: true });
   }
 
   function toggleExamType(type: string) {
     const next = selectedExamTypes.includes(type)
-      ? selectedExamTypes.filter((t) => t !== type)
+      ? selectedExamTypes.filter((t: string) => t !== type)
       : [...selectedExamTypes, type];
-    setValue("examTypes", next, { shouldValidate: true });
+    form.setValue("examTypes", next, { shouldValidate: true });
   }
 
   function addQuestion() {
@@ -348,171 +372,251 @@ function ExamForm({
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label>Judul Ujian</Label>
-          <Input placeholder="UTS Semester 1" {...register("title")} />
-          {errors.title && <p className="text-xs text-[#EF4444]">{errors.title.message}</p>}
-        </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            control={control}
+            name="title"
+            render={({ field }) => (
+              <FormItem className="sm:col-span-2">
+                <FormLabel>Judul Ujian</FormLabel>
+                <FormControl>
+                  <Input placeholder="UTS Semester 1" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="space-y-1.5 sm:col-span-2">
-          <Label>Kategori Ujian</Label>
-          <div className="flex flex-wrap gap-2">
-            {EXAM_TYPE_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => toggleExamType(opt.value)}
-                className={`px-3 py-1.5 rounded-full border text-sm transition-colors duration-200 ${
-                  selectedExamTypes.includes(opt.value)
-                    ? 'bg-[#4B5CF0] text-white border-[#4B5CF0]'
-                    : 'border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]'
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-          {errors.examTypes && <p className="text-xs text-[#EF4444]">{errors.examTypes.message}</p>}
-        </div>
-
-        <div className="space-y-1.5">
-          <Label>Tanggal Mulai</Label>
-          <Input type="datetime-local" {...register("availableDate")} />
-          {errors.availableDate && <p className="text-xs text-[#EF4444]">{errors.availableDate.message}</p>}
-        </div>
-        <div className="space-y-1.5">
-          <Label>Tenggat Waktu</Label>
-          <Input type="datetime-local" {...register("deadlineDate")} />
-          {errors.deadlineDate && <p className="text-xs text-[#EF4444]">{errors.deadlineDate.message}</p>}
-        </div>
-        <div className="space-y-1.5">
-          <Label>Durasi (menit)</Label>
-          <Input type="number" min={1} placeholder="90" {...register("durationMinutes", { valueAsNumber: true })} />
-          {errors.durationMinutes && <p className="text-xs text-[#EF4444]">{errors.durationMinutes.message}</p>}
-        </div>
-        <div className="space-y-1.5">
-          <Label>Kelas</Label>
-          <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto border border-[#E2E8F0] rounded-md p-2">
-            {classrooms.map((c) => (
-              <label key={c.id} className="flex items-center gap-2 text-sm text-[#0F172A] cursor-pointer">
-                <Checkbox checked={selectedClassrooms.includes(c.id)} onCheckedChange={() => toggleClassroom(c.id)} />
-                {c.name}
-              </label>
-            ))}
-          </div>
-          {errors.classroomIds && <p className="text-xs text-[#EF4444]">{errors.classroomIds.message}</p>}
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label className="text-base">Soal ({fields.length})</Label>
-          <Button type="button" variant="outline" size="sm" onClick={addQuestion}>
-            <PlusCircle className="mr-2 h-4 w-4" />Tambah Soal
-          </Button>
-        </div>
-        {errors.questions && <p className="text-xs text-[#EF4444]">{errors.questions.message}</p>}
-        {fields.map((field, qi) => (
-          <Card key={field.id} className="border border-[#E2E8F0] bg-white shadow-sm">
-            <CardHeader className="pb-2 flex-row items-center justify-between">
-              <CardTitle className="text-sm font-medium text-[#0F172A]">Soal {qi + 1}</CardTitle>
-              <Button
-                type="button" variant="ghost" size="icon"
-                className="h-7 w-7 text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200"
-                onClick={() => remove(qi)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Input placeholder="Teks pertanyaan..." {...register(`questions.${qi}.text`)} />
-              {errors.questions?.[qi]?.text && (
-                <p className="text-xs text-[#EF4444]">{errors.questions[qi]?.text?.message}</p>
-              )}
-              <div className="space-y-2">
-                {(field.options ?? []).map((_, oi) => (
-                  <div key={oi} className="flex items-center gap-2">
-                    <Checkbox {...register(`questions.${qi}.options.${oi}.isCorrect`)} />
-                    <Input placeholder={`Pilihan ${oi + 1}`} {...register(`questions.${qi}.options.${oi}.label`)} />
+          <FormField
+            control={control}
+            name="examTypes"
+            render={() => (
+              <FormItem className="sm:col-span-2">
+                <FormLabel>Kategori Ujian</FormLabel>
+                <FormControl>
+                  <div className="flex flex-wrap gap-2">
+                    {EXAM_TYPE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => toggleExamType(opt.value)}
+                        className={`px-3 py-1.5 rounded-full border text-sm transition-colors duration-200 ${
+                          selectedExamTypes.includes(opt.value)
+                            ? 'bg-[#4B5CF0] text-white border-[#4B5CF0]'
+                            : 'border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <div className="flex gap-3 pt-2">
-        <Button type="submit" disabled={isPending}>
-          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {submitLabel}
-        </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>Batal</Button>
-      </div>
-    </form>
+          <FormField
+            control={control}
+            name="availableDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tanggal Mulai</FormLabel>
+                <FormControl>
+                  <Input type="datetime-local" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={control}
+            name="deadlineDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tenggat Waktu</FormLabel>
+                <FormControl>
+                  <Input type="datetime-local" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={control}
+            name="durationMinutes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Durasi (menit)</FormLabel>
+                <FormControl>
+                  <Input type="number" min={1} placeholder="90" {...field} onChange={e => field.onChange(e.target.valueAsNumber || e.target.value)} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={control}
+            name="classroomIds"
+            render={() => (
+              <FormItem>
+                <FormLabel>Kelas</FormLabel>
+                <FormControl>
+                  <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto border border-[#E2E8F0] rounded-md p-2">
+                    {classrooms.map((c) => (
+                      <label key={c.id} className="flex items-center gap-2 text-sm text-[#0F172A] cursor-pointer">
+                        <Checkbox checked={selectedClassrooms.includes(c.id)} onCheckedChange={() => toggleClassroom(c.id)} />
+                        {c.name}
+                      </label>
+                    ))}
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-base">Soal ({fields.length})</Label>
+            <Button type="button" variant="outline" size="sm" onClick={addQuestion}>
+              <PlusCircle className="mr-2 h-4 w-4" />Tambah Soal
+            </Button>
+          </div>
+          {form.formState.errors.questions && <p className="text-xs text-[#EF4444]">{form.formState.errors.questions.message as string}</p>}
+          
+          {fields.map((field, qi) => (
+            <Card key={field.id} className="border border-[#E2E8F0] bg-white shadow-sm">
+              <CardHeader className="pb-2 flex-row items-center justify-between">
+                <CardTitle className="text-sm font-medium text-[#0F172A]">Soal {qi + 1}</CardTitle>
+                <Button
+                  type="button" variant="ghost" size="icon"
+                  className="h-7 w-7 text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200"
+                  onClick={() => remove(qi)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <FormField
+                  control={control}
+                  name={`questions.${qi}.text`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input placeholder="Teks pertanyaan..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="space-y-2">
+                  {((field as any).options ?? []).map((_: any, oi: any) => (
+                    <div key={oi} className="flex items-center gap-2">
+                      <FormField
+                        control={control}
+                        name={`questions.${qi}.options.${oi}.isCorrect`}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={control}
+                        name={`questions.${qi}.options.${oi}.label`}
+                        render={({ field }) => (
+                          <FormItem className="flex-1">
+                            <FormControl>
+                              <Input placeholder={`Pilihan ${oi + 1}`} {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <div className="flex gap-3 pt-2">
+          <Button type="submit" disabled={isPending}>
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {submitLabel}
+          </Button>
+          <Button type="button" variant="outline" onClick={onCancel}>Batal</Button>
+        </div>
+      </form>
+    </Form>
   );
 }
 
-export function AddExamPage() {
-  const router = useRouter();
-  const mutation = useCreateExam();
-  return (
-    <div className="space-y-6 max-w-3xl">
-      <PageHeader title="Tambah Ujian" />
-      <Card>
-        <CardContent className="pt-6">
-          <ExamForm
-            onSubmit={async (v) => {
-              await mutation.mutateAsync(v as any);
-              router.push("/exams");
-            }}
-            isPending={mutation.isPending}
-            submitLabel="Simpan"
-            onCancel={() => router.back()}
-          />
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+export function ExamFormModal({ isOpen, onClose, exam }: {
+  isOpen: boolean
+  onClose: () => void
+  exam?: Exam | null
+}) {
+  const isEditing = !!exam
+  const createMutation = useCreateExam()
+  const updateMutation = useUpdateExam(String(exam?.id ?? ''))
+  const isPending = createMutation.isPending || updateMutation.isPending
 
-export function EditExamPage({ id }: { id: string }) {
-  const router = useRouter();
-  const { data: exam, isLoading } = useExamDetail(id);
-  const mutation = useUpdateExam(id);
-  if (isLoading) return <Skeleton className="h-[600px] max-w-3xl rounded-lg bg-[#E2E8F0]" />;
+  const form = useForm<ExamFormValues>({
+    resolver: zodResolver(examSchema),
+    values: exam
+      ? {
+          title: exam.title,
+          description: exam.description ?? undefined,
+          examTypes: exam.examTypes,
+          classroomIds: exam.classroomIds,
+          availableDate: exam.availableDate,
+          deadlineDate: exam.deadlineDate,
+          durationMinutes: exam.durationMinutes,
+          questions: exam.questions.map((q) => ({ ...q, image: q.image })),
+        }
+      : { examTypes: [], classroomIds: [], questions: [] } as any,
+  });
+
+  async function onSubmit(v: ExamFormValues) {
+    try {
+      if (isEditing) {
+        await updateMutation.mutateAsync(v as any)
+      } else {
+        await createMutation.mutateAsync(v as any)
+      }
+      form.reset()
+      onClose()
+    } catch (error) {
+      handleApiError(error, form.setError)
+    }
+  }
+
   return (
-    <div className="space-y-6 max-w-3xl">
-      <PageHeader title="Edit Ujian" />
-      <Card>
-        <CardContent className="pt-6">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{isEditing ? 'Edit Ujian' : 'Tambah Ujian'}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
           <ExamForm
-            defaultValues={
-              exam
-                ? {
-                    title: exam.title,
-                    description: exam.description ?? undefined,
-                    examTypes: exam.examTypes,
-                    classroomIds: exam.classroomIds,
-                    availableDate: exam.availableDate,
-                    deadlineDate: exam.deadlineDate,
-                    durationMinutes: exam.durationMinutes,
-                    questions: exam.questions.map((q) => ({ ...q, image: q.image })),
-                  }
-                : undefined
-            }
-            onSubmit={async (v) => {
-              await mutation.mutateAsync(v as any);
-              router.push(`/exams/${id}`);
-            }}
-            isPending={mutation.isPending}
-            submitLabel="Simpan Perubahan"
-            onCancel={() => router.back()}
+            form={form}
+            onSubmit={onSubmit}
+            isPending={isPending}
+            submitLabel={isEditing ? 'Simpan Perubahan' : 'Simpan'}
+            onCancel={onClose}
           />
-        </CardContent>
-      </Card>
-    </div>
-  );
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }

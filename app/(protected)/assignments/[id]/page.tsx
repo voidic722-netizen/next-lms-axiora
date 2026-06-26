@@ -3,6 +3,7 @@ import { AssignmentDetailPage } from '@/features/assignment-submissions/componen
 
 export const metadata: Metadata = { title: 'Detail Tugas' }
 
-export default function Page({ params }: { params: { id: string } }) {
-  return <AssignmentDetailPage id={params.id} />
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params
+  return <AssignmentDetailPage id={resolvedParams.id} />
 }

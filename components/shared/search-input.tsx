@@ -22,7 +22,7 @@ export function SearchInput({
 }: SearchInputProps) {
   return (
     <div className={cn('relative', className)}>
-      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B] pointer-events-none" />
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8] pointer-events-none" />
       <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -33,15 +33,15 @@ export function SearchInput({
         <Button
           type="button"
           variant="ghost"
-          size="icon"
-          className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]"
+          size="icon-xs"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]"
           onClick={() => onChange('')}
         >
           <X className="h-3.5 w-3.5" />
         </Button>
       )}
       {totalResults !== undefined && value && (
-        <p className="text-xs text-[#64748B] mt-1">
+        <p className="text-xs text-[#64748B] mt-1.5">
           {totalResults} hasil ditemukan
         </p>
       )}

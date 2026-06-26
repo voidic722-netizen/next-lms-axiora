@@ -44,12 +44,14 @@ export function ExamCard({
         : { label: 'Aktif', className: 'bg-[#4B5CF0] text-white border-0' }
 
   const content = (
-    <CardContent className="py-3 px-4">
+    <CardContent className="py-3.5 px-4">
       <div className="flex items-start gap-3">
-        <GraduationCap className="h-4 w-4 text-[#4B5CF0] shrink-0 mt-0.5" />
+        <div className="inline-flex items-center justify-center size-8 rounded-lg bg-[#EEF1FF] text-[#4B5CF0] shrink-0 mt-0.5">
+          <GraduationCap className="h-4 w-4" />
+        </div>
         <div className="flex-1 min-w-0">
-          <p className="font-medium text-sm text-[#0F172A] truncate">{title}</p>
-          <div className="flex flex-wrap gap-1.5 mt-1.5">
+          <p className="font-semibold text-sm text-[#0F172A] truncate">{title}</p>
+          <div className="flex flex-wrap gap-1.5 mt-2">
             {examTypes.map((t) => (
               <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
             ))}
@@ -57,24 +59,24 @@ export function ExamCard({
               {statusBadge.label}
             </Badge>
           </div>
-          <p className="text-xs text-[#64748B] mt-1.5 flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {durationMinutes} menit · {questionCount} soal · {formatDate(deadlineDate)}
-          </p>
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-[#64748B]">
+            <Clock className="h-3 w-3 shrink-0" />
+            <span>{durationMinutes} menit · {questionCount} soal · {formatDate(deadlineDate)}</span>
+          </div>
         </div>
       </div>
     </CardContent>
   )
 
+  const cardClass = cn(
+    'group border border-[#E2E8F0] bg-white shadow-premium hover:border-[#4B5CF0]/40 hover:shadow-premium-hover hover:-translate-y-0.5 transition-all duration-200',
+    onClick && 'cursor-pointer',
+    className
+  )
+
   if (onClick) {
     return (
-      <Card
-        className={cn(
-          'cursor-pointer border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200',
-          className
-        )}
-        onClick={(e) => onClick(e)}
-      >
+      <Card className={cardClass} onClick={(e) => onClick(e)}>
         {content}
       </Card>
     )
@@ -82,12 +84,7 @@ export function ExamCard({
 
   return (
     <Link href={href ?? `/exams/${id}`}>
-      <Card
-        className={cn(
-          'border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200',
-          className
-        )}
-      >
+      <Card className={cardClass}>
         {content}
       </Card>
     </Link>

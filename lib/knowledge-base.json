@@ -2,175 +2,97 @@
   {
     "id": "what-is-axiora",
     "question": "Apa itu Axiora?",
-    "answer": "Axiora adalah sistem pembelajaran terpadu dan modern yang menyediakan manajemen akademik dan pembelajaran daring dalam satu platform. Dibangun dengan Laravel sebagai backend dan Next.js sebagai frontend, Axiora mudah digunakan, aman, dan terstruktur untuk seluruh civitas akademika.",
-    "keywords": ["pengertian", "definisi", "axiora", "sistem", "platform", "pembelajaran", "akademik", "laravel", "nextjs"]
-  },
-  {
-    "id": "tech-stack",
-    "question": "Teknologi apa yang digunakan di Axiora?",
-    "answer": "Axiora menggunakan teknologi modern: Backend dengan Laravel 11 (PHP), Frontend dengan Next.js 16 + TypeScript + Tailwind CSS + shadcn/ui, State Management dengan TanStack Query dan Zustand, Storage file dengan Cloudinary, dan Database dengan MySQL.",
-    "keywords": ["teknologi", "stack", "laravel", "nextjs", "typescript", "tailwind", "shadcn", "cloudinary", "mysql"]
+    "answer": "Axiora adalah sistem manajemen pembelajaran (LMS) terpadu dan modern yang dirancang untuk memudahkan kegiatan akademik di kampus. Dengan Axiora, dosen dan mahasiswa dapat berinteraksi, berbagi materi, mengumpulkan tugas, hingga melakukan ujian dalam satu platform yang mudah digunakan.",
+    "keywords": ["pengertian", "definisi", "axiora", "sistem", "platform", "pembelajaran", "akademik", "kampus", "lms"]
   },
   {
     "id": "main-features",
     "question": "Apa saja fitur utama Axiora?",
-    "answer": "Fitur utama Axiora meliputi: Fakultas & Jurusan, Semester & Mata Kuliah, Kelas & Jadwal, Manajemen Pengguna, Tugas & Pengumpulan (dengan upload file), dan Sistem Ujian terstruktur.",
+    "answer": "Fitur utama Axiora meliputi pengelolaan Kelas & Jadwal perkuliahan, Sistem Tugas & Ujian online, hingga penilaian otomatis. Semuanya dirancang agar proses belajar mengajar jadi lebih terstruktur dan rapi.",
     "keywords": ["fitur", "utama", "modul", "platform", "fakultas", "jurusan", "semester", "mata kuliah", "kelas", "jadwal", "pengguna", "tugas", "ujian"]
   },
   {
     "id": "file-upload",
-    "question": "Bagaimana sistem upload file di Axiora?",
-    "answer": "Axiora menggunakan Cloudinary untuk penyimpanan file. Mahasiswa dapat mengunggah file tugas dengan batas ukuran yang ditentukan oleh dosen, dan sistem menampilkan progress upload secara real-time.",
-    "keywords": ["upload", "file", "cloudinary", "tugas", "dokumen", "progress"]
-  },
-  {
-    "id": "faculty-department",
-    "question": "Apa fungsi modul Fakultas & Jurusan?",
-    "answer": "Modul Fakultas & Jurusan berfungsi untuk menyusun struktur institusi ke dalam fakultas dan jurusan, serta menetapkan hierarki akademik dan kepemilikan administratif.",
-    "keywords": ["fakultas", "jurusan", "struktur", "institusi", "hierarki", "akademik", "admin"]
-  },
-  {
-    "id": "semester-subject",
-    "question": "Bagaimana cara mengelola semester dan mata kuliah?",
-    "answer": "Admin dapat mengkonfigurasikan semester akademik dan mengelola mata kuliah berdasarkan jurusan dan konteks semester yang sesuai.",
-    "keywords": ["semester", "mata kuliah", "konfigurasi", "kelola", "jurusan", "admin"]
+    "question": "Bagaimana cara mengumpulkan tugas atau dokumen di Axiora?",
+    "answer": "Sangat mudah! Mahasiswa cukup masuk ke halaman tugas yang diberikan dosen, klik tombol unggah, dan pilih file dari perangkat. Anda juga bisa melihat proses unggah secara langsung.",
+    "keywords": ["upload", "file", "tugas", "dokumen", "progress", "mengumpulkan"]
   },
   {
     "id": "class-schedule",
-    "question": "Bagaimana membuat kelas dan jadwal?",
-    "answer": "Admin dapat menetapkan kelas untuk mata kuliah dan membuat jadwal terstruktur yang dapat diakses oleh dosen dan mahasiswa.",
+    "question": "Bagaimana cara melihat jadwal kuliah?",
+    "answer": "Setelah login, mahasiswa dan dosen bisa langsung melihat jadwal perkuliahan mereka di halaman Dashboard atau menu Jadwal. Jadwal sudah disusun rapi berdasarkan hari dan jam mata kuliah.",
     "keywords": ["kelas", "jadwal", "terstruktur", "dosen", "mahasiswa", "admin"]
   },
   {
     "id": "user-management",
-    "question": "Bagaimana manajemen pengguna di Axiora?",
-    "answer": "Admin dapat mengelola seluruh pengguna platform dengan peran Admin, Dosen, dan Mahasiswa secara terkontrol dan terstruktur.",
-    "keywords": ["pengguna", "manajemen", "peran", "admin", "dosen", "mahasiswa"]
+    "question": "Siapa saja yang bisa menggunakan Axiora?",
+    "answer": "Axiora dirancang untuk tiga peran utama di kampus: Admin (yang mengatur jadwal dan data kampus), Dosen (yang mengelola materi dan penilaian kelas), serta Mahasiswa (yang mengikuti perkuliahan dan mengerjakan tugas).",
+    "keywords": ["pengguna", "manajemen", "peran", "admin", "dosen", "mahasiswa", "siapa"]
   },
   {
     "id": "assignment-system",
-    "question": "Bagaimana sistem tugas di Axiora?",
-    "answer": "Dosen dapat membuat dan mendistribusikan tugas per mata kuliah dengan menentukan jenis tugas, tenggat waktu, dan batas ukuran file. Mahasiswa mengumpulkan pekerjaan langsung dalam platform dengan upload file.",
+    "question": "Bagaimana sistem pemberian tugas bekerja?",
+    "answer": "Dosen dapat membuat tugas untuk setiap kelasnya lengkap dengan tenggat waktu (deadline). Mahasiswa kemudian bisa melihat daftar tugas tersebut di dashboard mereka dan mengunggah jawabannya sebelum tenggat waktu berakhir.",
     "keywords": ["tugas", "pengumpulan", "dosen", "mahasiswa", "mata kuliah", "upload", "file"]
   },
   {
     "id": "exam-system",
-    "question": "Bagaimana sistem ujian di Axiora?",
-    "answer": "Axiora menyediakan sistem ujian terstruktur dengan pengamanan sesi, durasi waktu, pertanyaan terstruktur, dan pelacakan pengumpulan serta manajemen hasil.",
-    "keywords": ["ujian", "sesi", "pengamanan", "pelacakan", "hasil", "dosen", "mahasiswa", "durasi"]
+    "question": "Apakah Axiora mendukung ujian online?",
+    "answer": "Tentu saja! Axiora memiliki sistem ujian online yang aman dan terstruktur. Dosen bisa mengatur waktu mulai dan batas durasi pengerjaan ujian, sehingga proses ujian tetap tertib dan transparan.",
+    "keywords": ["ujian", "sesi", "pengamanan", "pelacakan", "hasil", "dosen", "mahasiswa", "durasi", "online"]
   },
   {
     "id": "role-admin",
-    "question": "Apa saja tugas Admin di Axiora?",
-    "answer": "Admin bertanggung jawab mengelola seluruh infrastruktur akademik dan basis pengguna platform, termasuk konfigurasi fakultas dan jurusan, membuat dan mengelola semester, mendaftarkan dan mengelola semua pengguna, menyiapkan mata kuliah dan kelas, serta membuat dan menetapkan jadwal.",
+    "question": "Apa peran Admin di platform ini?",
+    "answer": "Admin adalah pengelola utama sistem. Tugasnya adalah mengatur data penting kampus seperti daftar Fakultas, Jurusan, mendaftarkan akun Dosen dan Mahasiswa, serta membuat jadwal kuliah setiap semester.",
     "keywords": ["admin", "tugas", "peran", "infrastruktur", "fakultas", "jurusan", "semester", "pengguna", "mata kuliah", "kelas", "jadwal"]
   },
   {
     "id": "role-lecturer",
-    "question": "Apa saja tugas Dosen di Axiora?",
-    "answer": "Dosen beroperasi dalam mata kuliah yang ditugaskan untuk mengelola konten dan penilaian akademik, termasuk melihat mata kuliah dan jadwal yang ditugaskan, membuat dan mengelola tugas dengan modul file, mengkonfigurasikan dan menyelenggarakan sesi ujian dengan durasi waktu, serta meninjau dan memantau pengumpulan mahasiswa.",
-    "keywords": ["dosen", "tugas", "peran", "mata kuliah", "jadwal", "tugas", "ujian", "pengumpulan", "mahasiswa"]
+    "question": "Apa yang bisa dilakukan oleh Dosen?",
+    "answer": "Dosen bisa mengelola kelas yang diajarnya. Mulai dari memberikan tugas, mengadakan sesi ujian online, hingga memantau dan menilai tugas-tugas yang sudah dikumpulkan oleh mahasiswa.",
+    "keywords": ["dosen", "tugas", "peran", "mata kuliah", "jadwal", "tugas", "ujian", "pengumpulan", "mahasiswa", "mengajar"]
   },
   {
     "id": "role-student",
-    "question": "Apa saja yang bisa dilakukan Mahasiswa di Axiora?",
-    "answer": "Mahasiswa dapat mengakses konten akademik dan berpartisipasi dalam penilaian di mata kuliah yang diikuti, termasuk melihat mata kuliah dan jadwal yang diikuti, mengumpulkan tugas dengan upload file sebelum tenggat waktu, mengikuti sesi ujian yang terstruktur, serta mengakses status pengumpulan dan hasil.",
+    "question": "Apa kemudahan Axiora bagi Mahasiswa?",
+    "answer": "Mahasiswa tidak perlu lagi bingung mencari informasi kuliah. Di Axiora, mahasiswa bisa melihat jadwal kelas, mengecek tugas yang harus dikerjakan, mengikuti ujian online, dan memantau status pengumpulan tugasnya di satu tempat.",
     "keywords": ["mahasiswa", "tugas", "peran", "mata kuliah", "jadwal", "tugas", "ujian", "pengumpulan", "hasil", "upload"]
   },
   {
-    "id": "workflow-step-1",
-    "question": "Langkah pertama menggunakan Axiora?",
-    "answer": "Langkah pertama adalah konfigurasi struktur akademik, dimana Admin menyiapkan fakultas dan jurusan, lalu membuat semester untuk mendefinisikan kalender akademik.",
-    "keywords": ["langkah", "pertama", "konfigurasi", "struktur", "akademik", "fakultas", "jurusan", "semester", "admin"]
-  },
-  {
-    "id": "workflow-step-2",
-    "question": "Bagaimana langkah selanjutnya setelah struktur akademik siap?",
-    "answer": "Setelah struktur akademik siap, langkah selanjutnya adalah mendaftarkan mata kuliah dan kelas, dimana mata kuliah ditambahkan berdasarkan jurusan dan semester yang sesuai, lalu kelas dibuat dan dihubungkan ke sesi perkuliahan.",
-    "keywords": ["langkah", "mata kuliah", "kelas", "daftar", "jurusan", "semester"]
-  },
-  {
-    "id": "faq-who-prepares-structure",
-    "question": "Siapa yang bertanggung jawab menyiapkan struktur akademik?",
-    "answer": "Admin mengonfigurasi seluruh infrastruktur akademik — termasuk fakultas, jurusan, semester, mata kuliah, kelas, dan jadwal. Dosen dan mahasiswa beroperasi dalam struktur yang telah ditetapkan Admin.",
-    "keywords": ["struktur", "akademik", "siapa", "admin", "infrastruktur"]
-  },
-  {
-    "id": "faq-subject-organization",
-    "question": "Bagaimana mata kuliah diorganisasi dalam platform?",
-    "answer": "Mata kuliah didaftarkan di bawah jurusan dan semester tertentu, memastikan cakupan yang tepat dalam kalender akademik dan dapat diakses oleh pengguna yang sesuai.",
-    "keywords": ["mata kuliah", "organisasi", "jurusan", "semester"]
-  },
-  {
-    "id": "faq-lecturer-multiple-subjects",
-    "question": "Apakah dosen dapat mengelola tugas di beberapa mata kuliah?",
-    "answer": "Ya. Dosen dapat membuat dan mengelola tugas secara mandiri untuk setiap mata kuliah yang ditugaskan. Setiap tugas memiliki cakupan khusus dalam mata kuliahnya masing-masing.",
-    "keywords": ["dosen", "beberapa", "mata kuliah", "tugas", "kelola"]
-  },
-  {
-    "id": "faq-exam-session",
-    "question": "Bagaimana sesi ujian diselenggarakan?",
-    "answer": "Dosen mengonfigurasi ujian dengan waktu mulai, berakhir, dan durasi yang ditentukan per mata kuliah. Mahasiswa mengakses dan mengumpulkan ujian dalam jendela sesi tersebut. Kontrol integritas sesi aktif sepanjang proses berlangsung.",
-    "keywords": ["ujian", "sesi", "dosen", "mahasiswa", "waktu", "mulai", "berakhir", "integritas", "durasi"]
-  },
-  {
     "id": "faq-exam-security",
-    "question": "Apa yang dimaksud dengan pengamanan sesi ujian?",
-    "answer": "Platform memiliki kontrol integritas bawaan yang memantau aktivitas mahasiswa selama sesi ujian aktif berlangsung, guna menjaga konsistensi dan keadilan penilaian.",
-    "keywords": ["pengamanan", "ujian", "sesi", "integritas", "keadilan", "penilaian"]
+    "question": "Apakah hasil ujian di Axiora aman?",
+    "answer": "Ya, Axiora dilengkapi sistem yang memantau durasi dan sesi ujian secara ketat. Dosen bisa langsung memantau siapa saja yang sudah mengumpulkan jawaban, sehingga penilaian dijamin adil dan aman.",
+    "keywords": ["pengamanan", "ujian", "sesi", "integritas", "keadilan", "penilaian", "aman"]
   },
   {
     "id": "faq-submission-history",
-    "question": "Apakah mahasiswa dapat melihat riwayat pengumpulan mereka?",
-    "answer": "Catatan pengumpulan tersimpan dalam platform. Mahasiswa dan dosen dapat mengakses data pengumpulan melalui modul tugas atau ujian yang bersangkutan.",
-    "keywords": ["riwayat", "pengumpulan", "mahasiswa", "dosen", "tugas", "ujian"]
-  },
-  {
-    "id": "faq-schedule-access",
-    "question": "Bagaimana jadwal perkuliahan tersedia untuk pengguna?",
-    "answer": "Admin membangun jadwal dengan mengaitkan mata kuliah, kelas, dan dosen ke dalam sesi terstruktur. Dosen dan mahasiswa dapat melihat jadwal berdasarkan mata kuliah yang ditugaskan atau diikuti.",
-    "keywords": ["jadwal", "perkuliahan", "akses", "pengguna", "dosen", "mahasiswa", "admin"]
-  },
-  {
-    "id": "how-axiora-works",
-    "question": "Bagaimana Axiora berjalan?",
-    "answer": "Axiora berjalan dengan dua bagian utama: Backend (Laravel API) yang mengelola database dan logika bisnis, dan Frontend (Next.js) yang menampilkan antarmuka kepada pengguna. Pengguna dapat mengakses Axiora melalui browser web.",
-    "keywords": ["berjalan", "cara kerja", "backend", "frontend", "laravel", "nextjs", "browser"]
-  },
-  {
-    "id": "who-can-use-axiora",
-    "question": "Siapa saja yang bisa menggunakan Axiora?",
-    "answer": "Axiora dapat digunakan oleh Admin, Dosen, dan Mahasiswa. Setiap peran memiliki akses dan fungsi yang berbeda sesuai dengan kebutuhan.",
-    "keywords": ["pengguna", "siapa", "admin", "dosen", "mahasiswa", "peran"]
+    "question": "Apakah saya bisa melihat daftar tugas yang sudah selesai?",
+    "answer": "Bisa. Axiora menyimpan riwayat tugas dan ujian. Anda selalu bisa mengecek kembali tugas mana saja yang sudah dikumpulkan dan ujian yang sudah diselesaikan.",
+    "keywords": ["riwayat", "pengumpulan", "mahasiswa", "dosen", "tugas", "ujian", "selesai"]
   },
   {
     "id": "how-to-login",
-    "question": "Bagaimana cara login ke Axiora?",
-    "answer": "Anda dapat login ke Axiora dengan menggunakan akun yang telah didaftarkan oleh Admin. Masukkan username/email dan password pada halaman login.",
-    "keywords": ["login", "masuk", "akun", "username", "password", "halaman login"]
+    "question": "Bagaimana cara masuk (login) ke sistem?",
+    "answer": "Anda bisa login menggunakan email atau NIK/NIM yang sudah didaftarkan oleh pihak kampus (Admin). Jika lupa kata sandi, silakan hubungi admin kampus Anda.",
+    "keywords": ["login", "masuk", "akun", "username", "password", "halaman login", "email", "nim"]
   },
   {
     "id": "what-is-classroom",
-    "question": "Apa itu Kelas di Axiora?",
-    "answer": "Kelas di Axiora adalah grup mahasiswa yang terdaftar dalam suatu mata kuliah dan semester tertentu. Dosen dapat memberikan tugas dan ujian kepada kelas tersebut.",
+    "question": "Apa yang dimaksud dengan Kelas di Axiora?",
+    "answer": "Kelas di Axiora adalah wadah virtual yang mengelompokkan mahasiswa untuk satu mata kuliah tertentu. Di dalam kelas ini, dosen akan memberikan materi, tugas, dan ujian khusus untuk kelompok tersebut.",
     "keywords": ["kelas", "grup", "mahasiswa", "mata kuliah", "semester"]
   },
   {
-    "id": "how-to-submit-assignment",
-    "question": "Bagaimana cara mengumpulkan tugas di Axiora?",
-    "answer": "Mahasiswa dapat mengumpulkan tugas dengan masuk ke halaman detail tugas, lalu mengunggah file sesuai batas ukuran yang ditentukan sebelum tenggat waktu.",
-    "keywords": ["mengumpulkan", "tugas", "submit", "file", "tenggat waktu"]
-  },
-  {
     "id": "deadline-assignment",
-    "question": "Apa yang terjadi jika terlambat mengumpulkan tugas?",
-    "answer": "Kebijakan keterlambatan pengumpulan tugas ditentukan oleh masing-masing dosen. Silakan hubungi dosen yang bersangkutan untuk informasi lebih lanjut.",
-    "keywords": ["terlambat", "deadline", "tugas", "keterlambatan"]
+    "question": "Apa yang terjadi jika saya terlambat mengumpulkan tugas?",
+    "answer": "Sistem Axiora akan mencatat secara akurat kapan Anda mengumpulkan tugas. Jika melewati batas waktu (deadline), status tugas akan ditandai terlambat. Kebijakan nilai sepenuhnya ada di tangan dosen pengampu.",
+    "keywords": ["terlambat", "deadline", "tugas", "keterlambatan", "batas waktu"]
   },
   {
     "id": "contact-admin",
-    "question": "Bagaimana cara menghubungi admin?",
-    "answer": "Untuk pertanyaan lebih lanjut atau bantuan, Anda dapat menghubungi tim admin Axiora melalui kontak yang tersedia di institusi Anda.",
-    "keywords": ["hubungi", "admin", "bantuan", "kontak"]
+    "question": "Bagaimana jika saya mengalami kendala atau error?",
+    "answer": "Jangan ragu untuk menghubungi Admin sistem di kampus Anda. Tim admin memiliki akses untuk membantu memecahkan kendala akun atau masalah teknis yang Anda alami.",
+    "keywords": ["hubungi", "admin", "bantuan", "kontak", "error", "masalah", "kendala"]
   }
 ]

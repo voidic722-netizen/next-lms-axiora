@@ -3,6 +3,7 @@ import { FacultyDetailPage } from '@/features/faculties/components/faculty-detai
 
 export const metadata: Metadata = { title: 'Detail Fakultas' }
 
-export default function Page({ params }: { params: { id: string } }) {
+export default async function Page(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   return <FacultyDetailPage id={params.id} />
 }

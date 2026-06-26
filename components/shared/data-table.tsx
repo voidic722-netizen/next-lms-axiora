@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronLeft, ChevronRight, Search, FolderOpen } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export interface DataTableColumn<T> {
   key: string
@@ -69,17 +70,17 @@ export function DataTable<T extends Record<string, unknown>>({
     <div className="space-y-4">
       {searchable && (
         <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#64748B] pointer-events-none" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94A3B8] pointer-events-none" />
           <Input
             placeholder={searchPlaceholder}
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            className="pl-9 border-[#E2E8F0] bg-white focus:ring-2 focus:ring-[#4B5CF0]/20 focus:border-[#4B5CF0] transition-all duration-200 rounded-lg"
+            className="pl-9"
           />
         </div>
       )}
 
-      <div className="rounded-xl border border-[#E2E8F0] shadow-sm overflow-hidden bg-white">
+      <div className="rounded-xl border border-[#E2E8F0] shadow-premium overflow-hidden bg-white">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-[#E2E8F0] bg-[#F8FAFC] hover:bg-[#F8FAFC]">
@@ -87,7 +88,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 <TableHead
                   key={col.key}
                   className={cn(
-                    'text-xs font-semibold text-[#64748B] uppercase tracking-wider py-3.5',
+                    'text-[11px] font-bold text-[#64748B] uppercase tracking-wider py-3',
                     col.className,
                   )}
                 >
@@ -101,11 +102,16 @@ export function DataTable<T extends Record<string, unknown>>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-32 text-center"
+                  className="h-40 text-center"
                 >
-                  <div className="flex flex-col items-center justify-center gap-2 text-[#64748B]">
-                    <FolderOpen className="h-8 w-8" strokeWidth={1.5} />
-                    <span className="text-sm">{emptyMessage}</span>
+                  <div className="flex flex-col items-center justify-center gap-3 text-[#64748B]">
+                    <div className="inline-flex items-center justify-center size-12 rounded-xl bg-[#F1F5F9]">
+                      <FolderOpen className="h-6 w-6 text-[#94A3B8]" strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{emptyMessage}</p>
+                      <p className="text-xs text-[#94A3B8] mt-0.5">Data akan muncul di sini</p>
+                    </div>
                   </div>
                 </TableCell>
               </TableRow>
@@ -114,14 +120,14 @@ export function DataTable<T extends Record<string, unknown>>({
                 <TableRow
                   key={rowIndex}
                   className={cn(
-                    'border-b border-[#E2E8F0] transition-all duration-200 hover:bg-[#F8FAFC]',
-                    rowIndex % 2 === 1 ? 'bg-[#F8FAFC]/50' : 'bg-white',
+                    'border-b border-[#E2E8F0]/50 transition-colors duration-150 hover:bg-[#F8FAFC]',
+                    rowIndex % 2 === 1 ? 'bg-[#FAFBFD]' : 'bg-white',
                   )}
                 >
                   {columns.map((col) => (
                     <TableCell
                       key={col.key}
-                      className={cn('py-3.5 text-[#0F172A]', col.className)}
+                      className={cn('py-3 text-[#0F172A]', col.className)}
                     >
                       {col.render(row)}
                     </TableCell>
@@ -135,23 +141,26 @@ export function DataTable<T extends Record<string, unknown>>({
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm text-[#64748B]">
-          <span>
+          <span className="text-xs">
             {filtered.length} data · Halaman {safePage} dari {totalPages}
           </span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <Button
               variant="outline"
-              size="icon"
-              className="h-8 w-8 border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-200"
+              size="icon-sm"
+              className="border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={safePage <= 1}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
+            <span className="inline-flex items-center justify-center h-8 min-w-[2rem] px-2 rounded-lg bg-[#F1F5F9] text-xs font-semibold text-[#0F172A]">
+              {safePage}
+            </span>
             <Button
               variant="outline"
-              size="icon"
-              className="h-8 w-8 border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-200"
+              size="icon-sm"
+              className="border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={safePage >= totalPages}
             >
@@ -162,8 +171,4 @@ export function DataTable<T extends Record<string, unknown>>({
       )}
     </div>
   )
-}
-
-function cn(...classes: (string | undefined | false)[]) {
-  return classes.filter(Boolean).join(' ')
 }

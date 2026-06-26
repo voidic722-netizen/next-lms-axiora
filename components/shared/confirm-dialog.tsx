@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { AlertTriangle, Loader2 } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,6 +10,7 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
+  AlertDialogMedia,
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
@@ -47,30 +48,34 @@ export function ConfirmDialog({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent className="bg-white border border-[#E2E8F0] rounded-xl shadow-xl p-6">
+      <AlertDialogContent size="sm" className="bg-white border border-[#E2E8F0] rounded-xl shadow-[0_16px_48px_-12px_rgba(0,0,0,0.12)] p-6">
         <AlertDialogHeader>
+          <AlertDialogMedia
+            className={variant === 'destructive'
+              ? 'bg-[#FEF2F2] text-[#EF4444]'
+              : 'bg-[#EEF1FF] text-[#4B5CF0]'
+            }
+          >
+            <AlertTriangle className="h-7 w-7" />
+          </AlertDialogMedia>
           <AlertDialogTitle className="text-lg font-semibold text-[#0F172A]">
             {title}
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-sm text-[#64748B]">
+          <AlertDialogDescription className="text-sm text-[#64748B] leading-relaxed">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="gap-2">
+        <AlertDialogFooter className="gap-2 pt-2">
           <AlertDialogCancel
             disabled={loading}
-            className="border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC] transition-colors duration-200"
+            className="border border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC]"
           >
             {cancelLabel}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={loading}
-            className={
-              variant === 'destructive'
-                ? 'bg-[#EF4444] text-white hover:bg-[#DC2626] transition-colors duration-200'
-                : 'bg-[#4B5CF0] text-white hover:bg-[#3D4DE0] transition-colors duration-200'
-            }
+            variant={variant}
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {confirmLabel}

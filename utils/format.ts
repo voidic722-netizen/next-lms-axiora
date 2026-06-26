@@ -17,7 +17,6 @@ export function formatFileSize(bytes: number): string {
  * values <= 1000 are treated as megabytes; larger values as bytes.
  * This helper centralises that heuristic in one place.
  *
- * TODO: Confirm canonical unit with the backend team and remove this
  * helper once the API is standardised.
  */
 export function resolveMaxFileSizeBytes(maxFileSize: number): number {

@@ -23,6 +23,7 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -51,7 +52,7 @@ export function LoginForm() {
         </CardHeader>
         <CardContent>
           <form
-            onSubmit={handleSubmit((values) => login(values, redirectTo))}
+            onSubmit={handleSubmit((values) => login(values, setError, redirectTo))}
             className="space-y-4"
             noValidate
           >

@@ -11,14 +11,14 @@ export function PageHeader({ title, description, action, className }: PageHeader
   return (
     <div
       className={cn(
-        'flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between pb-6',
+        'flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-[#E2E8F0]/60 mb-6',
         className,
       )}
     >
       <div>
-        <h1 className="text-2xl font-semibold text-[#0F172A]">{title}</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-[#0F172A] text-balance">{title}</h1>
         {description && (
-          <p className="text-sm text-[#64748B] mt-0.5">{description}</p>
+          <p className="text-sm text-[#64748B] mt-1 leading-relaxed">{description}</p>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}

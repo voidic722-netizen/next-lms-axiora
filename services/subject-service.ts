@@ -43,9 +43,7 @@ export async function createSubjectService(payload: CreateSubjectPayload): Promi
   form.append('description', payload.description)
   if (payload.departmentId != null) form.append('department_id', String(payload.departmentId))
   if (payload.thumbnail) form.append('thumbnail', payload.thumbnail)
-  const { data } = await api.post<RawSubject>('/subjects', form, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawSubject>('/subjects', form)
   return mapSubject(data)
 }
 

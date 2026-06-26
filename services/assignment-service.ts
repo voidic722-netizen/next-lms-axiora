@@ -65,6 +65,7 @@ export async function getAssignmentByIdService(id: number | string): Promise<Ass
 
 function buildAssignmentFormData(payload: CreateAssignmentPayload | UpdateAssignmentPayload): FormData {
   const form = new FormData()
+  payload.modules?.forEach((file) => form.append('modules[]', file))
   form.append('title', payload.title)
   form.append('description', payload.description)
   form.append('task_types', JSON.stringify(payload.types))
@@ -72,14 +73,11 @@ function buildAssignmentFormData(payload: CreateAssignmentPayload | UpdateAssign
   form.append('due_date', payload.dueDate)
   form.append('max_file_size', String(payload.maxFileSize))
   form.append('subject_id', String(payload.subjectId))
-  payload.modules?.forEach((file) => form.append('modules[]', file))
   return form
 }
 
 export async function createAssignmentService(payload: CreateAssignmentPayload): Promise<Assignment> {
-  const { data } = await api.post<RawAssignment>('/assignments', buildAssignmentFormData(payload), {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  const { data } = await api.post<RawAssignment>('/assignments', buildAssignmentFormData(payload))
   return mapAssignment(data)
 }
 
