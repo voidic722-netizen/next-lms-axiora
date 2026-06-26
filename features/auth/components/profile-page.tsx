@@ -105,7 +105,7 @@ export function EditProfilePage() {
 
   const { register, handleSubmit, formState: { errors } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { name: user?.name ?? '', email: user?.email ?? '' },
+    values: { name: user?.name ?? '', email: user?.email ?? '' },
   })
 
   return (

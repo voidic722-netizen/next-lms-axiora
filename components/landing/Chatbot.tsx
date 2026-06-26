@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
-import { X, Send, User } from "lucide-react";
+import { X, User } from "lucide-react";
 import knowledgeBase from "@/lib/knowledge-base.json";
 
 interface KnowledgeItem {
@@ -154,6 +154,7 @@ export function Chatbot() {
       }, 400);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isOpen, messages.length]);
 
   useEffect(() => {
@@ -343,6 +344,35 @@ export function Chatbot() {
               </div>
             </div>
           )}
+
+          <div style={{ padding: "12px", borderTop: "1px solid #e2e8f0", backgroundColor: "white", display: "flex", gap: "8px", flexShrink: 0 }}>
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ketik pesan..."
+              style={{ flex: 1, padding: "8px 12px", border: "1px solid #e2e8f0", borderRadius: "20px", fontSize: "13px", outline: "none", color: "#1e293b" }}
+            />
+            <button
+              onClick={() => handleSendMessage(input)}
+              disabled={!input.trim()}
+              style={{
+                height: "36px", width: "36px", borderRadius: "50%",
+                backgroundColor: input.trim() ? "#7c3aed" : "#e2e8f0",
+                color: "white", border: "none", display: "flex",
+                alignItems: "center", justifyContent: "center",
+                cursor: input.trim() ? "pointer" : "not-allowed",
+                flexShrink: 0,
+              }}
+              aria-label="Kirim pesan"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
 
         </div>
       )}
