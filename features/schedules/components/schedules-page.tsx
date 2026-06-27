@@ -114,7 +114,7 @@ function ScheduleCard({
       <CardContent className="py-4 px-5 flex items-center justify-between gap-4">
         <div className="flex items-center gap-5">
           <div className="w-14 h-14 rounded-xl bg-indigo-50 border border-indigo-100/50 flex flex-col items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:border-indigo-600 transition-colors duration-300">
-            <p className="text-[10px] uppercase font-bold text-indigo-600 group-hover:text-indigo-100 tracking-wider mb-0.5">{formatDay(s.date).split(',')[0].substring(0, 3)}</p>
+            <p className="text-[10px] uppercase font-bold text-indigo-600 group-hover:text-indigo-100 tracking-wider mb-0.5">{(formatDay(s.date).split(',')[0] || '').substring(0, 3)}</p>
             <p className="text-lg font-bold text-slate-800 group-hover:text-white leading-none">{new Date(s.date).getDate()}</p>
           </div>
           <div>

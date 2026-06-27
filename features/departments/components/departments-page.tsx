@@ -241,7 +241,7 @@ import {
 } from '@/components/ui/form'
 import { handleApiError } from '@/lib/error-handler'
 
-function DepartmentForm({ form, onSubmit, isPending, submitLabel, onCancel }: {
+function DepartmentForm({ form, onSubmit, isPending, submitLabel, onCancel, initialPreview }: {
   form: any
   onSubmit: (v: DepartmentFormValues) => Promise<void>
   isPending: boolean

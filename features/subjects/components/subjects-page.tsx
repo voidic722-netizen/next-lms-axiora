@@ -219,6 +219,7 @@ function SubjectForm({
   isPending,
   submitLabel,
   onCancel,
+  initialPreview,
 }: {
   form: any
   onSubmit: (v: SubjectFormValues) => Promise<void>
