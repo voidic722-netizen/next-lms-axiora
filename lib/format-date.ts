@@ -84,3 +84,30 @@ export function isFuture(dateStr: string): boolean {
     return false
   }
 }
+
+/**
+ * Converts a UTC ISO string (from backend) to a local datetime-local string (YYYY-MM-DDThh:mm)
+ */
+export function toLocalDatetimeString(isoString?: string | null): string {
+  if (!isoString) return ''
+  try {
+    const d = new Date(isoString)
+    if (isNaN(d.getTime())) return ''
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+    return d.toISOString().slice(0, 16)
+  } catch {
+    return ''
+  }
+}
+
+/**
+ * Converts a local datetime-local string (YYYY-MM-DDThh:mm) to a UTC ISO string for backend
+ */
+export function toUtcIsoString(localString?: string | null): string {
+  if (!localString) return ''
+  try {
+    return new Date(localString).toISOString()
+  } catch {
+    return localString
+  }
+}

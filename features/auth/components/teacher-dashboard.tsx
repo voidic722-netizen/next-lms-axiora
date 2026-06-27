@@ -189,7 +189,7 @@ export function TeacherDashboard() {
 
         <div className="p-4 sm:p-6 bg-white min-h-[400px]">
           {activeTab === 'kelas' && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {myClassrooms.length === 0 ? (
                 <EmptyState icon={<School className="h-10 w-10" />} text="Belum ada kelas yang diampu" />
               ) : (
@@ -229,7 +229,7 @@ export function TeacherDashboard() {
           )}
 
           {activeTab === 'tugas' && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {myAssignments.length === 0 ? (
                 <EmptyState icon={<BookOpen className="h-10 w-10" />} text="Belum ada tugas yang dibuat" />
               ) : (
@@ -262,7 +262,7 @@ export function TeacherDashboard() {
           )}
 
           {activeTab === 'ujian' && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {myExams.length === 0 ? (
                 <EmptyState icon={<GraduationCap className="h-10 w-10" />} text="Belum ada ujian yang dibuat" />
               ) : (

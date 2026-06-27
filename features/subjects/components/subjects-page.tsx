@@ -47,9 +47,9 @@ export function SubjectsPage() {
 
   if (isLoading)
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Skeleton key={i} className="h-48 rounded-lg bg-[#E2E8F0]" />
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} className="h-56 rounded-2xl bg-slate-100" />
         ))}
       </div>
     )
@@ -73,7 +73,7 @@ export function SubjectsPage() {
           <p className="text-[#64748B]">Belum ada mata pelajaran</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {subjects.map((s) => (
             <SubjectCard 
               key={s.id} 
@@ -110,7 +110,7 @@ function SubjectCard({
 }) {
   const thumb = withStorageUrl(s.thumbnail)
   return (
-    <Card className="overflow-hidden group border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
+    <Card className="p-0 gap-0 overflow-hidden group border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
       <Link href={`/subjects/${s.id}`}>
         <div className="aspect-video bg-[#F8FAFC]">
           {thumb ? (
@@ -169,21 +169,36 @@ export function SubjectDetailPage({ id }: { id: string }) {
   if (!subject) return <p className="text-[#64748B]">Mata pelajaran tidak ditemukan.</p>
   const thumb = withStorageUrl(subject.thumbnail)
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl mx-auto">
       <PageHeader title={subject.name} />
-      <Card>
-        <CardContent className="pt-4 space-y-4">
-          {thumb && (
-            <img src={thumb} alt={subject.name} className="w-full max-h-64 object-cover rounded-lg" />
-          )}
-          <div className="flex items-center gap-2">
-            <Badge variant={subject.type === 'compulsory' ? 'default' : 'secondary'}>
-              {subject.type === 'compulsory' ? 'Wajib' : 'Umum'}
-            </Badge>
-          </div>
-          <p className="text-sm text-[#0F172A]">{subject.description}</p>
-        </CardContent>
-      </Card>
+      <div className="grid gap-6 md:grid-cols-3 items-start">
+        <div className="md:col-span-1">
+          <Card className="p-0 gap-0 overflow-hidden border-[#E2E8F0]">
+            <div className="w-full aspect-video md:aspect-square bg-slate-50 flex items-center justify-center border-b border-[#E2E8F0]">
+              {thumb ? (
+                <img src={thumb} alt={subject.name} className="w-full h-full object-cover" />
+              ) : (
+                <BookText className="h-12 w-12 text-slate-300" />
+              )}
+            </div>
+            <CardContent className="p-4 flex flex-col gap-4">
+              <Badge variant={subject.type === 'compulsory' ? 'default' : 'secondary'} className="w-full justify-center text-sm py-1">
+                {subject.type === 'compulsory' ? 'Mata Pelajaran Wajib' : 'Mata Pelajaran Umum'}
+              </Badge>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="md:col-span-2">
+          <Card className="h-full">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-slate-800 mb-3 border-b border-slate-100 pb-2">Tentang Mata Pelajaran</h3>
+              <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed text-sm sm:text-base">
+                <p className="whitespace-pre-wrap">{subject.description || 'Belum ada deskripsi untuk mata pelajaran ini.'}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }
@@ -210,10 +225,11 @@ function SubjectForm({
   isPending: boolean
   submitLabel: string
   onCancel: () => void
+  initialPreview?: string | null
 }) {
   const { data: departments = [] } = useDepartments()
   const fileRef = useRef<HTMLInputElement>(null)
-  const [preview, setPreview] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string | null>(initialPreview || null)
 
   function clearThumbnail() {
     form.setValue('thumbnail', undefined)
@@ -408,6 +424,7 @@ export function SubjectFormModal({ isOpen, onClose, subject }: {
             isPending={isPending}
             submitLabel={isEditing ? 'Simpan Perubahan' : 'Simpan'}
             onCancel={onClose}
+            initialPreview={subject?.thumbnail ? withStorageUrl(subject.thumbnail) : null}
           />
         </div>
       </DialogContent>

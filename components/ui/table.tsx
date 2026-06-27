@@ -8,7 +8,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      className="relative w-full overflow-x-auto rounded-xl border border-slate-200/60 bg-white/50 backdrop-blur-sm shadow-[0_4px_20px_rgb(0,0,0,0.03)]"
     >
       <table
         data-slot="table"
@@ -23,7 +23,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b border-[#E2E8F0] bg-[#F8FAFC]", className)}
+      className={cn("[&_tr]:border-b border-slate-200/60 bg-slate-50/80 backdrop-blur-md", className)}
       {...props}
     />
   )
@@ -57,7 +57,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "group border-b border-[#E2E8F0]/60 transition-colors duration-150 hover:bg-[#F8FAFC] has-aria-expanded:bg-[#F8FAFC] data-[state=selected]:bg-[#EEF1FF]",
+        "group border-b border-slate-100/80 transition-all duration-200 hover:bg-slate-50/60 hover:shadow-[0_2px_10px_rgb(0,0,0,0.02)] relative z-0 hover:z-10 has-aria-expanded:bg-slate-50/60 data-[state=selected]:bg-indigo-50/50",
         className
       )}
       {...props}
@@ -70,7 +70,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-11 px-4 text-left align-middle text-[11px] uppercase tracking-wider font-bold text-[#64748B] whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "h-12 px-5 text-left align-middle text-[12px] uppercase tracking-wider font-semibold text-slate-500 whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
       {...props}
@@ -83,7 +83,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-4 py-3 align-middle text-[#0F172A] text-sm whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "px-5 py-4 align-middle text-slate-700 text-sm whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
         className
       )}
       {...props}

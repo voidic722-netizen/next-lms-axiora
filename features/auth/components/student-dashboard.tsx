@@ -199,7 +199,7 @@ export function StudentDashboard() {
 
         <div className="p-4 sm:p-6 bg-white min-h-[400px]">
           {activeTab === 'tugas' && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {sortedAssignments.length === 0 ? (
                 <EmptyState icon={<BookOpen className="h-10 w-10" />} text="Tidak ada tugas saat ini" />
               ) : (
@@ -209,10 +209,7 @@ export function StudentDashboard() {
                   return (
                     <Link key={a.id} href={`/assignments/${a.id}`} className="group block h-full">
                       <div className="flex flex-col h-full bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm hover:border-[#4B5CF0] hover:shadow-premium transition-all duration-300 relative overflow-hidden">
-                        <div className={cn(
-                          "absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300",
-                          submitted ? "bg-[#22C55E]" : overdue ? "bg-[#EF4444]" : "bg-[#4B5CF0]"
-                        )} />
+
                         
                         <div className="flex-1">
                           <div className="flex justify-between items-start gap-3 mb-3">
@@ -250,7 +247,7 @@ export function StudentDashboard() {
           )}
 
           {activeTab === 'ujian' && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {sortedExams.length === 0 ? (
                 <EmptyState icon={<GraduationCap className="h-10 w-10" />} text="Tidak ada ujian saat ini" />
               ) : (
@@ -260,10 +257,7 @@ export function StudentDashboard() {
                   return (
                     <Link key={e.id} href={`/exams/${e.id}`} className="group block h-full">
                       <div className="flex flex-col h-full bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm hover:border-[#4B5CF0] hover:shadow-premium transition-all duration-300 relative overflow-hidden">
-                        <div className={cn(
-                          "absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300",
-                          submitted ? "bg-[#22C55E]" : overdue ? "bg-[#EF4444]" : "bg-[#4B5CF0]"
-                        )} />
+
                         
                         <div className="flex-1">
                           <div className="flex justify-between items-start gap-3 mb-3">
@@ -301,7 +295,7 @@ export function StudentDashboard() {
           )}
 
           {activeTab === 'jadwal' && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {schedules.length === 0 ? (
                 <EmptyState icon={<CalendarDays className="h-10 w-10" />} text="Tidak ada jadwal saat ini" />
               ) : (

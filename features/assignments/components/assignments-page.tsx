@@ -20,7 +20,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { formatDate, isPast } from '@/lib/format-date'
+import { formatDate, isPast, toLocalDatetimeString, toUtcIsoString } from '@/lib/format-date'
 import { ASSIGNMENT_TYPE_LABELS, ASSIGNMENT_TYPE_OPTIONS } from '../constants/assignment-type-labels'
 import { assignmentSchema, type AssignmentFormValues } from '../schemas/assignment-schema'
 import {
@@ -120,42 +120,44 @@ function AssignmentCard({
 }) {
   const overdue = isPast(a.dueDate)
   return (
-    <Card className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
-      <CardContent className="pt-4">
-        <div className="flex items-start justify-between gap-3">
+    <Card className="group relative overflow-hidden bg-white border-slate-200/60 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(75,92,240,0.08)] hover:-translate-y-[2px] transition-all duration-300 rounded-2xl">
+
+      <CardContent className="py-5 px-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <Link
               href={`/assignments/${a.id}`}
-              className="font-semibold text-[#0F172A] hover:underline truncate block"
+              className="font-semibold text-lg text-slate-800 hover:text-indigo-600 hover:underline truncate block transition-colors"
             >
               {a.title}
             </Link>
-            <p className="text-sm text-[#64748B] line-clamp-1 mt-0.5">{a.description}</p>
-            <div className="flex flex-wrap gap-1.5 mt-2">
+            <p className="text-sm text-slate-500 line-clamp-2 mt-1 mb-3 leading-relaxed">{a.description}</p>
+            <div className="flex flex-wrap gap-2 items-center">
               {a.types.map((t) => (
-                <Badge key={t} variant="secondary" className="text-xs">
+                <Badge key={t} variant="outline" className="text-[10px] uppercase font-bold tracking-wider text-slate-600 bg-slate-50 border-slate-200">
                   {ASSIGNMENT_TYPE_LABELS[t] ?? t}
                 </Badge>
               ))}
+              <span className="w-1 h-1 rounded-full bg-slate-300 mx-1" />
               <Badge
                 variant={overdue ? 'destructive' : 'secondary'}
-                className="text-xs"
+                className="text-xs font-medium"
               >
                 {formatDate(a.dueDate)}
               </Badge>
             </div>
           </div>
           {isTeacherOrAdmin && (
-            <div className="flex gap-1 shrink-0">
-              <Button variant="ghost" size="sm" onClick={onEdit}>
+            <div className="flex sm:flex-col gap-2 shrink-0 sm:pt-0 pt-2 w-full sm:w-auto border-t sm:border-0 border-slate-100 mt-2 sm:mt-0">
+              <Button variant="outline" size="sm" onClick={onEdit} className="flex-1 sm:flex-none">
                 Edit
               </Button>
               <ConfirmDialog
                 trigger={
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200"
+                    className="flex-1 sm:flex-none text-red-500 hover:text-red-600 hover:bg-red-50 border-red-100 hover:border-red-200 transition-colors"
                   >
                     Hapus
                   </Button>
@@ -431,19 +433,32 @@ export function AssignmentFormModal({ isOpen, onClose, assignment }: {
           description: assignment.description,
           types: assignment.types,
           classroomIds: assignment.classroomIds,
-          dueDate: assignment.dueDate?.slice(0, 16) ?? '',
+          dueDate: toLocalDatetimeString(assignment.dueDate),
           maxFileSize: assignment.maxFileSize,
           subjectId: assignment.subjectId,
         }
-      : { types: [], classroomIds: [] } as any,
+      : { 
+          title: '', 
+          description: '', 
+          types: [], 
+          classroomIds: [], 
+          dueDate: '', 
+          maxFileSize: 10,
+          subjectId: 0
+        } as any,
   })
 
   async function onSubmit(v: AssignmentFormValues) {
     try {
+      const payload = {
+        ...v,
+        dueDate: toUtcIsoString(v.dueDate),
+      }
+      
       if (isEditing) {
-        await updateMutation.mutateAsync(v)
+        await updateMutation.mutateAsync(payload)
       } else {
-        await createMutation.mutateAsync(v)
+        await createMutation.mutateAsync(payload)
       }
       form.reset()
       onClose()

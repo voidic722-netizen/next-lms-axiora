@@ -33,38 +33,14 @@ import type { StudentSubmissionRecord } from '@/types/assignment-submission'
 export function AssignmentDetailPage({ id }: { id: string }) {
   const { isTeacherOrAdmin } = useAuth()
   const { data: assignment, isLoading } = useAssignmentDetail(id)
+  const router = useRouter()
+  const deleteMutation = useDeleteAssignment()
 
   if (isLoading) return <AssignmentDetailSkeleton />
   if (!assignment) return <p className="text-[#64748B]">Tugas tidak ditemukan.</p>
 
   return (
-    <div className="space-y-6">
-      <AssignmentDetailHeader id={id} assignment={assignment} isTeacherOrAdmin={isTeacherOrAdmin} />
-
-      {isTeacherOrAdmin ? (
-        <TeacherSubmissionsPanel assignmentId={id} />
-      ) : (
-        <StudentSubmissionPanel assignmentId={id} maxFileSizeRaw={assignment.maxFileSize} />
-      )}
-    </div>
-  )
-}
-
-function AssignmentDetailHeader({
-  id,
-  assignment,
-  isTeacherOrAdmin,
-}: {
-  id: string
-  assignment: NonNullable<ReturnType<typeof useAssignmentDetail>['data']>
-  isTeacherOrAdmin: boolean
-}) {
-  const router = useRouter()
-  const deleteMutation = useDeleteAssignment()
-  const overdue = isPast(assignment.dueDate)
-
-  return (
-    <div className="space-y-4">
+    <div className="space-y-6 max-w-5xl mx-auto">
       <PageHeader
         title={assignment.title}
         action={
@@ -94,51 +70,93 @@ function AssignmentDetailHeader({
         }
       />
 
-      <Card>
-        <CardContent className="pt-4 space-y-3">
-          <p className="text-sm text-[#0F172A]">{assignment.description}</p>
-          <div className="flex flex-wrap gap-2">
-            {assignment.types.map((t) => (
-              <Badge key={t} variant="secondary">{ASSIGNMENT_TYPE_LABELS[t] ?? t}</Badge>
-            ))}
+      {isTeacherOrAdmin ? (
+        <div className="space-y-6">
+          <AssignmentDetailContent assignment={assignment} />
+          <TeacherSubmissionsPanel assignmentId={id} />
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-3 items-start">
+          <div className="md:col-span-2 space-y-6">
+            <AssignmentDetailContent assignment={assignment} />
           </div>
-          <div className="grid gap-2 sm:grid-cols-2 text-sm">
-            <div>
-              <span className="text-[#64748B]">Tenggat: </span>
-              <span className={overdue ? 'text-[#EF4444] font-medium' : 'text-[#0F172A]'}>
-                {formatDate(assignment.dueDate)}
-              </span>
-            </div>
-            <div>
-              <span className="text-[#64748B]">Maks ukuran file: </span>
-              <span className="text-[#0F172A]">{formatMaxFileSize(assignment.maxFileSize)}</span>
-            </div>
+          <div className="md:col-span-1 space-y-6">
+            <StudentSubmissionPanel assignmentId={id} maxFileSizeRaw={assignment.maxFileSize} />
           </div>
-          {assignment.modules.length > 0 && (
-            <div className="space-y-2 border-t border-[#E2E8F0] pt-3">
-              <p className="text-sm font-medium text-[#0F172A]">Modul</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AssignmentDetailContent({
+  assignment,
+}: {
+  assignment: NonNullable<ReturnType<typeof useAssignmentDetail>['data']>
+}) {
+  const overdue = isPast(assignment.dueDate)
+
+  return (
+
+    <Card className="border border-slate-200/60 bg-white/80 backdrop-blur-sm shadow-sm rounded-2xl overflow-hidden">
+      <div className={`h-1.5 w-full ${overdue ? 'bg-gradient-to-r from-red-400 to-red-500' : 'bg-gradient-to-r from-indigo-400 to-indigo-500'}`} />
+      <CardContent className="p-6 space-y-6">
+        <div>
+          <h3 className="text-sm font-semibold text-slate-800 uppercase tracking-wider mb-2">Deskripsi</h3>
+          <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed text-sm">
+            <p className="whitespace-pre-wrap">{assignment.description || 'Tidak ada deskripsi.'}</p>
+          </div>
+        </div>
+        
+        <div className="grid gap-4 sm:grid-cols-2 bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <div>
+            <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Tenggat Waktu</p>
+            <p className={`font-semibold ${overdue ? 'text-red-500' : 'text-slate-800'}`}>
+              {formatDate(assignment.dueDate)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider mb-1">Batas File</p>
+            <p className="font-semibold text-slate-800">{formatMaxFileSize(assignment.maxFileSize)}</p>
+          </div>
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
+          {assignment.types.map((t) => (
+            <Badge key={t} variant="outline" className="text-xs font-semibold uppercase tracking-wider bg-slate-50 border-slate-200 text-slate-600">
+              {ASSIGNMENT_TYPE_LABELS[t] ?? t}
+            </Badge>
+          ))}
+        </div>
+
+        {assignment.modules.length > 0 && (
+          <div className="space-y-3 pt-4 border-t border-slate-100">
+            <h3 className="text-sm font-semibold text-slate-800 uppercase tracking-wider">Modul Lampiran</h3>
+            <div className="grid gap-2">
               {assignment.modules.map((m) => (
-                <div key={m.id} className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <FileText className="h-4 w-4 text-[#64748B] shrink-0" />
-                    <span className="truncate text-[#0F172A]">{m.name}</span>
-                    <span className="text-[#64748B]">({m.fileSize})</span>
+                <div key={m.id} className="flex items-center justify-between gap-3 p-3 rounded-xl border border-slate-200/60 bg-white hover:border-indigo-200 transition-colors">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+                      <FileText className="h-4 w-4 text-indigo-500" />
+                    </div>
+                    <div className="truncate">
+                      <p className="text-sm font-medium text-slate-800 truncate">{m.name}</p>
+                      <p className="text-xs text-slate-500">{m.fileSize}</p>
+                    </div>
                   </div>
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 shrink-0"
+                    variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 shrink-0"
                     onClick={() => downloadFile(m.filePath, m.name).catch(() => toast.error('Gagal mengunduh'))}
                   >
-                    <Download className="h-3.5 w-3.5" />
+                    <Download className="h-4 w-4" />
                   </Button>
                 </div>
               ))}
             </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }
 
@@ -161,32 +179,40 @@ function StudentSubmissionPanel({
 
   if (submission) {
     return (
-      <Card>
-        <CardHeader><CardTitle className="text-base">Pengumpulan Saya</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Badge className={submission.status === 'late' ? 'bg-[#EF4444] text-white border-0' : 'bg-[#22C55E] text-white border-0'}>
+      <Card className="border-slate-200/60 shadow-sm rounded-2xl">
+        <CardHeader className="pb-3 border-b border-slate-100">
+          <CardTitle className="text-sm font-semibold uppercase tracking-wider text-slate-800">Status Pengumpulan</CardTitle>
+        </CardHeader>
+        <CardContent className="pt-4 space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className={submission.status === 'late' ? 'bg-red-500 text-white border-0' : 'bg-green-500 text-white border-0'}>
               {submission.status === 'late' ? 'Terlambat' : 'Tepat Waktu'}
             </Badge>
             {submission.grade != null && (
-              <Badge variant="secondary">Nilai: {submission.grade}</Badge>
+              <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 font-semibold">
+                Nilai: {submission.grade}
+              </Badge>
             )}
           </div>
-          {submission.files.map((f, i) => (
-            <div key={i} className="flex items-center gap-2 text-sm">
-              <FileText className="h-4 w-4 text-[#64748B]" />
-              <span className="truncate text-[#0F172A]">{f.fileName}</span>
-              <Button
-                variant="ghost" size="icon" className="h-6 w-6 shrink-0 ml-auto"
-                onClick={() => downloadFile(f.filePath, f.fileName).catch(() => toast.error('Gagal mengunduh'))}
-              >
-                <Download className="h-3 w-3" />
-              </Button>
-            </div>
-          ))}
+          <div className="space-y-2">
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">File yang dikumpulkan</p>
+            {submission.files.map((f, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm p-2 rounded-lg border border-slate-100 bg-slate-50">
+                <FileText className="h-4 w-4 text-indigo-500 shrink-0" />
+                <span className="truncate text-slate-700 flex-1 font-medium">{f.fileName}</span>
+                <Button
+                  variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-indigo-600 shrink-0"
+                  onClick={() => downloadFile(f.filePath, f.fileName).catch(() => toast.error('Gagal mengunduh'))}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
           {submission.feedback && (
-            <div className="border-t border-[#E2E8F0] pt-3">
-              <p className="text-sm text-[#64748B]">Feedback: {submission.feedback}</p>
+            <div className="border-t border-slate-100 pt-3">
+              <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Feedback dari Pengajar</p>
+              <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100">{submission.feedback}</p>
             </div>
           )}
         </CardContent>
@@ -195,32 +221,34 @@ function StudentSubmissionPanel({
   }
 
   return (
-    <Card>
-      <CardHeader><CardTitle className="text-base">Kumpulkan Tugas</CardTitle></CardHeader>
-      <CardContent className="space-y-4">
+    <Card className="border-slate-200/60 shadow-sm rounded-2xl">
+      <CardHeader className="pb-3 border-b border-slate-100"><CardTitle className="text-sm font-semibold uppercase tracking-wider text-slate-800">Kumpulkan Tugas</CardTitle></CardHeader>
+      <CardContent className="pt-5 space-y-4">
         <div
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-            dragActive ? 'border-[#4B5CF0] bg-[#EEF1FF]' : 'border-[#E2E8F0] hover:border-[#4B5CF0]/50'
+          className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
+            dragActive ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
           }`}
         >
-          <Upload className="h-8 w-8 mx-auto text-[#64748B] mb-2" />
-          <p className="text-sm text-[#64748B]">
-            Klik atau seret file ke sini · Maks {formatMaxFileSize(maxFileSizeRaw)}
+          <Upload className={`h-10 w-10 mx-auto mb-3 transition-colors ${dragActive ? 'text-indigo-500' : 'text-slate-400'}`} />
+          <p className="text-sm font-medium text-slate-700 mb-1">
+            Klik atau seret file ke sini
           </p>
+          <p className="text-xs text-slate-500">Maks {formatMaxFileSize(maxFileSizeRaw)}</p>
         </div>
         <input ref={fileInputRef} type="file" multiple className="hidden" onChange={handleInputChange} />
-        {sizeError && <p className="text-xs text-[#EF4444]">{sizeError}</p>}
+        {sizeError && <p className="text-xs text-red-500 bg-red-50 p-2 rounded-lg border border-red-100">{sizeError}</p>}
         {stagedFiles.length > 0 && (
           <div className="space-y-2">
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Akan dikumpulkan</p>
             {stagedFiles.map((sf) => (
-              <div key={sf.id} className="flex items-center gap-2 text-sm">
-                <FileText className="h-4 w-4 text-[#64748B] shrink-0" />
-                <span className="truncate flex-1 text-[#0F172A]">{sf.file.name}</span>
-                <button onClick={() => removeFile(sf.id)} className="text-[#64748B] hover:text-[#EF4444] text-xs">Hapus</button>
+              <div key={sf.id} className="flex items-center gap-2 text-sm p-2 rounded-lg border border-indigo-100 bg-indigo-50/50">
+                <FileText className="h-4 w-4 text-indigo-500 shrink-0" />
+                <span className="truncate flex-1 font-medium text-indigo-900">{sf.file.name}</span>
+                <button onClick={() => removeFile(sf.id)} className="text-slate-400 hover:text-red-500 text-xs px-2 transition-colors">Hapus</button>
               </div>
             ))}
           </div>
@@ -228,10 +256,11 @@ function StudentSubmissionPanel({
         <Button
           onClick={handleSubmit}
           disabled={stagedFiles.length === 0 || submitMutation.isPending}
-          className="w-full"
+          className="w-full mt-2"
+          size="lg"
         >
-          {submitMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Kumpulkan
+          {submitMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+          Kumpulkan Sekarang
         </Button>
       </CardContent>
     </Card>

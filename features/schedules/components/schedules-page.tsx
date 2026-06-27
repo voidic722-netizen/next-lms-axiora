@@ -109,16 +109,20 @@ function ScheduleCard({
   onDelete: () => Promise<void>
 }) {
   return (
-    <Card className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
-      <CardContent className="py-3 px-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-14 text-center">
-            <p className="text-xs text-[#64748B] leading-none">{formatDay(s.date).split(',')[0]}</p>
-            <p className="text-lg font-bold text-[#0F172A] leading-tight">{new Date(s.date).getDate()}</p>
+    <Card className="group relative overflow-hidden bg-white border-slate-200/60 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(75,92,240,0.08)] hover:-translate-y-[2px] hover:border-indigo-500/30 transition-all duration-300 rounded-2xl">
+
+      <CardContent className="py-4 px-5 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-xl bg-indigo-50 border border-indigo-100/50 flex flex-col items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:border-indigo-600 transition-colors duration-300">
+            <p className="text-[10px] uppercase font-bold text-indigo-600 group-hover:text-indigo-100 tracking-wider mb-0.5">{formatDay(s.date).split(',')[0].substring(0, 3)}</p>
+            <p className="text-lg font-bold text-slate-800 group-hover:text-white leading-none">{new Date(s.date).getDate()}</p>
           </div>
           <div>
-            <p className="font-medium text-sm text-[#0F172A]">{s.topic}</p>
-            <p className="text-xs text-[#64748B]">{s.classroom?.name ?? `Kelas #${s.classroomId}`}</p>
+            <p className="font-semibold text-base text-slate-800 group-hover:text-indigo-700 transition-colors">{s.topic}</p>
+            <p className="text-sm text-slate-500 flex items-center gap-1.5 mt-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+              {s.classroom?.name ?? `Kelas #${s.classroomId}`}
+            </p>
           </div>
         </div>
         {isTeacherOrAdmin && (
@@ -261,7 +265,7 @@ export function ScheduleFormModal({ isOpen, onClose, schedule }: {
     resolver: zodResolver(scheduleSchema),
     values: schedule
       ? { classroomId: schedule.classroomId, date: schedule.date?.split('T')[0] ?? '', topic: schedule.topic }
-      : undefined,
+      : { classroomId: 0, date: '', topic: '' } as any,
   })
 
   async function onSubmit(v: ScheduleFormValues) {

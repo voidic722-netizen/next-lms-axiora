@@ -188,49 +188,49 @@ export function ClassroomDetailPage({ id }: { id: string }) {
           <TabsTrigger value="exams">Ujian ({exams.length})</TabsTrigger>
           <TabsTrigger value="schedules">Jadwal ({schedules.length})</TabsTrigger>
         </TabsList>
-        <TabsContent value="students" className="mt-4">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <TabsContent value="students" className="mt-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {students.map((s) => (
-              <Card key={s.id} className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
-                <CardContent className="pt-4 flex items-center gap-3">
-                  <Avatar>
-                    <AvatarFallback>{s.name.charAt(0)}</AvatarFallback>
+              <Card key={s.id} className="group border-slate-200/60 bg-white shadow-sm hover:shadow-md hover:border-indigo-200 hover:-translate-y-1 transition-all duration-300 rounded-xl overflow-hidden">
+                <CardContent className="p-4 flex items-center gap-4">
+                  <Avatar className="h-10 w-10 ring-2 ring-indigo-50 group-hover:ring-indigo-100 transition-all">
+                    <AvatarFallback className="bg-indigo-50 text-indigo-700 font-semibold">{s.name.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <div>
-                    <p className="font-medium text-sm text-[#0F172A]">{s.name}</p>
-                    <p className="text-xs text-[#64748B]">{s.nim ?? s.email}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm text-slate-800 truncate group-hover:text-indigo-700 transition-colors">{s.name}</p>
+                    <p className="text-xs text-slate-500 truncate mt-0.5">{s.nim ?? s.email}</p>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
         </TabsContent>
-        <TabsContent value="assignments" className="mt-4 space-y-2">
+        <TabsContent value="assignments" className="mt-6 space-y-3">
           {assignments.map((a) => (
-            <Card key={a.id} className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
-              <CardContent className="py-3 px-4 flex items-center justify-between">
-                <Link href={`/assignments/${a.id}`} className="font-medium text-sm text-[#0F172A] hover:underline">{a.title}</Link>
-                <span className="text-xs text-[#64748B]">{formatDate(a.dueDate)}</span>
+            <Card key={a.id} className="group border-slate-200/60 bg-white shadow-sm hover:shadow-md hover:border-indigo-200 hover:-translate-y-0.5 transition-all duration-300 rounded-xl">
+              <CardContent className="py-4 px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <Link href={`/assignments/${a.id}`} className="font-semibold text-slate-700 hover:text-indigo-600 transition-colors block truncate">{a.title}</Link>
+                <Badge variant="outline" className="text-[10px] uppercase tracking-wider text-slate-500 bg-slate-50 border-slate-200 shrink-0 w-fit">{formatDate(a.dueDate)}</Badge>
               </CardContent>
             </Card>
           ))}
         </TabsContent>
-        <TabsContent value="exams" className="mt-4 space-y-2">
+        <TabsContent value="exams" className="mt-6 space-y-3">
           {exams.map((e) => (
-            <Card key={e.id} className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
-              <CardContent className="py-3 px-4 flex items-center justify-between">
-                <Link href={`/exams/${e.id}`} className="font-medium text-sm text-[#0F172A] hover:underline">{e.title}</Link>
-                <span className="text-xs text-[#64748B]">{formatDate(e.deadlineDate)}</span>
+            <Card key={e.id} className="group border-slate-200/60 bg-white shadow-sm hover:shadow-md hover:border-indigo-200 hover:-translate-y-0.5 transition-all duration-300 rounded-xl">
+              <CardContent className="py-4 px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <Link href={`/exams/${e.id}`} className="font-semibold text-slate-700 hover:text-indigo-600 transition-colors block truncate">{e.title}</Link>
+                <Badge variant="outline" className="text-[10px] uppercase tracking-wider text-slate-500 bg-slate-50 border-slate-200 shrink-0 w-fit">{formatDate(e.deadlineDate)}</Badge>
               </CardContent>
             </Card>
           ))}
         </TabsContent>
-        <TabsContent value="schedules" className="mt-4 space-y-2">
+        <TabsContent value="schedules" className="mt-6 space-y-3">
           {schedules.map((s) => (
-            <Card key={s.id} className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
-              <CardContent className="py-3 px-4 flex items-center justify-between">
-                <p className="text-sm text-[#0F172A]">{s.topic}</p>
-                <span className="text-xs text-[#64748B]">{formatDate(s.date)}</span>
+            <Card key={s.id} className="group border-slate-200/60 bg-white shadow-sm hover:shadow-md hover:border-indigo-200 hover:-translate-y-0.5 transition-all duration-300 rounded-xl">
+              <CardContent className="py-4 px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <p className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors">{s.topic}</p>
+                <Badge variant="outline" className="text-[10px] uppercase tracking-wider text-slate-500 bg-slate-50 border-slate-200 shrink-0 w-fit">{formatDate(s.date)}</Badge>
               </CardContent>
             </Card>
           ))}
@@ -384,10 +384,11 @@ export function ClassroomFormModal({ isOpen, onClose, classroom }: {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <Card className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
-      <CardContent className="pt-4">
-        <p className="text-xs text-[#64748B]">{label}</p>
-        <p className="font-semibold text-[#0F172A] mt-0.5">{value}</p>
+    <Card className="group relative overflow-hidden bg-white border-slate-200/60 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(75,92,240,0.08)] hover:-translate-y-[2px] transition-all duration-300 rounded-2xl">
+
+      <CardContent className="p-5">
+        <p className="text-xs text-slate-500 uppercase font-bold tracking-wider">{label}</p>
+        <p className="font-bold text-2xl text-slate-800 mt-1">{value}</p>
       </CardContent>
     </Card>
   )

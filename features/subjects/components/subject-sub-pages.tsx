@@ -27,7 +27,7 @@ export function SubjectClassesPage({ id }: { id: string }) {
       {filtered.length === 0
         ? <EmptyState icon={<School className="h-12 w-12" />} text="Belum ada kelas untuk mata pelajaran ini" />
         : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((c) => (
               <Link key={c.id} href={`/classrooms/${c.id}`}>
                 <Card className="border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200 h-full">

@@ -25,8 +25,8 @@ export function FacultyDetailPage({ id }: { id: string }) {
   const thumb = withStorageUrl(faculty.thumbnail)
 
   return (
-    <div className="space-y-6">
-      <PageHeader title={faculty.name} description={faculty.description}
+    <div className="space-y-6 max-w-5xl mx-auto">
+      <PageHeader title={faculty.name}
         action={isAdmin ? (
           <div className="flex gap-2">
             <Button asChild variant="outline" size="sm">
@@ -40,9 +40,38 @@ export function FacultyDetailPage({ id }: { id: string }) {
           </div>
         ) : undefined}
       />
-      {thumb && <img src={thumb} alt={faculty.name} className="w-full max-h-64 object-cover rounded-lg border border-[#E2E8F0]" />}
-      {faculty.deanUser && <p className="text-sm"><span className="text-[#64748B]">Dekan: </span><span className="font-medium text-[#0F172A]">{faculty.deanUser.name}</span></p>}
-      <Tabs defaultValue="departments">
+      <div className="grid gap-6 md:grid-cols-3 items-start">
+        <div className="md:col-span-1">
+          <Card className="p-0 gap-0 overflow-hidden border-[#E2E8F0]">
+            <div className="w-full aspect-video md:aspect-square bg-slate-50 flex items-center justify-center border-b border-[#E2E8F0]">
+              {thumb ? (
+                <img src={thumb} alt={faculty.name} className="w-full h-full object-cover" />
+              ) : (
+                <Building2 className="h-12 w-12 text-slate-300" />
+              )}
+            </div>
+            <CardContent className="p-4 flex flex-col gap-4">
+              {faculty.deanUser && (
+                <div className="text-sm bg-slate-50 p-3 rounded-lg border border-slate-100 mt-2">
+                   <p className="text-slate-500 mb-1 text-xs uppercase tracking-wider font-semibold">Dekan</p>
+                   <p className="font-medium text-slate-800">{faculty.deanUser.name}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        <div className="md:col-span-2">
+          <Card className="h-full">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-slate-800 mb-3 border-b border-slate-100 pb-2">Tentang Fakultas</h3>
+              <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed text-sm sm:text-base">
+                <p className="whitespace-pre-wrap">{faculty.description || 'Belum ada deskripsi untuk fakultas ini.'}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+      <Tabs defaultValue="departments" className="mt-4">
         <TabsList>
           <TabsTrigger value="departments">Jurusan ({faculty.departments.length})</TabsTrigger>
           <TabsTrigger value="teachers">Pengajar ({faculty.teachers.length})</TabsTrigger>

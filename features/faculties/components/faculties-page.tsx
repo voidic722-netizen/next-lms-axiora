@@ -55,7 +55,7 @@ export function FacultiesPage() {
           <p className="text-[#64748B]">Belum ada fakultas</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {faculties.map((faculty) => (
             <FacultyCard
               key={faculty.id}
@@ -93,7 +93,7 @@ function FacultyCard({
   const thumb = withStorageUrl(faculty.thumbnail)
 
   return (
-    <Card className="overflow-hidden group border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
+    <Card className="p-0 gap-0 overflow-hidden group border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
       <Link href={`/faculties/${faculty.id}`}>
         <div className="aspect-video bg-[#F8FAFC] overflow-hidden">
           {thumb ? (
@@ -146,7 +146,7 @@ function FacultiesPageSkeleton() {
   return (
     <div className="space-y-6">
       <Skeleton className="h-8 w-48 bg-[#E2E8F0]" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-56 rounded-lg bg-[#E2E8F0]" />
         ))}

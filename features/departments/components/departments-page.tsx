@@ -65,7 +65,7 @@ export function DepartmentsPage() {
       {departments.length === 0 ? (
         <EmptyState icon={<Building2 className="h-12 w-12 text-[#64748B]/40" />} text="Belum ada jurusan" />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {departments.map((d) => (
             <DepartmentCard key={d.id} department={d} isAdmin={isAdmin}
               onEdit={() => openEditModal(d)}
@@ -90,7 +90,7 @@ function DepartmentCard({ department: d, isAdmin, onEdit, onDelete }: {
 }) {
   const thumb = withStorageUrl(d.thumbnail)
   return (
-    <Card className="overflow-hidden group border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
+    <Card className="p-0 gap-0 overflow-hidden group border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200">
       <Link href={`/departments/${d.id}`}>
         <div className="aspect-video bg-[#F8FAFC]">
           {thumb
@@ -124,10 +124,48 @@ export function DepartmentDetailPage({ id }: { id: string }) {
   const { data: dept, isLoading } = useDepartmentDetail(id)
   if (isLoading) return <Skeleton className="h-96 rounded-lg bg-[#E2E8F0]" />
   if (!dept) return <p className="text-[#64748B]">Jurusan tidak ditemukan.</p>
+  const thumb = withStorageUrl(dept.thumbnail)
   return (
-    <div className="space-y-6">
-      <PageHeader title={dept.name} description={dept.description} />
-      <Tabs defaultValue="teachers">
+    <div className="space-y-6 max-w-5xl mx-auto">
+      <PageHeader title={dept.name} />
+      <div className="grid gap-6 md:grid-cols-3 items-start">
+        <div className="md:col-span-1">
+          <Card className="p-0 gap-0 overflow-hidden border-[#E2E8F0]">
+            <div className="w-full aspect-video md:aspect-square bg-slate-50 flex items-center justify-center border-b border-[#E2E8F0]">
+              {thumb ? (
+                <img
+                  src={thumb}
+                  alt={dept.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Building2 className="h-12 w-12 text-slate-300" />
+              )}
+            </div>
+            <CardContent className="p-4 flex flex-col gap-4">
+              {/* @ts-ignore */}
+              {dept.faculty && (
+                <div className="text-sm bg-slate-50 p-3 rounded-lg border border-slate-100 mt-2">
+                   <p className="text-slate-500 mb-1 text-xs uppercase tracking-wider font-semibold">Fakultas</p>
+                   {/* @ts-ignore */}
+                   <p className="font-medium text-slate-800">{dept.faculty.name}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        <div className="md:col-span-2">
+          <Card className="h-full">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-slate-800 mb-3 border-b border-slate-100 pb-2">Tentang Jurusan</h3>
+              <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed text-sm sm:text-base">
+                <p className="whitespace-pre-wrap">{dept.description || 'Belum ada deskripsi untuk jurusan ini.'}</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+      <Tabs defaultValue="teachers" className="mt-4">
         <TabsList>
           <TabsTrigger value="teachers">Pengajar ({dept.teachers.length})</TabsTrigger>
           <TabsTrigger value="students">Mahasiswa ({dept.students.length})</TabsTrigger>
@@ -135,7 +173,7 @@ export function DepartmentDetailPage({ id }: { id: string }) {
           <TabsTrigger value="classrooms">Kelas ({dept.classrooms.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="teachers" className="mt-4">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {dept.teachers.map((t) => (
               <Card key={t.id} className="border border-[#E2E8F0] bg-white shadow-sm">
                 <CardContent className="pt-4 flex items-center gap-3">
@@ -150,7 +188,7 @@ export function DepartmentDetailPage({ id }: { id: string }) {
           </div>
         </TabsContent>
         <TabsContent value="students" className="mt-4">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {dept.students.map((s) => (
               <Card key={s.id} className="border border-[#E2E8F0] bg-white shadow-sm">
                 <CardContent className="pt-4 flex items-center gap-3">
@@ -209,10 +247,11 @@ function DepartmentForm({ form, onSubmit, isPending, submitLabel, onCancel }: {
   isPending: boolean
   submitLabel: string
   onCancel: () => void
+  initialPreview?: string | null
 }) {
   const { data: faculties = [] } = useFaculties()
   const fileRef = useRef<HTMLInputElement>(null)
-  const [preview, setPreview] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string | null>(initialPreview || null)
 
   function clearThumbnail() {
     form.setValue('thumbnail', undefined)
@@ -358,6 +397,7 @@ export function DepartmentFormModal({ isOpen, onClose, department }: {
             form={form}
             onSubmit={onSubmit}
             isPending={isPending} submitLabel={isEditing ? 'Simpan Perubahan' : 'Simpan'} onCancel={onClose}
+            initialPreview={department?.thumbnail ? withStorageUrl(department.thumbnail) : null}
           />
         </div>
       </DialogContent>
@@ -369,5 +409,5 @@ function EmptyState({ icon, text }: { icon: React.ReactNode; text: string }) {
   return <div className="flex flex-col items-center justify-center py-16 text-center gap-3">{icon}<p className="text-[#64748B]">{text}</p></div>
 }
 function GridSkeleton() {
-  return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-56 rounded-lg bg-[#E2E8F0]" />)}</div>
+  return <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-56 rounded-lg bg-[#E2E8F0]" />)}</div>
 }

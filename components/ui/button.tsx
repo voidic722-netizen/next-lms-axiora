@@ -9,15 +9,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[#4B5CF0] text-white shadow-sm hover:bg-[#3D4DE0] active:bg-[#3545D0]",
+        default: "bg-gradient-to-b from-[#5C6DF2] to-[#4B5CF0] text-white shadow-[0_2px_10px_rgb(75,92,240,0.3)] hover:shadow-[0_4px_15px_rgb(75,92,240,0.4)] hover:-translate-y-[1px] hover:from-[#6576F4] hover:to-[#5565ED] active:translate-y-[0px] active:shadow-none border border-[#4B5CF0]/20",
         destructive:
-          "bg-[#EF4444] text-white shadow-sm hover:bg-[#DC2626] focus-visible:ring-[#EF4444]/15",
+          "bg-gradient-to-b from-red-500 to-red-600 text-white shadow-[0_2px_10px_rgb(239,68,68,0.3)] hover:shadow-[0_4px_15px_rgb(239,68,68,0.4)] hover:-translate-y-[1px] focus-visible:ring-red-500/20",
         outline:
-          "border border-[#E2E8F0] bg-white shadow-sm text-[#0F172A] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]",
+          "border border-slate-200/80 bg-white/50 backdrop-blur-sm shadow-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 hover:shadow-md hover:-translate-y-[1px]",
         secondary:
-          "bg-[#F1F5F9] text-[#0F172A] hover:bg-[#E2E8F0]",
+          "bg-indigo-50/80 text-indigo-700 hover:bg-indigo-100/80 hover:-translate-y-[1px] transition-all",
         ghost:
-          "text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]",
+          "text-slate-600 hover:bg-slate-100/50 hover:text-slate-900",
         link: "text-[#4B5CF0] underline-offset-4 hover:underline",
       },
       size: {

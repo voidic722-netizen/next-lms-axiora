@@ -17,7 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DataTable } from "@/components/shared/data-table";
-import { formatDate, isFuture } from "@/lib/format-date";
+import { formatDate, isFuture, toLocalDatetimeString, toUtcIsoString } from "@/lib/format-date";
 import { examSchema, type ExamFormValues } from "../schemas/exam-schema";
 import {
   useExams,
@@ -176,33 +176,48 @@ function ExamCard({
   const expired = !isFuture(e.deadlineDate);
   return (
     <Card
-      className="cursor-pointer border border-[#E2E8F0] bg-white shadow-sm hover:border-[#4B5CF0] hover:shadow-md transition-all duration-200"
+      className="group cursor-pointer relative overflow-hidden bg-white border-slate-200/60 shadow-[0_2px_10px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(75,92,240,0.08)] hover:-translate-y-[2px] transition-all duration-300 rounded-2xl"
       onClick={(ev) => onExamClick(ev, e.id, false, e.availableDate)}
     >
-      <CardContent className="pt-4">
-        <div className="flex items-start justify-between gap-3">
+
+      <CardContent className="py-5 px-6">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-[#0F172A] truncate">{e.title}</p>
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
+            <p className="font-semibold text-lg text-slate-800 group-hover:text-indigo-600 truncate transition-colors">{e.title}</p>
+            <div className="flex flex-wrap gap-2 mt-2 items-center">
               {e.examTypes.map((t) => (
-                <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
+                <Badge key={t} variant="outline" className="text-[10px] uppercase font-bold tracking-wider text-slate-600 bg-slate-50 border-slate-200">
+                  {t}
+                </Badge>
               ))}
-              <Badge className={`text-xs border-0 ${expired ? "bg-[#EF4444] text-white" : notYet ? "bg-[#EEF1FF] text-[#4B5CF0]" : "bg-[#4B5CF0] text-white"}`}>
+              <span className="w-1 h-1 rounded-full bg-slate-300 mx-1" />
+              <Badge className={`text-[10px] uppercase font-bold tracking-wider border-0 ${expired ? "bg-red-100 text-red-600" : notYet ? "bg-slate-100 text-slate-600" : "bg-indigo-100 text-indigo-700"}`}>
                 {expired ? "Berakhir" : notYet ? "Belum Dimulai" : "Aktif"}
               </Badge>
             </div>
-            <p className="text-xs text-[#64748B] mt-1.5">
-              {formatDate(e.availableDate)} — {formatDate(e.deadlineDate)} · {e.durationMinutes} menit · {e.questions.length} soal
+            <p className="text-sm text-slate-500 mt-3 flex items-center flex-wrap gap-2">
+              <span className="font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">{e.durationMinutes} menit</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+              <span className="font-medium text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md">{e.questions.length} soal</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+              <span className="text-xs">{formatDate(e.availableDate)} — {formatDate(e.deadlineDate)}</span>
             </p>
           </div>
           {isTeacherOrAdmin && (
-            <div className="flex gap-1 shrink-0" onClick={(ev) => ev.stopPropagation()}>
-              <Button variant="ghost" size="sm" onClick={onEdit}>
+            <div
+              className="flex sm:flex-col gap-2 shrink-0 sm:pt-0 pt-2 w-full sm:w-auto border-t sm:border-0 border-slate-100 mt-2 sm:mt-0"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Button variant="outline" size="sm" onClick={onEdit} className="flex-1 sm:flex-none">
                 Edit
               </Button>
               <ConfirmDialog
                 trigger={
-                  <Button variant="ghost" size="sm" className="text-[#EF4444] hover:text-[#DC2626] hover:bg-[#EF4444]/10 transition-colors duration-200">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 sm:flex-none text-red-500 hover:text-red-600 hover:bg-red-50 border-red-100 hover:border-red-200 transition-colors"
+                  >
                     Hapus
                   </Button>
                 }
@@ -579,20 +594,35 @@ export function ExamFormModal({ isOpen, onClose, exam }: {
           description: exam.description ?? undefined,
           examTypes: exam.examTypes,
           classroomIds: exam.classroomIds,
-          availableDate: exam.availableDate,
-          deadlineDate: exam.deadlineDate,
+          availableDate: toLocalDatetimeString(exam.availableDate),
+          deadlineDate: toLocalDatetimeString(exam.deadlineDate),
           durationMinutes: exam.durationMinutes,
           questions: exam.questions.map((q) => ({ ...q, image: q.image })),
         }
-      : { examTypes: [], classroomIds: [], questions: [] } as any,
+      : { 
+          title: '', 
+          description: '', 
+          examTypes: [], 
+          classroomIds: [], 
+          availableDate: '', 
+          deadlineDate: '', 
+          durationMinutes: 0, 
+          questions: [] 
+        } as any,
   });
 
   async function onSubmit(v: ExamFormValues) {
     try {
+      const payload = {
+        ...v,
+        availableDate: toUtcIsoString(v.availableDate),
+        deadlineDate: toUtcIsoString(v.deadlineDate),
+      };
+      
       if (isEditing) {
-        await updateMutation.mutateAsync(v as any)
+        await updateMutation.mutateAsync(payload as any)
       } else {
-        await createMutation.mutateAsync(v as any)
+        await createMutation.mutateAsync(payload as any)
       }
       form.reset()
       onClose()
