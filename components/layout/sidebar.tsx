@@ -1,21 +1,11 @@
 'use client'
 
-import { useQueryClient } from '@tanstack/react-query'
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useMemo } from 'react'
-import { LogOut, User as UserIcon } from 'lucide-react'
 import Image from 'next/image'
-import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { useAuthStore } from '@/stores/auth-store'
 import { getSidebarMenusByRole } from '@/constants/sidebar-navigation'
-import { logoutService } from '@/services/auth-service'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
 import type { User } from '@/types/user'
 
 interface SidebarProps {
@@ -24,26 +14,11 @@ interface SidebarProps {
 
 export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname()
-  const router = useRouter()
-  const clearUser = useAuthStore((s) => s.clearUser)
 
   const groups = useMemo(
     () => getSidebarMenusByRole(user.role),
     [user.role],
   )
-
-  const queryClient = useQueryClient()
-
-  async function handleLogout() {
-    try {
-      await logoutService()
-      clearUser()
-      queryClient.clear()
-      router.push('/login')
-    } catch {
-      toast.error('Gagal keluar. Silakan coba lagi.')
-    }
-  }
 
   return (
     <aside className="hidden md:flex w-64 flex-col border-r border-[#E2E8F0] bg-white h-screen sticky top-0 shrink-0">
@@ -97,34 +72,6 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
         ))}
       </nav>
-
-      <Separator />
-
-      <div className="p-3 space-y-1">
-        <Link
-          href="/profile"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] transition-all duration-200"
-        >
-          <Avatar className="h-7 w-7">
-            <AvatarImage src={user.image ?? undefined} />
-            <AvatarFallback className="text-xs bg-[#EEF1FF] text-[#4B5CF0] font-semibold">
-              {user.name.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-          <span className="truncate">{user.name}</span>
-          <UserIcon className="h-3.5 w-3.5 ml-auto shrink-0 text-[#94A3B8]" />
-        </Link>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleLogout}
-          className="w-full justify-start gap-3 px-3 text-[#EF4444] hover:text-[#EF4444] hover:bg-[#EF4444]/8 transition-all duration-200"
-        >
-          <LogOut className="h-4 w-4" />
-          Keluar
-        </Button>
-      </div>
     </aside>
   )
 }
